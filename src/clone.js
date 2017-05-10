@@ -22,7 +22,7 @@ export default function clone(obj, callback) {
         });
         return res;
     } else if (isDate(obj)) {
-        return new Date(obj);
+        return new Date(obj.getTime());
     }
     return obj;
 }
