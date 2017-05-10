@@ -1,14 +1,16 @@
 /* eslint-env mocha */
 import clone from '../src/clone.js';
-import { isDate, isNumber, isString, isObject, isArray } from '../src/types.js';
+import { isDate, isNumber, isString, isObject, isArray, isUndefined } from '../src/types.js';
 
 describe('Unit: Clone', () => {
     it('should clone a date', () => {
         let original = new Date();
+        original.test = true;
         let cloned = clone(original);
         assert(isDate(cloned));
         assert(cloned.getTime() === original.getTime());
-        assert(cloned !== original);
+        assert(original.test);
+        assert(isUndefined(cloned.test));
     });
 
     it('should clone a number', () => {
