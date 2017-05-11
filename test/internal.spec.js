@@ -12,11 +12,4 @@ describe('Unit: Internal', () => {
         assert.equal(scope.message, 'hello');
         assert.equal(internal(scope).message, 'world');
     });
-
-    it('should destroy private properties', () => {
-        internal.destroy(scope);
-        assert.equal(scope.value, 6);
-        assert.equal(scope.message, 'hello');
-        assert.equal(internal(scope).message, undefined);
-    });
 });

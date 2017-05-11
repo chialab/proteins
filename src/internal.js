@@ -1,14 +1,15 @@
-const MAP = new WeakMap();
+import symbolic from './symbolic.js';
+const SYM = symbolic('private');
 
+/**
+ * Return a private namespace for an object.
+ *
+ * @param {*} object The namespace scope.
+ * @return {Object} The namespace for the given scope.
+ */
 export default function internal(object) {
-    if (!MAP.has(object)) {
-        MAP.set(object, {});
+    if (!SYM(object)) {
+        SYM(object, {});
     }
-    return MAP.get(object);
+    return SYM(object);
 }
-
-internal.destroy = function(object) {
-    if (MAP.has(object)) {
-        MAP.delete(object);
-    }
-};
