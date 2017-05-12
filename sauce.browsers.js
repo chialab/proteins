@@ -28,13 +28,13 @@ module.exports = {
     SL_Chrome_dev: {
         base: 'SauceLabs',
         browserName: 'chrome',
-        platform: 'Windows 10',
+        platform: 'macOS 10.12',
         version: 'dev',
     },
     SL_Chrome_beta: {
         base: 'SauceLabs',
         browserName: 'chrome',
-        platform: 'Windows 10',
+        platform: 'macOS 10.12',
         version: 'beta',
     },
     SL_Chrome: {
