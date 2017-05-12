@@ -27,6 +27,7 @@ rules:
   indent:
     - 1
     - 4
+    - SwitchCase: 1
   func-names: 0
   prefer-const: 0
   space-before-function-paren:

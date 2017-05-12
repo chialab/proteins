@@ -32,6 +32,7 @@ const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
 const rollup = require('rollup-stream');
 const eslint = require('gulp-eslint');
+const mocha = require('gulp-mocha');
 const sourcemaps = require('gulp-sourcemaps');
 const karma = require('karma');
 
@@ -39,6 +40,7 @@ const env = process.env;
 const karmaConfig = path.resolve('./karma.conf.js');
 const DIST_PATH = 'dist';
 const SRC_PATH = 'src';
+const TMP_PATH = '.tmp';
 const ENTRY = 'proteins.js';
 
 function clean() {
@@ -56,7 +58,7 @@ function lint() {
         .pipe(eslint.failAfterError());
 }
 
-function jsCompile() {
+function compile() {
     return rollup('rollup.config.js')
         .on('error', (err) => {
             // eslint-disable-next-line
@@ -71,54 +73,49 @@ function jsCompile() {
         .pipe(gulp.dest(DIST_PATH));
 }
 
-function jsMin() {
+function min() {
     env.NODE_ENV = 'production';
-    env.min = true;
-
-    return jsCompile();
+    return compile();
 }
 
-function jsWatch() {
-    return jsCompile(env.TMP_PATH)
+function watch() {
+    return compile(env.TMP_PATH)
         .on('end', () => {
             gulp.watch(path.join(SRC_PATH, '**/*.js'), () =>
-                jsCompile(env.TMP_PATH)
+                compile(env.TMP_PATH)
             );
         });
 }
 
-function unit(done) {
+function unitNode() {
     env.NODE_ENV = 'test';
+    env.TARGET = 'node';
+    return rollup('rollup.config.js')
+        .on('error', (err) => {
+            // eslint-disable-next-line
+            console.error(err);
+        })
+        .pipe(source('specs.js', TMP_PATH))
+        .pipe(buffer())
+        .pipe(gulp.dest(TMP_PATH))
+        .pipe(mocha());
+}
+
+function unitBrowser(done) {
+    env.NODE_ENV = 'test';
+    env.TARGET = 'browser';
     new karma.Server({
         configFile: karmaConfig,
         singleRun: true,
     }, done).start();
 }
 
-function unitServer(done) {
-    env.NODE_ENV = 'test';
-    new karma.Server({
-        configFile: karmaConfig,
-        browsers: [],
-        singleRun: false,
-    }, done).start();
-}
-
-function unitWatch(done) {
-    env.NODE_ENV = 'test';
-    new karma.Server({
-        configFile: karmaConfig,
-        browsers: ['Chrome', 'Firefox'],
-    }, done).start();
-}
-
 gulp.task('clean', clean);
-gulp.task('unit', unit);
-gulp.task('unit-server', unitServer);
-gulp.task('unit-watch', unitWatch);
 gulp.task('lint', lint);
-gulp.task('js', ['clean', 'lint'], jsMin);
-gulp.task('js-watch', jsWatch);
+gulp.task('js', ['clean', 'lint'], min);
+gulp.task('js-watch', watch);
+gulp.task('unit-node', unitNode);
+gulp.task('unit-browser', unitBrowser);
 gulp.task('dist', ['js']);
 
 gulp.task('default', ['dist']);

@@ -26,7 +26,7 @@
 
 const path = require('path');
 
-module.exports = function (config) {
+module.exports = function(config) {
     config.set({
 
         // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -63,7 +63,7 @@ module.exports = function (config) {
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
         reporters: [
-            process.env.CI ? 'dots' : 'progress',
+            process.env.CI ? 'dots' : 'mocha',
             'coverage',
         ],
 
@@ -119,9 +119,9 @@ module.exports = function (config) {
             logLevel: config.LOG_ERROR,
         });
 
-        switch (process.env.CI_BUILD_TYPE) {
+        switch (process.env.BROWSER_PROVIDER) {
             case 'saucelabs': {
-                const saucelabsBrowsers = require('./sl.browsers.js');
+                const saucelabsBrowsers = require('./sauce.browsers.js');
                 config.set({
                     retryLimit: 3,
                     browserDisconnectTimeout: 10000,
@@ -130,10 +130,13 @@ module.exports = function (config) {
                     captureTimeout: 4 * 60 * 1000,
                     reporters: ['dots', 'saucelabs', 'coverage'],
                     sauceLabs: {
-                        startConnect: false,
+                        startConnect: true,
+                        connectOptions: {
+                            'no-ssl-bump-domains': 'all',
+                            'username': process.env.SAUCE_USERNAME,
+                            'accessKey': process.env.SAUCE_ACCESS_KEY,
+                        },
                         options: {},
-                        username: process.env.SAUCE_USERNAME,
-                        accessKey: process.env.SAUCE_ACCESS_KEY,
                         build: process.env.TRAVIS ?
                             `TRAVIS # ${process.env.TRAVIS_BUILD_NUMBER} (${process.env.TRAVIS_BUILD_ID})` :
                             undefined,
