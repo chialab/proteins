@@ -13,10 +13,10 @@ env:
 
 matrix:
   include:
-    - node: 7
+    - node_js: 7
       env: "CI_BUILD_TYPE=\"test-saucelabs\""
   allow_failures:
-    - node: 7
+    - node_js: 7
       env: "CI_BUILD_TYPE=\"test-saucelabs\""
 
 script:

@@ -28,11 +28,13 @@ module.exports = {
     SL_Chrome_dev: {
         base: 'SauceLabs',
         browserName: 'chrome',
+        platform: 'Windows 10',
         version: 'dev',
     },
     SL_Chrome_beta: {
         base: 'SauceLabs',
         browserName: 'chrome',
+        platform: 'Windows 10',
         version: 'beta',
     },
     SL_Chrome: {
@@ -56,11 +58,13 @@ module.exports = {
     SL_Firefox_dev: {
         base: 'SauceLabs',
         browserName: 'firefox',
+        platform: 'Windows 10',
         version: 'dev',
     },
     SL_Firefox_beta: {
         base: 'SauceLabs',
         browserName: 'firefox',
+        platform: 'Windows 10',
         version: 'beta',
     },
     SL_Firefox: {
