@@ -3,25 +3,25 @@ import { Url, serialize, unserialize } from '../src/url.js';
 
 describe('Unit: Url', () => {
     it('should check url validity', () => {
-        assert.doesNotThrow(() => new Url('local.host'), 'local.host');
-        assert.doesNotThrow(() => new Url('local.host:80'), 'local.host:80');
-        assert.doesNotThrow(() => new Url('//local.host'), '//local.host');
-        assert.doesNotThrow(() => new Url('//local.host:80'), '//local.host:80');
-        assert.doesNotThrow(() => new Url('http://localhost'), 'http://localhost');
-        assert.doesNotThrow(() => new Url('http://localhost:80'), 'http://localhost:80');
-        assert.doesNotThrow(() => new Url('127.0.0.1'), '127.0.0.1');
-        assert.doesNotThrow(() => new Url('127.0.0.1:8080'), '127.0.0.1:8080');
-        assert.doesNotThrow(() => new Url('/posts'), '/posts');
-        assert.doesNotThrow(() => new Url('/posts?size=50'), '/posts?size=50');
-        assert.doesNotThrow(() => new Url('/posts?size=50&help'), '/posts?size=50&help');
-        assert.doesNotThrow(() => new Url('/posts?size=50/help'), '/posts?size=50/help');
-        assert.doesNotThrow(() => new Url('file:///'), 'file:///');
-        assert.throws(() => new Url('http://'), SyntaxError, 'http://');
-        assert.throws(() => new Url(':80'), SyntaxError, ':80');
-        assert.throws(() => new Url('http:///'), SyntaxError, 'http:///');
-        assert.throws(() => new Url('http://:80'), SyntaxError, 'http://:80');
-        assert.throws(() => new Url('?size=50'), SyntaxError, '?size=50');
-        assert.throws(() => new Url('?size=50/help'), SyntaxError, '?size=50/help');
+        assert.doesNotThrow(() => new Url('local.host'));
+        assert.doesNotThrow(() => new Url('local.host:80'));
+        assert.doesNotThrow(() => new Url('//local.host'));
+        assert.doesNotThrow(() => new Url('//local.host:80'));
+        assert.doesNotThrow(() => new Url('http://localhost'));
+        assert.doesNotThrow(() => new Url('http://localhost:80'));
+        assert.doesNotThrow(() => new Url('127.0.0.1'));
+        assert.doesNotThrow(() => new Url('127.0.0.1:8080'));
+        assert.doesNotThrow(() => new Url('/posts'));
+        assert.doesNotThrow(() => new Url('/posts?size=50'));
+        assert.doesNotThrow(() => new Url('/posts?size=50&help'));
+        assert.doesNotThrow(() => new Url('/posts?size=50/help'));
+        assert.doesNotThrow(() => new Url('file:///'));
+        assert.throws(() => new Url('http://'), SyntaxError);
+        assert.throws(() => new Url(':80'), SyntaxError);
+        assert.throws(() => new Url('http:///'), SyntaxError);
+        assert.throws(() => new Url('http://:80'), SyntaxError);
+        assert.throws(() => new Url('?size=50'), SyntaxError);
+        assert.throws(() => new Url('?size=50/help'), SyntaxError);
         // unhandled yet
         // assert.doesNotThrow(() => new Url('[::1]'), '[::1]');
         // assert.doesNotThrow(() => new Url('[::1]:8080'), '[::1]:8080');
