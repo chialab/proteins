@@ -107,15 +107,21 @@ function unitKarma(done) {
         });
 }
 
-function unitNativesciptIOS(done) {
+function unitNativescipt(platform, done) {
     env.NODE_ENV = 'test';
     env.TARGET = 'node';
     compileUnitTests()
         .on('end', () => {
             exec('tns create Test --path .tmp')
+                .then((result) => {
+                    console.log(result.stdout);
+                })    
                 .then(() => exec('tns test init --path .tmp/Test --framework mocha'))
+                .then((result) => {
+                    console.log(result.stdout);
+                })
                 .then(() => exec('cp .tmp/specs.js .tmp/Test/app/tests'))
-                .then(() => exec('tns test ios --emulator --justlaunch --path .tmp/Test'))
+                .then(() => exec(`tns test ${platform} --emulator --justlaunch --path .tmp/Test`))
                 .then((result) => {
                     console.log(result.stdout);
                     done();
@@ -127,24 +133,12 @@ function unitNativesciptIOS(done) {
         });
 }
 
+function unitNativesciptIOS(done) {
+    unitNativescipt('ios', done);
+}
+
 function unitNativesciptAndroid(done) {
-    env.NODE_ENV = 'test';
-    env.TARGET = 'node';
-    compileUnitTests()
-        .on('end', () => {
-            exec('tns create Test --path .tmp')
-                .then(() => exec('tns test init --path .tmp/Test --framework mocha'))
-                .then(() => exec('cp .tmp/specs.js .tmp/Test/app/tests'))
-                .then(() => exec('tns test android --emulator --justlaunch --path .tmp/Test'))
-                .then((result) => {
-                    console.log(result.stdout);
-                    done();
-                })
-                .catch((err) => {
-                    console.error(err);
-                    process.exit(1);
-                });
-        });
+    unitNativescipt('android', done);
 }
 
 gulp.task('clean', clean);
