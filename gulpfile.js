@@ -24,6 +24,9 @@
  * SOFTWARE.
  */
 
+const env = process.env;
+const project = require('./package.json');
+
 const path = require('path');
 const del = require('del');
 const mkdirp = require('mkdirp');
@@ -34,19 +37,18 @@ const rollup = require('rollup-stream');
 const eslint = require('gulp-eslint');
 const mocha = require('gulp-mocha');
 const sourcemaps = require('gulp-sourcemaps');
+const exec = require('child-process-promise').exec;
 const karma = require('karma');
 
-const env = process.env;
-const karmaConfig = path.resolve('./karma.conf.js');
 const DIST_PATH = 'dist';
 const SRC_PATH = 'src';
 const TMP_PATH = '.tmp';
-const ENTRY = 'proteins.js';
+const ENTRY = path.basename(project.main || project.module);
 
 function clean() {
-    let p = path.join(DIST_PATH);
-    return del([p]).then(() => {
-        mkdirp.sync(p);
+    let paths = [DIST_PATH, TMP_PATH];
+    return del(paths).then(() => {
+        paths.forEach((p) => mkdirp.sync(p));
         return Promise.resolve();
     });
 }
@@ -59,10 +61,12 @@ function lint() {
 }
 
 function compile() {
+    env.NODE_ENV = 'production';
     return rollup('rollup.config.js')
         .on('error', (err) => {
             // eslint-disable-next-line
             console.error(err);
+            process.exit(1);
         })
         .pipe(source(ENTRY))
         .pipe(buffer())
@@ -73,49 +77,83 @@ function compile() {
         .pipe(gulp.dest(DIST_PATH));
 }
 
-function min() {
-    env.NODE_ENV = 'production';
-    return compile();
-}
-
-function watch() {
-    return compile(env.TMP_PATH)
-        .on('end', () => {
-            gulp.watch(path.join(SRC_PATH, '**/*.js'), () =>
-                compile(env.TMP_PATH)
-            );
-        });
+function compileUnitTests() {
+    return rollup('rollup.config.js')
+        .on('error', (err) => {
+            // eslint-disable-next-line
+            console.error(err);
+            process.exit(1);
+        })
+        .pipe(source('specs.js', TMP_PATH))
+        .pipe(buffer())
+        .pipe(gulp.dest(TMP_PATH));
 }
 
 function unitNode() {
     env.NODE_ENV = 'test';
     env.TARGET = 'node';
-    return rollup('rollup.config.js')
-        .on('error', (err) => {
-            // eslint-disable-next-line
-            console.error(err);
-        })
-        .pipe(source('specs.js', TMP_PATH))
-        .pipe(buffer())
-        .pipe(gulp.dest(TMP_PATH))
-        .pipe(mocha());
+    return compileUnitTests().pipe(mocha());
 }
 
-function unitBrowser(done) {
+function unitKarma(done) {
     env.NODE_ENV = 'test';
     env.TARGET = 'browser';
-    new karma.Server({
-        configFile: karmaConfig,
-        singleRun: true,
-    }, done).start();
+    compileUnitTests()
+        .on('end', () => {
+            new karma.Server({
+                configFile: path.join(__dirname, 'karma.conf.js'),
+                singleRun: true,
+            }, done).start();
+        });
+}
+
+function unitNativesciptIOS(done) {
+    env.NODE_ENV = 'test';
+    env.TARGET = 'node';
+    compileUnitTests()
+        .on('end', () => {
+            exec('tns create Test --path .tmp')
+                .then(() => exec('tns test init --path .tmp/Test --framework mocha'))
+                .then(() => exec('cp .tmp/specs.js .tmp/Test/app/tests'))
+                .then(() => exec('tns test ios --emulator --justlaunch --path .tmp/Test'))
+                .then((result) => {
+                    console.log(result.stdout);
+                    done();
+                })
+                .catch((err) => {
+                    console.error(err);
+                    process.exit(1);
+                });
+        });
+}
+
+function unitNativesciptAndroid(done) {
+    env.NODE_ENV = 'test';
+    env.TARGET = 'node';
+    compileUnitTests()
+        .on('end', () => {
+            exec('tns create Test --path .tmp')
+                .then(() => exec('tns test init --path .tmp/Test --framework mocha'))
+                .then(() => exec('cp .tmp/specs.js .tmp/Test/app/tests'))
+                .then(() => exec('tns test android --emulator --justlaunch --path .tmp/Test'))
+                .then((result) => {
+                    console.log(result.stdout);
+                    done();
+                })
+                .catch((err) => {
+                    console.error(err);
+                    process.exit(1);
+                });
+        });
 }
 
 gulp.task('clean', clean);
 gulp.task('lint', lint);
-gulp.task('js', ['clean', 'lint'], min);
-gulp.task('js-watch', watch);
-gulp.task('unit-node', unitNode);
-gulp.task('unit-browser', unitBrowser);
+gulp.task('js', ['clean', 'lint'], compile);
+gulp.task('unit-node', ['clean', 'lint'], unitNode);
+gulp.task('unit-browsers', ['clean', 'lint'], unitKarma);
+gulp.task('unit-nativescript-ios', ['clean', 'lint'], unitNativesciptIOS);
+gulp.task('unit-nativescript-android', ['clean', 'lint'], unitNativesciptAndroid);
 gulp.task('dist', ['js']);
 
 gulp.task('default', ['dist']);

@@ -1,7 +1,8 @@
 language: node_js
+
 node_js:
-  - "6"
-  - "7"
+  - 6
+  - 7
 
 branches:
   only:
@@ -9,18 +10,54 @@ branches:
 
 env:
   global:
-    - "CI_BUILD_TYPE=\"test-default\""
+    - CI_BUILD_TYPE=default
 
 matrix:
   include:
-    - node_js: 7
-      env: "CI_BUILD_TYPE=\"test-saucelabs\""
+    - os: linux
+      node_js: 7
+      env: CI_BUILD_TYPE=saucelabs
+    - os: osx
+      node_js: 7
+      env: CI_BUILD_TYPE=nativescript
+    - os: linux
+      language: android
+      jdk: oraclejdk8
+      node_js: 7
+      android:
+        components:
+          - platform-tools
+          - build-tools-23.0.1
+          - android-23
+          - extra-android-m2repository
+          - sys-img-armeabi-v7a-android-19
+      env: CI_BUILD_TYPE=nativescript
+
   allow_failures:
-    - node_js: 7
-      env: "CI_BUILD_TYPE=\"test-saucelabs\""
+    - env: CI_BUILD_TYPE=saucelabs
+    - env: CI_BUILD_TYPE=nativescript
+
+install:
+  - |
+    if [ "$CI_BUILD_TYPE" = 'nativescript' ]; then
+      nvm install 7
+      npm install -g nativescript
+      tns usage-reporting disable
+      tns error-reporting disable
+      export CI_BUILD_TYPE="$CI_BUILD_TYPE-$TRAVIS_OS_NAME"
+    fi
+  - npm install
+
+before_script:
+  - |
+    if [ "$CI_BUILD_TYPE" = 'nativescript-linux' ]; then
+      echo no | android create avd --force -n test -t android-19 -b armeabi-v7a
+      emulator -avd test -no-audio -no-window &
+      android-wait-for-emulator
+    fi
 
 script:
-  - npm run $CI_BUILD_TYPE
+  - npm run test-$CI_BUILD_TYPE
 
 after_success:
   - cat coverage/report-lcov/*/lcov.info | ./node_modules/.bin/codecov
