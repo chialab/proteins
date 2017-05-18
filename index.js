@@ -15,3 +15,4 @@ export { clone };
 export { merge };
 export { mix };
 export { internal };
+export * from './src/url.js';
