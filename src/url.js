@@ -1,34 +1,58 @@
 import internal from './internal.js';
 
-export const URL_REGEX = /((?:^(?:[a-z]+:))|^)?(?:\/\/)?([^?:/$]*)(\:\d*)?([^?]*)?(\?.*)?/i;
+export const URL_REGEX = /((?:^(?:[a-z]+:))|^)?(?:\/\/)?([^?\/$]*)([^?]*)?(\?.*)?/i;
 
-export function getUrlInfo(url) {
+const PORT_REGEX = /\:\d*$/;
+
+export function getUrlInfo(url = '') {
+    let hashSplit = url.split('#');
+    let hash = hashSplit.length > 1 ? hashSplit.pop() : undefined;
+    url = hashSplit.join('#');
     let match = url.match(URL_REGEX);
-    let res = {};
+    let res = {
+        host: undefined,
+        hostname: undefined,
+        port: undefined,
+        username: undefined,
+        password: undefined,
+        hash,
+    };
     if (match) {
         res.protocol = match[1];
-        res.hostname = match[2];
-        res.port = match[3] && match[3].substring(1);
-        res.pathname = match[4];
-        res.search = match[5];
+        if (match[2]) {
+            let host = match[2];
+            res.host = host;
+            let port = host.match(PORT_REGEX);
+            if (port) {
+                res.port = port[0].substring(1);
+                host = host.replace(port[0], '');
+            }
+            let authSplit = host.split('@');
+            res.hostname = authSplit.pop();
+            let authChunk = authSplit.join('@').split(':');
+            res.username = authChunk.shift();
+            res.password = authChunk.join(':');
+        }
+        res.pathname = match[3];
+        res.search = match[4];
     }
     if (
         !match ||
         (res.port && !res.hostname) ||
         (res.protocol && res.protocol !== 'file:' && !res.hostname) ||
-        (res.search && !res.hostname && !res.pathname)
+        (res.search && !res.hostname && !res.pathname) ||
+        (res.password && !res.username)
     ) {
         throw new SyntaxError('invalid url');
     }
-    if (res.hostname) {
-        res.host = res.hostname;
-        if (res.port) {
-            res.host += `:${res.port}`;
-        }
-        res.origin = res.protocol ? `${res.protocol}//${res.host}` : res.host;
-    }
-    if (res.hostname && res.pathname === '/') {
+    if (res.host && res.pathname === '/') {
         res.pathname = '';
+    }
+    if (res.hostname) {
+        let origin = res.protocol ? `${res.protocol}//` : '';
+        origin += res.hostname;
+        origin += res.port ? `:${res.port}` : '';
+        res.origin = origin;
     }
     return res;
 }

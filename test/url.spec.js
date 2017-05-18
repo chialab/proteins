@@ -16,6 +16,10 @@ describe('Unit: Url', () => {
         assert.doesNotThrow(() => new Url('/posts?size=50&help'));
         assert.doesNotThrow(() => new Url('/posts?size=50/help'));
         assert.doesNotThrow(() => new Url('file:///'));
+        assert.doesNotThrow(() => new Url('[::1]'), '[::1]');
+        assert.doesNotThrow(() => new Url('[::1]:8080'), '[::1]:8080');
+        assert.doesNotThrow(() => new Url('http://[2a00:1450:4002:809::200e]'));
+        assert.doesNotThrow(() => new Url('https://user:pass@[::1]:443/path?query#id'));
         assert.throws(() => new Url('http://'), SyntaxError);
         assert.throws(() => new Url(':80'), SyntaxError);
         assert.throws(() => new Url('http:///'), SyntaxError);
@@ -23,10 +27,6 @@ describe('Unit: Url', () => {
         assert.throws(() => new Url('?size=50'), SyntaxError);
         assert.throws(() => new Url('?size=50/help'), SyntaxError);
         // unhandled yet
-        // assert.doesNotThrow(() => new Url('[::1]'), '[::1]');
-        // assert.doesNotThrow(() => new Url('[::1]:8080'), '[::1]:8080');
-        // assert.doesNotThrow(() => new Url('https://user:pass@[::1]:443/path?query#id'), 'https://user:pass@[::1]:443/path?query#id');
-        // assert.doesNotThrow(() => new Url('http://[2a00:1450:4002:809::200e]'), 'http://[2a00:1450:4002:809::200e]');
     });
 
     it('should get information on a base url', () => {
