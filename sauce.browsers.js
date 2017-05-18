@@ -139,7 +139,7 @@ module.exports = {
         base: 'SauceLabs',
         browserName: 'Safari',
         platform: 'iOS',
-        version: '10.2',
+        version: '10.3',
         device: 'iPhone 7',
     },
     SL_Android_4: {
