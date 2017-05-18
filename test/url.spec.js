@@ -9,11 +9,12 @@ describe('Unit: Url', () => {
         assert.doesNotThrow(() => new Url('//local.host:80'), '//local.host:80');
         assert.doesNotThrow(() => new Url('http://localhost'), 'http://localhost');
         assert.doesNotThrow(() => new Url('http://localhost:80'), 'http://localhost:80');
+        assert.doesNotThrow(() => new Url('127.0.0.1'), '127.0.0.1');
+        assert.doesNotThrow(() => new Url('127.0.0.1:8080'), '127.0.0.1:8080');
         assert.doesNotThrow(() => new Url('/posts'), '/posts');
         assert.doesNotThrow(() => new Url('/posts?size=50'), '/posts?size=50');
         assert.doesNotThrow(() => new Url('/posts?size=50&help'), '/posts?size=50&help');
         assert.doesNotThrow(() => new Url('/posts?size=50/help'), '/posts?size=50/help');
-        assert.doesNotThrow(() => new Url('file:///'), 'file:///');
         assert.doesNotThrow(() => new Url('file:///'), 'file:///');
         assert.throws(() => new Url('http://'), SyntaxError, 'http://');
         assert.throws(() => new Url(':80'), SyntaxError, ':80');
@@ -21,6 +22,11 @@ describe('Unit: Url', () => {
         assert.throws(() => new Url('http://:80'), SyntaxError, 'http://:80');
         assert.throws(() => new Url('?size=50'), SyntaxError, '?size=50');
         assert.throws(() => new Url('?size=50/help'), SyntaxError, '?size=50/help');
+        // unhandled yet
+        // assert.doesNotThrow(() => new Url('[::1]'), '[::1]');
+        // assert.doesNotThrow(() => new Url('[::1]:8080'), '[::1]:8080');
+        // assert.doesNotThrow(() => new Url('https://user:pass@[::1]:443/path?query#id'), 'https://user:pass@[::1]:443/path?query#id');
+        // assert.doesNotThrow(() => new Url('http://[2a00:1450:4002:809::200e]'), 'http://[2a00:1450:4002:809::200e]');
     });
 
     it('should get information on a base url', () => {
@@ -39,7 +45,7 @@ describe('Unit: Url', () => {
         let person = {
             firstName: 'Alan',
             age: 21,
-            birthday: new Date('1912/06/12'),
+            birthday: new Date('1912-06-11T22:00:00.000Z'),
         };
         let serialized = serialize(person);
         let unserialized = unserialize(serialized);
