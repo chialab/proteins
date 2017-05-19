@@ -1,4 +1,5 @@
 /* eslint-env node */
+/* eslint-disable no-console */
 
 /**
  * Copyright 2017 Chialab. All Rights Reserved.
@@ -107,27 +108,29 @@ function unitKarma(done) {
         });
 }
 
+function execAndLog(cmd) {
+    let promise = exec(cmd);
+    let childProcess = promise.childProcess;
+    childProcess.stdout.on('data', (data) => {
+        console.log(data.toString());
+    });
+    childProcess.stderr.on('data', (data) => {
+        console.error(data.toString());
+    });
+    return promise;
+}
+
 function unitNativescipt(platform, done) {
     env.NODE_ENV = 'test';
     env.TARGET = 'node';
     compileUnitTests()
         .on('end', () => {
-            exec('tns create Test --path .tmp')
-                .then((result) => {
-                    console.log(result.stdout);
-                })    
-                .then(() => exec('tns test init --path .tmp/Test --framework mocha'))
-                .then((result) => {
-                    console.log(result.stdout);
-                })
-                .then(() => exec('cp .tmp/specs.js .tmp/Test/app/tests'))
-                .then(() => exec(`tns test ${platform} --emulator --justlaunch --path .tmp/Test`))
-                .then((result) => {
-                    console.log(result.stdout);
-                    done();
-                })
-                .catch((err) => {
-                    console.error(err);
+            execAndLog('tns create Test --path .tmp')
+                .then(() => execAndLog('tns test init --path .tmp/Test --framework mocha'))
+                .then(() => execAndLog('cp .tmp/specs.js .tmp/Test/app/tests'))
+                .then(() => execAndLog(`tns test ${platform} --emulator --justlaunch --path .tmp/Test`))
+                .then(() => done())
+                .catch(() => {
                     process.exit(1);
                 });
         });
