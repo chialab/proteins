@@ -157,4 +157,12 @@ module.exports = {
         platform: 'Linux',
         version: '5.1',
     },
+    SL_Android_6: {
+        base: 'SauceLabs',
+        browserName: 'android',
+        deviceName: 'Android Emulator',
+        deviceType: 'phone',
+        platform: 'Linux',
+        version: '6.0',
+    },
 };
