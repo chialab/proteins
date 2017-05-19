@@ -165,4 +165,12 @@ module.exports = {
         platform: 'Linux',
         version: '6.0',
     },
+    SL_Android_7: {
+        base: 'SauceLabs',
+        browserName: 'android',
+        deviceName: 'Android GoogleAPI Emulator',
+        deviceType: 'phone',
+        platform: 'Linux',
+        version: '7.0',
+    },
 };
