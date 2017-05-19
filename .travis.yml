@@ -17,15 +17,15 @@ matrix:
     - os: linux
       node_js: 7
       env: CI_BUILD_TYPE=saucelabs
-    - os: osx
-      node_js: 7
-      env: CI_BUILD_TYPE=nativescript
     - os: linux
       node_js: 7
       env: CI_BUILD_TYPE=electron
     - os: osx
       node_js: 7
       env: CI_BUILD_TYPE=electron
+    - os: osx
+      node_js: 7
+      env: CI_BUILD_TYPE=nativescript
     - os: linux
       language: android
       jdk: oraclejdk8
@@ -60,12 +60,15 @@ install:
       tns error-reporting disable
       export CI_BUILD_TYPE="$CI_BUILD_TYPE-$TRAVIS_OS_NAME"
     fi
+  - npm install
   - |
     if [ "$CI_BUILD_TYPE" = 'electron' ]; then
-      nvm install 7
-      npm install electron
+      npm install electron karma-electron-launcher
     fi
-  - npm install
+  - |
+    if [ "$CI_BUILD_TYPE" = 'saucelabs' ]; then
+      npm install karma-sauce-launcher
+    fi
 
 before_script:
   - |
