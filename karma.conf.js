@@ -111,51 +111,6 @@ module.exports = function(config) {
             },
             logLevel: config.LOG_ERROR,
         });
-
-        switch (process.env.BROWSER_PROVIDER) {
-            case 'saucelabs': {
-                const saucelabsBrowsers = require('./sauce.browsers.js');
-                config.set({
-                    concurrency: 1,
-                    retryLimit: 3,
-                    browserDisconnectTimeout: 10000,
-                    browserDisconnectTolerance: 1,
-                    browserNoActivityTimeout: 4 * 60 * 1000,
-                    captureTimeout: 4 * 60 * 1000,
-                    reporters: ['dots', 'saucelabs', 'coverage'],
-                    sauceLabs: {
-                        startConnect: true,
-                        connectOptions: {
-                            'no-ssl-bump-domains': 'all',
-                            'username': process.env.SAUCE_USERNAME,
-                            'accessKey': process.env.SAUCE_ACCESS_KEY,
-                        },
-                        options: {},
-                        build: process.env.TRAVIS ?
-                            `TRAVIS # ${process.env.TRAVIS_BUILD_NUMBER} (${process.env.TRAVIS_BUILD_ID})` :
-                            undefined,
-                        tunnelIdentifier: process.env.TRAVIS ?
-                            process.env.TRAVIS_JOB_NUMBER :
-                            undefined,
-                        recordScreenshots: true,
-                    },
-                    customLaunchers: saucelabsBrowsers,
-                    browsers: Object.keys(saucelabsBrowsers),
-                });
-                break;
-            }
-            default:
-                config.set({
-                    customLaunchers: {
-                        Chrome_CI: {
-                            base: 'Chrome',
-                            flags: ['--no-sandbox'],
-                        },
-                    },
-                    browsers: ['Chrome_CI', 'Firefox'],
-                });
-                break;
-        }
     } else {
         config.set({
             coverageReporter: {
@@ -176,5 +131,59 @@ module.exports = function(config) {
                 ],
             },
         });
+    }
+
+    switch (process.env.BROWSER_PROVIDER) {
+        case 'saucelabs': {
+            const saucelabsBrowsers = require('./sauce.browsers.js');
+            config.set({
+                concurrency: 1,
+                retryLimit: 3,
+                browserDisconnectTimeout: 10000,
+                browserDisconnectTolerance: 1,
+                browserNoActivityTimeout: 4 * 60 * 1000,
+                captureTimeout: 4 * 60 * 1000,
+                reporters: ['dots', 'saucelabs', 'coverage'],
+                sauceLabs: {
+                    startConnect: true,
+                    connectOptions: {
+                        'no-ssl-bump-domains': 'all',
+                        'username': process.env.SAUCE_USERNAME,
+                        'accessKey': process.env.SAUCE_ACCESS_KEY,
+                    },
+                    options: {},
+                    build: process.env.TRAVIS ?
+                        `TRAVIS # ${process.env.TRAVIS_BUILD_NUMBER} (${process.env.TRAVIS_BUILD_ID})` :
+                        undefined,
+                    tunnelIdentifier: process.env.TRAVIS ?
+                        process.env.TRAVIS_JOB_NUMBER :
+                        undefined,
+                    recordScreenshots: true,
+                },
+                customLaunchers: saucelabsBrowsers,
+                browsers: Object.keys(saucelabsBrowsers),
+            });
+            break;
+        }
+        case 'electron': {
+            config.set({
+                browsers: ['Electron'],
+                client: {
+                    useIframe: false,
+                },
+            });
+            break;
+        } 
+        default:
+            config.set({
+                customLaunchers: {
+                    Chrome_CI: {
+                        base: 'Chrome',
+                        flags: ['--no-sandbox'],
+                    },
+                },
+                browsers: ['Chrome_CI', 'Firefox'],
+            });
+            break;
     }
 };

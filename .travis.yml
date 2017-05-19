@@ -21,6 +21,12 @@ matrix:
       node_js: 7
       env: CI_BUILD_TYPE=nativescript
     - os: linux
+      node_js: 7
+      env: CI_BUILD_TYPE=electron
+    - os: osx
+      node_js: 7
+      env: CI_BUILD_TYPE=electron
+    - os: linux
       language: android
       jdk: oraclejdk8
       node_js: 7
@@ -34,10 +40,18 @@ matrix:
       env: CI_BUILD_TYPE=nativescript
 
   allow_failures:
+    - env: CI_BUILD_TYPE=electron
     - env: CI_BUILD_TYPE=saucelabs
     - env: CI_BUILD_TYPE=nativescript
 
+addons:
+  apt:
+    packages:
+      - xvfb
+
 install:
+  - export DISPLAY=':99.0'
+  - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
   - |
     if [ "$CI_BUILD_TYPE" = 'nativescript' ]; then
       nvm install 7
@@ -45,6 +59,11 @@ install:
       tns usage-reporting disable
       tns error-reporting disable
       export CI_BUILD_TYPE="$CI_BUILD_TYPE-$TRAVIS_OS_NAME"
+    fi
+  - |
+    if [ "$CI_BUILD_TYPE" = 'electron' ]; then
+      nvm install 7
+      npm install electron
     fi
   - npm install
 
