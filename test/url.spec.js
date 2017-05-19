@@ -39,6 +39,53 @@ describe('Unit: Url', () => {
         assert.equal(url.host, 'www.chialab.it:80');
         assert.equal(url.search, '?size=10');
         assert.equal(url.origin, 'http://www.chialab.it:80');
+
+        assert(new Url('http://www.chialab.it:80').isAbsoluteUrl());
+        assert(!new Url('http://www.chialab.it:80').isDataUrl());
+        assert(!new Url('http://www.chialab.it:80').isLocalUrl());
+        assert(!new Url('/posts').isAbsoluteUrl());
+        assert(!new Url('/posts').isDataUrl());
+        assert(!new Url('/posts').isLocalUrl());
+        assert(new Url('file:///').isAbsoluteUrl());
+        assert(!new Url('file:///').isDataUrl());
+        assert(new Url('file:///').isLocalUrl());
+    });
+
+    it('should exec operations on search path', () => {
+        let url = new Url('http://www.chialab.it:80/posts?size=10');
+        let searchParams = url.searchParams;
+
+        assert.equal(searchParams.entries().length, 1);
+        assert.equal(searchParams.get('size'), '10');
+
+        searchParams.delete('size');
+        assert.equal(searchParams.entries().length, 0);
+        assert.equal(searchParams.get('size'), undefined);
+
+        searchParams.set('size', 2);
+        searchParams.set('size', 11);
+
+        assert.equal(searchParams.entries().length, 1);
+        assert.equal(searchParams.get('size'), '11');
+
+        searchParams.set('order', 1);
+        searchParams.set('page', 2);
+
+        assert.equal(searchParams.entries().length, 3);
+        assert.deepEqual(searchParams.keys(), ['size', 'order', 'page']);
+        assert.deepEqual(searchParams.values(), ['11', '1', '2']);
+
+        searchParams.sort();
+        assert.equal(searchParams.entries().length, 3);
+        assert.deepEqual(searchParams.keys(), ['order', 'page', 'size']);
+        assert.deepEqual(searchParams.values(), ['1', '2', '11']);
+
+        assert(searchParams.has('size'));
+        assert(searchParams.has('page'));
+        assert(!searchParams.has('name'));
+
+        assert(searchParams.toString(), '?order=1&page=2&size=11');
+        assert(url.toString(), 'http://www.chialab.it:80/posts?order=1&page=2&size=11');
     });
 
     it('should serialize simple string', () => {
@@ -54,5 +101,17 @@ describe('Unit: Url', () => {
         assert.equal(person.firstName, unserialized.firstName);
         assert.equal(person.age, unserialized.age);
         assert.equal(person.birthday.getTime(), new Date(unserialized.birthday).getTime());
+    });
+
+    it('should resolve locations', () => {
+        let url = new Url('/posts', 'chialab.it');
+
+        assert.equal(url.href, 'chialab.it/posts');
+
+        let url2 = url.join('2', 'info');
+        assert.equal(url2.href, 'chialab.it/posts/2/info');
+
+        let url3 = url2.resolve('../3/info');
+        assert.equal(url3.href, 'chialab.it/posts/3/info');
     });
 });

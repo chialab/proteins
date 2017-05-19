@@ -4,7 +4,7 @@ export const URL_REGEX = /((?:^(?:[a-z]+:))|^)?(?:\/\/)?([^?\/$]*)([^?]*)?(\?.*)
 
 const PORT_REGEX = /\:\d*$/;
 
-export function getUrlInfo(url = '') {
+export function parse(url = '') {
     let hashSplit = url.split('#');
     let hash = hashSplit.length > 1 ? hashSplit.pop() : undefined;
     url = hashSplit.join('#');
@@ -97,56 +97,23 @@ export function unserialize(str) {
 
     for (let i = 0, len = chunks.length; i < len; i++) {
         let chunk = chunks[i].split('=');
-        let val = decodeURIComponent(chunk[1]);
-        if (chunk[0].search('\\[\\]') !== -1) {
-            chunk[0] = chunk[0].replace(/\[\]$/, '');
-            if (typeof res[chunk[0]] === 'undefined') {
-                res[chunk[0]] = [val];
+        if (chunk[0] && chunk[1]) {
+            let val = decodeURIComponent(chunk[1]);
+            if (chunk[0].search('\\[\\]') !== -1) {
+                chunk[0] = chunk[0].replace(/\[\]$/, '');
+                if (typeof res[chunk[0]] === 'undefined') {
+                    res[chunk[0]] = [val];
 
+                } else {
+                    res[chunk[0]].push(val);
+                }
             } else {
-                res[chunk[0]].push(val);
+                res[chunk[0]] = val;
             }
-        } else {
-            res[chunk[0]] = val;
         }
     }
 
     return res;
-}
-/**
- * Get a key/value list of search params from an url.
- * @param {string} url The base url.
- * @return {Object} A key/value list of search params.
- */
-export function getSearchParams(url) {
-    let params = url.split('?').slice(1).join('?');
-    return params ? unserialize(params) : {};
-}
-/**
- * Get a search param value from an url.
- * @param {string} url The base url.
- * @param {string} param The search param name.
- * @return {string} The value for the requested param.
- */
-export function getSearchParam(url, param) {
-    return getSearchParams(url)[param];
-}
-
-export function setSearchParams(url, data) {
-    let res = getSearchParams(url);
-    for (let k in data) {
-        res[k] = data[k];
-    }
-    res = serialize(res);
-    return `${url.split('?')[0]}?${res}`;
-}
-
-export function setSearchParam(url, key, value) {
-    return setSearchParams(url, { [key]: value });
-}
-
-export function unsetSearchParam(url, key) {
-    return setSearchParam(url, key, undefined);
 }
 
 export function join(...paths) {
@@ -166,7 +133,7 @@ export function join(...paths) {
 
 export function resolve(base, relative) {
     if (relative[0] === '/') {
-        let baseInfo = getUrlInfo(base);
+        let baseInfo = parse(base);
         if (!baseInfo.origin) {
             throw new Error('base url is not an absolute url');
         }
@@ -174,7 +141,9 @@ export function resolve(base, relative) {
     }
     let stack = base.split('/');
     let parts = relative.split('/').filter((part) => part !== '');
-    stack.pop();
+    if (stack.length > 1) {
+        stack.pop();
+    }
     for (let i = 0; i < parts.length; i++) {
         if (parts[i] === '.') {
             continue;
@@ -188,15 +157,106 @@ export function resolve(base, relative) {
 }
 
 export function isAbsoluteUrl(url) {
-    return !!getUrlInfo(url).protocol;
+    return !!parse(url).protocol;
 }
 
 export function isDataUrl(url) {
-    return getUrlInfo(url).protocol === 'data:';
+    return parse(url).protocol === 'data:';
 }
 
 export function isLocalUrl(url) {
-    return getUrlInfo(url).protocol === 'file:';
+    return parse(url).protocol === 'file:';
+}
+
+function updateSearchPath(url, path) {
+    let href = url.href.split('?')[0];
+    url.href = `${href}?${path}`;
+}
+
+function entriesToString(entries) {
+    let unserialized = {};
+    entries.forEach((entry) => {
+        unserialized[entry[0]] = entry[1];
+    });
+    return serialize(unserialized);
+}
+
+class SearchParams {
+    constructor(urlRef) {
+        internal(this).ref = urlRef;
+    }
+
+    get url() {
+        return internal(this).ref;
+    }
+
+    delete(name) {
+        updateSearchPath(
+            this.url,
+            entriesToString(
+                this.entries().filter((entry) => entry[0] !== name)
+            )
+        );
+    }
+
+    entries() {
+        let search = this.url.search.substring(1);
+        let unserialized = unserialize(search);
+        return Object.keys(unserialized)
+            .map((key) => [key, unserialized[key]]);
+    }
+
+    get(name) {
+        let entries = this.entries();
+        for (let i = 0, len = entries.length; i < len; i++) {
+            if (entries[i][0] === name) {
+                return entries[i][1];
+            }
+        }
+    }
+
+    has(name) {
+        return !!this.get(name);
+    }
+
+    keys() {
+        return this.entries()
+            .map((entry) => entry[0]);
+    }
+
+    set(name, value) {
+        this.delete(name);
+        let entries = this.entries();
+        entries.push([name, value]);
+        updateSearchPath(
+            this.url,
+            entriesToString(entries)
+        );
+    }
+
+    sort() {
+        let entries = this.entries();
+        entries.sort((entry1, entry2) => {
+            let key1 = entry1[0];
+            let key2 = entry2[0];
+            if (key1 < key2) {
+                return -1;
+            } else if (key1 > key2) {
+                return 1;
+            }
+            return 0;
+        });
+        updateSearchPath(this.url, entriesToString(entries));
+    }
+
+    toString() {
+        return this.url.search;
+    }
+
+    values() {
+        return this.entries()
+            .map((entry) => entry[1]);
+    }
 }
 
 export class Url {
@@ -206,6 +266,7 @@ export class Url {
         } else {
             this.href = path;
         }
+        this.searchParams = new SearchParams(this);
     }
 
     get href() {
@@ -213,35 +274,19 @@ export class Url {
     }
 
     set href(href) {
-        let info = getUrlInfo(href);
+        let info = parse(href);
         internal(this).href = href;
         for (let k in info) {
             this[k] = info[k];
         }
     }
 
-    getSearchParams() {
-        return getSearchParams(this.href);
-    }
-
-    setSearchParams(params) {
-        this.href = setSearchParams(this.href, params);
-    }
-
-    getSearchParam(key) {
-        return getSearchParam(this.href, key);
-    }
-
-    setSearchParam(key, value) {
-        this.href = setSearchParam(this.href, key, value);
-    }
-
     join(...paths) {
-        return join(this.href, ...paths);
+        return new Url(join(this.href, ...paths));
     }
 
     resolve(path) {
-        return resolve(this.href, path);
+        return new Url(resolve(this.href, path));
     }
 
     isAbsoluteUrl() {
@@ -254,5 +299,9 @@ export class Url {
 
     isLocalUrl() {
         return isLocalUrl(this.href);
+    }
+
+    toString() {
+        return this.href;
     }
 }
