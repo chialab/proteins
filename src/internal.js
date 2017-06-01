@@ -13,3 +13,7 @@ export default function internal(object) {
     }
     return SYM(object);
 }
+
+internal.has = (object) => SYM(object) !== undefined;
+
+internal.destroy = (object) => SYM(object, undefined);

@@ -11,7 +11,7 @@ export default function symbolic(property) {
     if (typeof Symbol !== 'undefined') {
         SYM = Symbol(property);
     }
-    return (obj, val) => {
+    let fn = (obj, ...args) => {
         if (!hasOwnProperty.call(obj, SYM)) {
             Object.defineProperty(obj, SYM, {
                 enumerable: false,
@@ -20,9 +20,13 @@ export default function symbolic(property) {
                 value: undefined,
             });
         }
-        if (val) {
-            obj[SYM] = val;
+        if (args.length) {
+            obj[SYM] = args[0];
         }
         return obj[SYM];
     };
+
+    fn.has = (obj) => hasOwnProperty.call(obj, SYM);
+
+    return fn;
 }
