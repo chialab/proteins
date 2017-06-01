@@ -12,4 +12,16 @@ describe('Unit: Internal', () => {
         assert.equal(scope.message, 'hello');
         assert.equal(internal(scope).message, 'world');
     });
+
+    it('should check if has internal', () => {
+        assert(internal.has(scope));
+    });
+
+    it('should destroy internal', () => {
+        internal.destroy(scope);
+        assert(!internal.has(scope));
+        assert.equal(scope.value, 6);
+        assert.equal(scope.message, 'hello');
+        assert.equal(internal(scope).message, undefined);
+    });
 });

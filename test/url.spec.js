@@ -1,5 +1,9 @@
 /* eslint-env mocha */
-import { Url, serialize, unserialize } from '../src/url.js';
+import {
+    Url,
+    serialize,
+    unserialize,
+} from '../src/url.js';
 
 describe('Unit: Url', () => {
     it('should check url validity', () => {
@@ -7,7 +11,7 @@ describe('Unit: Url', () => {
         assert.doesNotThrow(() => new Url('local.host:80'));
         assert.doesNotThrow(() => new Url('//local.host'));
         assert.doesNotThrow(() => new Url('//local.host:80'));
-        assert.doesNotThrow(() => new Url('http://localhost'));
+        assert.doesNotThrow(() => new Url('http://localhost/'));
         assert.doesNotThrow(() => new Url('http://localhost:80'));
         assert.doesNotThrow(() => new Url('127.0.0.1'));
         assert.doesNotThrow(() => new Url('127.0.0.1:8080'));
@@ -88,6 +92,23 @@ describe('Unit: Url', () => {
         assert(url.toString(), 'http://www.chialab.it:80/posts?order=1&page=2&size=11');
     });
 
+    it('should resolve locations', () => {
+        let url = new Url('/posts', 'chialab.it');
+
+        assert.equal(url.href, 'chialab.it/posts');
+
+        let url2 = url.join('2', 'info');
+        assert.equal(url2.href, 'chialab.it/posts/2/info');
+
+        let url3 = url2.resolve('../3/info');
+        assert.equal(url3.href, 'chialab.it/posts/3/info');
+
+        let url4 = url3.resolve('./edit');
+        assert.equal(url4.href, 'chialab.it/posts/3/edit');
+
+        assert.throws(() => new Url('/posts').resolve('/article'), Error);
+    });
+
     it('should serialize simple string', () => {
         let person = {
             firstName: 'Alan',
@@ -103,15 +124,19 @@ describe('Unit: Url', () => {
         assert.equal(person.birthday.getTime(), new Date(unserialized.birthday).getTime());
     });
 
-    it('should resolve locations', () => {
-        let url = new Url('/posts', 'chialab.it');
-
-        assert.equal(url.href, 'chialab.it/posts');
-
-        let url2 = url.join('2', 'info');
-        assert.equal(url2.href, 'chialab.it/posts/2/info');
-
-        let url3 = url2.resolve('../3/info');
-        assert.equal(url3.href, 'chialab.it/posts/3/info');
+    it('should unserialize complex string', () => {
+        let serialized = 'filter[name]=Alan&filter[geo][latitude]=41&filter[type]=person&size=1&filter[tags][]=math';
+        let unserialized = unserialize(serialized);
+        assert.deepEqual(unserialized, {
+            filter: {
+                name: 'Alan',
+                geo: {
+                    latitude: '41',
+                },
+                type: 'person',
+                tags: ['math'],
+            },
+            size: '1',
+        });
     });
 });

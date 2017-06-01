@@ -2,7 +2,7 @@ import mix from './mixin.js';
 import symbolic from './symbolic.js';
 const SYM = symbolic('listeners');
 
-export class BaseObservable {};
+export class BaseObservable {}
 
 export const ObservableMixin = (SuperClass) => class extends SuperClass {
     constructor(...args) {

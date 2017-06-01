@@ -40,7 +40,11 @@ export default function keypath(obj, path, ...args) {
         let value = args[0];
         let ensure = args.length > 1 ? args[1] : true;
         if (path.length === 1) {
-            obj[path[0]] = value;
+            if (isArray(obj) && path[0] === '') {
+                obj.push(value);
+            } else {
+                obj[path[0]] = value;
+            }
             return value;
         }
         let current = path.shift();

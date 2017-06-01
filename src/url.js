@@ -1,4 +1,5 @@
 import internal from './internal.js';
+import keypath from './keypath.js';
 
 export const URL_REGEX = /((?:^(?:[a-z]+:))|^)?(?:\/\/)?([^?\/$]*)([^?]*)?(\?.*)?/i;
 
@@ -36,8 +37,7 @@ export function parse(url = '') {
         res.pathname = match[3];
         res.search = match[4];
     }
-    if (
-        !match ||
+    if (!match ||
         (res.port && !res.hostname) ||
         (res.protocol && res.protocol !== 'file:' && !res.hostname) ||
         (res.search && !res.hostname && !res.pathname) ||
@@ -75,8 +75,8 @@ export function serialize(obj, prefix) {
                 }
                 str.push(
                     (v !== null && typeof v === 'object') ?
-                        serialize(v, k) :
-                        `${encodeURIComponent(k)}=${encodeURIComponent(v)}`
+                    serialize(v, k) :
+                    `${encodeURIComponent(k)}=${encodeURIComponent(v)}`
                 );
             }
         }
@@ -98,18 +98,9 @@ export function unserialize(str) {
     for (let i = 0, len = chunks.length; i < len; i++) {
         let chunk = chunks[i].split('=');
         if (chunk[0] && chunk[1]) {
+            let key = chunk[0].replace(/\[(.*?)\]/g, '.$1');
             let val = decodeURIComponent(chunk[1]);
-            if (chunk[0].search('\\[\\]') !== -1) {
-                chunk[0] = chunk[0].replace(/\[\]$/, '');
-                if (typeof res[chunk[0]] === 'undefined') {
-                    res[chunk[0]] = [val];
-
-                } else {
-                    res[chunk[0]].push(val);
-                }
-            } else {
-                res[chunk[0]] = val;
-            }
+            keypath(res, key, val);
         }
     }
 
