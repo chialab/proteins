@@ -20,6 +20,8 @@ describe('Unit: Symbolic', () => {
         assert.equal(AGE(user), 29);
         assert.equal(Object.keys(user).length, 2);
         assert.equal(enumKeys.length, 2);
+        assert(AGE.has(user));
+        assert(!AGE.has({}));
         assert(!Object.hasOwnProperty('age'));
     });
 });

@@ -1,5 +1,6 @@
 import mix from './mixin.js';
 import symbolic from './symbolic.js';
+import { isFunction } from './types.js';
 const SYM = symbolic('listeners');
 
 export class BaseObservable {}
@@ -17,8 +18,8 @@ export const ObservableMixin = (SuperClass) => class extends SuperClass {
      * @return {Function} Destroy created listener with this function
      */
     on(name, callback) {
-        if (typeof callback !== 'function') {
-            throw new Error('Callback is not a function.');
+        if (!isFunction(callback)) {
+            throw new TypeError('callback is not a function');
         }
         let callbacks = SYM(this);
         let evtCallbacks = callbacks[name] = callbacks[name] || [];
@@ -57,7 +58,7 @@ export const ObservableMixin = (SuperClass) => class extends SuperClass {
      * @return {Promise}
      */
     trigger(name, ...args) {
-        let callbacks = SYM(this) || {};
+        let callbacks = SYM(this);
         let evtCallbacks = callbacks[name] || [];
         let promise = Promise.resolve();
         evtCallbacks.forEach((callback) => {
