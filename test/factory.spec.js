@@ -41,6 +41,14 @@ class ChildFactory extends Factory {
         };
     }
 
+    get defaultConfig() {
+        return {
+            mode: 1,
+            dispatch: false,
+            filters: ['firstName'],
+        };
+    }
+
     initialize(...args) {
         return super.initialize(...args)
             .then(() => {
@@ -58,7 +66,10 @@ describe('Unit: Factory', () => {
         MainFactory.init()
             .then((object) => {
                 factory = object;
-                factory.init(ChildFactory)
+                factory.init(ChildFactory, {
+                    mode: 2,
+                    filters: ['lastName'],
+                })
                     .then((object) => {
                         child = object;
                         done();
@@ -75,6 +86,21 @@ describe('Unit: Factory', () => {
         assert(child instanceof ChildFactory);
         assert.equal(child.prop, 11);
         assert.equal(child.getContext(), factory);
+    });
+
+    it('should instantiate a factory with configuration', () => {
+        assert.deepEqual(child.config(), {
+            mode: 2,
+            dispatch: false,
+            filters: ['lastName'],
+        });
+        assert.equal(child.configChanged, undefined);
+        child.config('mode', 4);
+        assert.deepEqual(child.config(), {
+            mode: 4,
+            dispatch: false,
+            filters: ['lastName'],
+        });
     });
 
     it('should handle injected', () => {

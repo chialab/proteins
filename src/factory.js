@@ -1,6 +1,8 @@
 import mix from './mixin.js';
 import internal from './internal.js';
-import { isArray, isObject } from './types.js';
+import keypath from './keypath.js';
+import clone from './clone.js';
+import { isArray, isObject, isString } from './types.js';
 import { ObservableMixin } from './observable.js';
 
 export class BaseFactory {}
@@ -76,7 +78,7 @@ export const InjectableMixin = (SuperClass) => class extends SuperClass {
         return Promise.resolve();
     }
 
-    getInjected() {
+    injected() {
         return this.internal().injected;
     }
 
@@ -92,7 +94,7 @@ export const InjectableMixin = (SuperClass) => class extends SuperClass {
             }
         } else {
             let resolve = Promise.resolve(Fn);
-            let contextInjected = this.getContext().getInjected();
+            let contextInjected = this.getContext().injected();
             if (contextInjected.hasOwnProperty(inject)) {
                 resolve = Promise.resolve(contextInjected[inject]);
             } else {
@@ -114,10 +116,45 @@ export const InjectableMixin = (SuperClass) => class extends SuperClass {
     }
 
     factory(name) {
-        let injected = this.getContext().getInjected();
+        let injected = this.getContext().injected();
         return injected && injected[name];
     }
 };
 
+export const ConfigurableMixin = (SuperClass) => class extends SuperClass {
+    get defaultConfig() {
+        return {};
+    }
+
+    initialize(config, ...args) {
+        this.internal().config = clone(this.defaultConfig);
+        return super.initialize(config, ...args)
+            .then(() => {
+                this.config(config);
+                return Promise.resolve(this);
+            });
+    }
+
+    config(config, val) {
+        if (isString(config)) {
+            return this.config({
+                [config]: val,
+            });
+        }
+        let current = this.internal().config;
+        if (isObject(config)) {
+            for (let k in config) {
+                let oldValue = keypath(current, k);
+                let newValue = config[k];
+                if (oldValue !== newValue) {
+                    keypath(current, k, newValue);
+                    this.trigger('config:changed', k, oldValue, newValue);
+                }
+            }
+        }
+        return current;
+    }
+};
+
 export class Factory extends mix(BaseFactory)
-    .with(ObservableMixin, FactoryMixin, InjectableMixin) { }
+    .with(ObservableMixin, FactoryMixin, InjectableMixin, ConfigurableMixin) { }
