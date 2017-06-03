@@ -3,9 +3,13 @@ npm-debug.log
 /bower_components
 /coverage
 /test
+/.tmp
 .eslint*
 .editorconfig
 .git*
 .babelrc
+.travis*
 gulpfile.js
 rollup.config.js
+sauce.browsers.js
+karma.conf.js
