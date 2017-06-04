@@ -1,6 +1,6 @@
 {
   "name": "@chialab/proteins",
-  "version": "3.0.0-beta.1",
+  "version": "3.0.0-beta.2",
   "description": "A set of JS utils.",
   "main": "dist/proteins.js",
   "module": "index.js",

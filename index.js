@@ -12,7 +12,7 @@ import internal from './src/internal.js';
 import keypath from './src/keypath.js';
 import symbolic from './src/symbolic.js';
 import * as Observable from './src/observable.js';
-import * as Factory from './src/observable.js';
+import * as Factory from './src/factory.js';
 
 export * from './src/types.js';
 export { clone };
@@ -23,4 +23,4 @@ export { internal };
 export { keypath };
 export * from './src/url.js';
 export { Observable };
-export { Factory };    
+export { Factory };
