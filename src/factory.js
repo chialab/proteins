@@ -1,10 +1,10 @@
 import mix from './mixin.js';
 import internal from './internal.js';
+import symbolic from './symbolic.js';
 import keypath from './keypath.js';
 import clone from './clone.js';
 import { isArray, isObject, isString } from './types.js';
 import { on, off, trigger } from './events.js';
-
 
 export class BaseObservable {}
 
@@ -43,6 +43,8 @@ export const ObservableMixin = (SuperClass) => class extends SuperClass {
 
 export class Observable extends mix(BaseObservable).with(ObservableMixin) { }
 
+export const CONFIG_SYM = symbolic('config');
+
 export const ConfigurableMixin = (SuperClass) => class extends SuperClass {
     get defaultConfig() {
         return {};
@@ -50,7 +52,7 @@ export const ConfigurableMixin = (SuperClass) => class extends SuperClass {
 
     constructor(config) {
         super(config);
-        this.internal().config = clone(this.defaultConfig);
+        CONFIG_SYM(this, clone(this.defaultConfig || {}));
         if (config) {
             this.config(config);
         }
@@ -62,7 +64,7 @@ export const ConfigurableMixin = (SuperClass) => class extends SuperClass {
                 [config]: val,
             });
         }
-        let current = this.internal().config;
+        let current = CONFIG_SYM(this);
         if (isObject(config)) {
             for (let k in config) {
                 let oldValue = keypath(current, k);
