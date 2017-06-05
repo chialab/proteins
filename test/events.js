@@ -1,8 +1,8 @@
 /* eslint-env mocha */
-import { Observable } from '../src/observable.js';
+import { on, off, trigger } from '../src/events.js';
 
-describe('Unit: Observable', () => {
-    let obj = new Observable();
+describe('Unit: Events', () => {
+    let obj = {};
     let check = {};
 
     function prepareFn(number) {
@@ -16,10 +16,10 @@ describe('Unit: Observable', () => {
     let callback3 = prepareFn(3);
     let callback4 = prepareFn(4);
 
-    obj.on('test1', callback1);
-    obj.on('test2', callback2);
-    obj.on('test3', callback3);
-    obj.on('test3', callback4);
+    on(obj, 'test1', callback1);
+    on(obj, 'test2', callback2);
+    on(obj, 'test3', callback3);
+    on(obj, 'test3', callback4);
 
     function reset() {
         check = {
@@ -35,12 +35,12 @@ describe('Unit: Observable', () => {
         before((done) => {
             reset().then(() =>
                 Promise.all([
-                        obj.trigger('test1', 2),
-                        obj.trigger('test2', 'callback'),
-                        obj.trigger('test3', 1, 4, 2),
-                    ]).then(() => {
-                        done();
-                    })
+                    trigger(obj, 'test1', 2),
+                    trigger(obj, 'test2', 'callback'),
+                    trigger(obj, 'test3', 1, 4, 2),
+                ]).then(() => {
+                    done();
+                })
             );
         });
 
@@ -61,9 +61,9 @@ describe('Unit: Observable', () => {
     describe('off', () => {
         before((done) => {
             reset().then(() => {
-                obj.off('test3', callback3);
+                off(obj, 'test3', callback3);
                 Promise.all([
-                    obj.trigger('test3', 1, 4, 2),
+                    trigger(obj, 'test3', 1, 4, 2),
                 ]).then(() => {
                     done();
                 });
@@ -79,9 +79,9 @@ describe('Unit: Observable', () => {
     describe('off', () => {
         before((done) => {
             reset().then(() => {
-                obj.off('test2');
+                off(obj, 'test2');
                 Promise.all([
-                    obj.trigger('test2', 'callback'),
+                    trigger(obj, 'test2', 'callback'),
                 ]).then(() => {
                     done();
                 });
@@ -96,10 +96,10 @@ describe('Unit: Observable', () => {
     describe('off', () => {
         before((done) => {
             reset().then(() => {
-                obj.off();
+                off(obj);
                 Promise.all([
-                    obj.trigger('test1', 2),
-                    obj.trigger('test3', 1, 4, 2),
+                    trigger(obj, 'test1', 2),
+                    trigger(obj, 'test3', 1, 4, 2),
                 ]).then(() => {
                     done();
                 });
@@ -114,7 +114,7 @@ describe('Unit: Observable', () => {
 
     describe('not function callback', () => {
         it('should throws', () => {
-            assert.throws(() => obj.on('event', 4), TypeError);
+            assert.throws(() => on(obj, 'event', 4), TypeError);
         });
     });
 });

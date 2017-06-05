@@ -55,5 +55,5 @@ module.exports = {
 };
 
 function camelize(str) {
-    return str.replace(/(^[a-z0-9]|[-_]([a-z0-9]))/g, (g) => (g[1] || g[0]).toUpperCase())
+    return str.replace(/(^[a-z0-9]|[-_]([a-z0-9]))/g, (g) => (g[1] || g[0]).toUpperCase());
 }

@@ -11,7 +11,6 @@ import mix from './src/mixin.js';
 import internal from './src/internal.js';
 import keypath from './src/keypath.js';
 import symbolic from './src/symbolic.js';
-import * as Observable from './src/observable.js';
 import * as Factory from './src/factory.js';
 
 export * from './src/types.js';
@@ -22,5 +21,5 @@ export { symbolic };
 export { internal };
 export { keypath };
 export * from './src/url.js';
-export { Observable };
+export * from './src/events.js';
 export { Factory };
