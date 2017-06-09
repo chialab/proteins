@@ -35,6 +35,7 @@ function pathToArray(path) {
 
 /**
  * Get a deep property of an object using paths
+ *
  * @param {Object} obj The object scope
  * @param {String|Array} path The path of the property to retrieve
  * @return {*} The property value
@@ -57,6 +58,7 @@ export function get(obj, path) {
 
 /**
  * Set a deep property of an object using paths
+ *
  * @param {Object} obj The object scope
  * @param {String|Array} path The path of the property to set
  * @param {*} value The value to set
@@ -95,6 +97,7 @@ export function set(obj, path, value, ensure = true) {
 
 /**
  * Check deep object property existence using paths
+ *
  * @param {Object} obj The object scope
  * @param {String|Array} path The path of the property to retrieve
  * @return {boolean} The property exists or not

@@ -3,6 +3,11 @@
  *
  * @param {*} obj The value to check.
  * @return {Boolean}
+ *
+ * @example
+ * isFunction(() => {})        // -> true
+ * isFunction(Object.toString) // -> true
+ * isFunction(class {})        // -> true
  */
 export function isFunction(obj) {
     return typeof obj === 'function';
@@ -12,6 +17,10 @@ export function isFunction(obj) {
  *
  * @param {*} obj The value to check.
  * @return {Boolean}
+ *
+ * @example
+ * isString('hello') // -> true
+ * isString('2')     // -> true
  */
 export function isString(obj) {
     return typeof obj === 'string';
@@ -21,6 +30,11 @@ export function isString(obj) {
  *
  * @param {*} obj The value to check.
  * @return {Boolean}
+ *
+ * @example
+ * isNumber(2)   // -> true
+ * isNumber('2') // -> false
+ * isNumber(NaN) // -> false
  */
 export function isNumber(obj) {
     return typeof obj === 'number' && !isNaN(obj);
@@ -30,6 +44,10 @@ export function isNumber(obj) {
  *
  * @param {*} obj The value to check.
  * @return {Boolean}
+ *
+ * @example
+ * isBoolean(false) // -> true
+ * isBoolean(true)  // -> true
  */
 export function isBoolean(obj) {
     return typeof obj === 'boolean';
@@ -39,6 +57,10 @@ export function isBoolean(obj) {
  *
  * @param {*} obj The value to check.
  * @return {Boolean}
+ *
+ * @example
+ * isDate(new Date())   // -> true
+ * isDate('2017/05/12') // -> false
  */
 export function isDate(obj) {
     return obj instanceof Date;
@@ -48,6 +70,10 @@ export function isDate(obj) {
  *
  * @param {*} obj The value to check.
  * @return {Boolean}
+ *
+ * @example
+ * isObject({})         // -> true
+ * isObject(new Date()) // -> false
  */
 export function isObject(obj) {
     return !isDate(obj) && !isArray(obj) && Object.prototype.toString.call(obj) === '[object Object]';
@@ -57,6 +83,10 @@ export function isObject(obj) {
  *
  * @param {*} obj The value to check.
  * @return {Boolean}
+ *
+ * @example
+ * isUndefined(undefined) // -> true
+ * isUndefined(null)      // -> false
  */
 export function isUndefined(obj) {
     return typeof obj === 'undefined';
@@ -66,6 +96,10 @@ export function isUndefined(obj) {
  *
  * @param {*} obj The value to check.
  * @return {Boolean}
+ *
+ * @example
+ * isArray([1, 2, 3])              // -> true
+ * isArray(document.body.children) // -> false
  */
 export function isArray(obj) {
     return Array.isArray(obj);
@@ -75,6 +109,13 @@ export function isArray(obj) {
  *
  * @param {*} obj The value to check.
  * @return {Boolean}
+ *
+ * @example
+ * isFalsy(null)      // -> true
+ * isFalsy(undefined) // -> true
+ * isFalsy(false)     // -> true
+ * isFalsy(0)         // -> false
+ * isFalsy('')        // -> false
  */
 export function isFalsy(obj) {
     return isUndefined(obj) || obj === null || obj === false || (typeof obj === 'number' && isNaN(obj));
