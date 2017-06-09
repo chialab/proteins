@@ -69,10 +69,10 @@ function docs() {
         version: project.version || '',
         description: project.description || '',
         parser: 'dox',
-        layout: 'markdown',
+        layout: 'bootstrap',
         package: './package.json',
     }).then((content) => {
-        fs.writeFileSync('DOCUMENTATION.md', content);
+        fs.writeFileSync('./docs/index.html', content);
     });
 }
 
