@@ -29,6 +29,7 @@ const env = process.env;
 const project = require('./package.json');
 
 const path = require('path');
+const fs = require('fs');
 const del = require('del');
 const mkdirp = require('mkdirp');
 const gulp = require('gulp');
@@ -40,6 +41,7 @@ const mocha = require('gulp-mocha');
 const sourcemaps = require('gulp-sourcemaps');
 const exec = require('child-process-promise').exec;
 const karma = require('karma');
+const doxdox = require('doxdox');
 
 const DIST_PATH = 'dist';
 const SRC_PATH = 'src';
@@ -59,6 +61,19 @@ function lint() {
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failAfterError());
+}
+
+function docs() {
+    return doxdox.parseInputs([path.join(SRC_PATH, '**/*.js')], {
+        title: project.name || '',
+        version: project.version || '',
+        description: project.description || '',
+        parser: 'dox',
+        layout: 'markdown',
+        package: './package.json',
+    }).then((content) => {
+        fs.writeFileSync('DOCUMENTATION.md', content);
+    });
 }
 
 function compile() {
@@ -146,6 +161,7 @@ function unitNativesciptAndroid(done) {
 
 gulp.task('clean', clean);
 gulp.task('lint', lint);
+gulp.task('docs', docs);
 gulp.task('js', ['clean', 'lint'], compile);
 gulp.task('unit-node', ['clean', 'lint'], unitNode);
 gulp.task('unit-browsers', ['clean', 'lint'], unitKarma);
