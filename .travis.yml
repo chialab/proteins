@@ -1,32 +1,72 @@
 language: node_js
 
-node_js:
-  - 6
-  - 7
-
 branches:
   only:
     - master
 
-env:
-  global:
-    - CI_BUILD_TYPE=default
-
-matrix:
+jobs:
   include:
-    - os: linux
+    - stage: test
+      env: CI_BUILD_TYPE=default
+      node_js: 6
+      install:
+        - npm install
+      script:
+        - npm run test-default
+    - stage: test
+      env: CI_BUILD_TYPE=default
       node_js: 7
+      install:
+        - npm install
+      script:
+        - npm run test-default
+    - stage: test
+      os: linux
       env: CI_BUILD_TYPE=saucelabs
-    - os: linux
       node_js: 7
+      install:
+        - npm install
+        - npm install karma-sauce-launcher
+      script:
+        - npm run test-saucelabs
+    - stage: test
+      os: linux
       env: CI_BUILD_TYPE=electron
-    - os: osx
       node_js: 7
+      install:
+        - export DISPLAY=':99.0'
+        - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        - npm install
+        - npm install electron karma-electron-launcher
+      script:
+        - npm run test-electron
+    - stage: test
+      os: osx
       env: CI_BUILD_TYPE=electron
-    - os: osx
       node_js: 7
+      install:
+        - export DISPLAY=':99.0'
+        - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        - npm install
+        - npm install electron karma-electron-launcher
+      script:
+        - npm run test-electron
+    - stage: test
+      os: osx
       env: CI_BUILD_TYPE=nativescript
-    - os: linux
+      node_js: 7
+      install:
+        - export DISPLAY=':99.0'
+        - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        - npm install -g nativescript
+        - tns usage-reporting disable
+        - tns error-reporting disable
+        - npm install
+      script:
+        - npm run test-nativescript-ios
+    - stage: test
+      os: linux
+      env: CI_BUILD_TYPE=nativescript
       language: android
       jdk: oraclejdk8
       node_js: 7
@@ -37,21 +77,34 @@ matrix:
           - android-23
           - extra-android-m2repository
           - sys-img-armeabi-v7a-android-19
-      env: CI_BUILD_TYPE=nativescript
+      install:
+        - export DISPLAY=':99.0'
+        - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        - npm install -g nativescript
+        - tns usage-reporting disable
+        - tns error-reporting disable
+        - npm install
+      before_script:
+        - echo no | android create avd --force -n test -t android-19 -b armeabi-v7a
+        - emulator -avd test -no-audio -no-window &
+        - android-wait-for-emulator
+      script:
+        - npm run test-nativescript-android
     - stage: docs
       os: linux
       node_js: 7
       env: CNAME=docs.chialab.io
-      before_script:
+      install:
         - pip install --user awscli
-        - mkdir -p docs
+        - aws configure set preview.cloudfront true
         - npm install
+      before_script:
+        - mkdir -p docs
       script:
         - npm run docs
       after_success:
         - aws s3 sync docs s3://$CNAME/~chialab/proteins/latest --region eu-west-1 --delete
         - aws cloudfront create-invalidation --paths '/~chialab/proteins/latest/*' --distribution-id $(aws cloudfront list-distributions | python -c 'import json, os, sys; print([d["Id"] for d in json.loads(sys.stdin.read()).get("DistributionList", {}).get("Items", []) if os.environ.get("CNAME") in d.get("Aliases", {}).get("Items", [])][0])')
-
   allow_failures:
     - env: CI_BUILD_TYPE=electron
     - env: CI_BUILD_TYPE=saucelabs
@@ -62,38 +115,6 @@ addons:
   apt:
     packages:
       - xvfb
-
-install:
-  - export DISPLAY=':99.0'
-  - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-  - |
-    if [ "$CI_BUILD_TYPE" = 'nativescript' ]; then
-      nvm install 7
-      npm install -g nativescript
-      tns usage-reporting disable
-      tns error-reporting disable
-      export CI_BUILD_TYPE="$CI_BUILD_TYPE-$TRAVIS_OS_NAME"
-    fi
-  - npm install
-  - |
-    if [ "$CI_BUILD_TYPE" = 'electron' ]; then
-      npm install electron karma-electron-launcher
-    fi
-  - |
-    if [ "$CI_BUILD_TYPE" = 'saucelabs' ]; then
-      npm install karma-sauce-launcher
-    fi
-
-before_script:
-  - |
-    if [ "$CI_BUILD_TYPE" = 'nativescript-linux' ]; then
-      echo no | android create avd --force -n test -t android-19 -b armeabi-v7a
-      emulator -avd test -no-audio -no-window &
-      android-wait-for-emulator
-    fi
-
-script:
-  - npm run test-$CI_BUILD_TYPE
 
 after_success:
   - cat coverage/report-lcov/*/lcov.info | ./node_modules/.bin/codecov

@@ -4,7 +4,7 @@ import { isFunction } from './types.js';
 const SYM = symbolic('listeners');
 
 /**
- * Add a callbacks for the specified trigger.
+ * Add a callback for the specified trigger.
  *
  * @param {Object} scope The event scope
  * @param {String} name The event name

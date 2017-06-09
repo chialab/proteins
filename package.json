@@ -11,8 +11,8 @@
     "test-browsers": "gulp unit-browsers",
     "test-saucelabs": "BROWSER_PROVIDER=\"saucelabs\" gulp unit-browsers",
     "test-electron": "BROWSER_PROVIDER=\"electron\" gulp unit-browsers",
-    "test-nativescript-osx": "gulp unit-nativescript-ios",
-    "test-nativescript-linux": "gulp unit-nativescript-android",
+    "test-nativescript-ios": "gulp unit-nativescript-ios",
+    "test-nativescript-android": "gulp unit-nativescript-android",
     "lint": "gulp lint",
     "docs": "gulp docs"
   },

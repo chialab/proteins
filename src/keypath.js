@@ -7,10 +7,27 @@ import {
     isFalsy,
 } from './types.js';
 
+/**
+ * Assert scope object is an array or an object
+ * @private
+ *
+ * @param {*} obj The object to check
+ * @return {boolean} The object is valid or not
+ */
 function assertObject(obj) {
     return isArray(obj) || isObject(obj);
 }
 
+/**
+ * Assert scope object and path are valid
+ * @private
+ *
+ * @param {*} obj The object to check
+ * @param {*} path The property path
+ * @return {boolean} Arguments valid or not
+ * @throws {Error} throw error when object scope is invalid undefined
+ * @throws {Error} throw error when paths is invalid or undefined
+ */
 function assertArgs(obj, path) {
     if (!assertObject(obj)) {
         throw new Error('invalid scope');
@@ -20,6 +37,13 @@ function assertArgs(obj, path) {
     }
 }
 
+/**
+ * Normalize path argument in an array of paths
+ * @private
+ *
+ * @param {Array|string|number} path The argument to normalize
+ * @return {Array} An array of paths
+ */
 function pathToArray(path) {
     if (isString(path)) {
         return path.split('.');
@@ -64,7 +88,7 @@ export function get(obj, path) {
  * @param {*} value The value to set
  * @param {boolean} [ensure=true] Create path if does not exists
  * @return {*} The property value
- * @throws {Error} throw error when object scope is undefined
+ * @throws {Error} throw error when object scope is invalid undefined
  * @throws {Error} throw error when paths is invalid or undefined
  */
 export function set(obj, path, value, ensure = true) {
@@ -101,7 +125,7 @@ export function set(obj, path, value, ensure = true) {
  * @param {Object} obj The object scope
  * @param {String|Array} path The path of the property to retrieve
  * @return {boolean} The property exists or not
- * @throws {Error} throw error when object scope is undefined
+ * @throws {Error} throw error when object scope is invalid undefined
  * @throws {Error} throw error when paths is invalid or undefined
  */
 export function has(obj, path) {
