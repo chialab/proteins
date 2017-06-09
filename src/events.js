@@ -1,11 +1,12 @@
 import symbolic from './symbolic.js';
 import { isFunction } from './types.js';
+
 const SYM = symbolic('listeners');
 
 /**
  * Add a callbacks for the specified trigger.
  *
- * @param {*} scope The event scope
+ * @param {Object} scope The event scope
  * @param {String} name The event name
  * @param {Function} callback The callback function
  * @return {Function} Destroy created listener with this function
@@ -23,11 +24,11 @@ export function on(scope, name, callback) {
     return off.bind(null, scope, name, callback);
 }
 /**
- * Remove one or all listeners.
+ * Remove one or multiple listeners.
  *
- * @param {*} scope The event scope
+ * @param {Object} scope The event scope
  * @param {String} name Optional event name to reset
- * @param {Function} callback Optional callback to remove (empty, removes all listeners).
+ * @param {Function} [callback] Callback to remove (empty, removes all listeners).
  */
 export function off(scope, name, callback) {
     if (callback) {
@@ -51,11 +52,10 @@ export function off(scope, name, callback) {
 /**
  * Trigger a callback.
  *
- * @param {*} scope The event scope
+ * @param {Object} scope The event scope
  * @param {String} name Event name
- * @param {Array} ...args Arguments to pass to callback functions
- * @exec callback functions
- * @return {Promise}
+ * @param {...*} [args] Arguments to pass to callbacks
+ * @return {Promise} The final Promise of the callbacks chain
  */
 export function trigger(scope, name, ...args) {
     let callbacks = SYM(scope);

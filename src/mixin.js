@@ -33,15 +33,13 @@ class Mixin {
  * @return {Function} A mixed class.
  *
  * @example
- * ```js
  * // my-super.js
  * export class MySuperClass {
  *     constructor() {
  *         // do something
  *     }
  * }
- * ```
- * ```js
+ * @example
  * // mixin.js
  * export const Mixin = (superClass) => class extends superClass {
  *     constructor() {
@@ -49,8 +47,7 @@ class Mixin {
  *         // do something else
  *     }
  * };
- * ```
- * ```js
+ * @example
  * import { mix } from '@chialab/proteins';
  * import { MySuperClass } from './my-super.js';
  * import { Mixin } from './mixin.js';
@@ -58,7 +55,6 @@ class Mixin {
  * export class MixedClass extends mix(MySuperClass).with(Mixin) {
  *     ...
  * }
- * ```
  */
 export default function mix(superClass) {
     return new Mixin(superClass);

@@ -1,11 +1,11 @@
 import { isObject, isDate, isArray } from './types.js';
 
 /**
- * Clone objects.
- *
+ * Clone an object.
+ * @method clone
  * @param {*} obj The instance to clone.
- * @param {Function} callback An optional function which runs before inserting a property.
- * @return {Object|Array} The clone of the object.
+ * @param {Function} [callback] A modifier function for each property.
+ * @return {*} The clone of the object.
  */
 export default function clone(obj, callback) {
     callback = callback || function(scope, key, prop) { return prop; };

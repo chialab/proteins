@@ -14,6 +14,7 @@ class MergeOptions {
  *
  * @param {Object|Array} obj1 The initial object.
  * @param {Object|Array} obj2 The object to merge.
+ * @param {MergeOptions} options Merge options.
  * @return {Object} The merged object.
  */
 export default function merge(obj1, obj2, options) {
