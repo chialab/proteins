@@ -12,15 +12,15 @@ export default function symbolic(property) {
         SYM = Symbol(property);
     }
     let fn = (obj, ...args) => {
-        if (!hasOwnProperty.call(obj, SYM)) {
-            Object.defineProperty(obj, SYM, {
-                enumerable: false,
-                configurable: false,
-                writable: true,
-                value: undefined,
-            });
-        }
         if (args.length) {
+            if (!fn.has(obj)) {
+                Object.defineProperty(obj, SYM, {
+                    enumerable: false,
+                    configurable: false,
+                    writable: true,
+                    value: undefined,
+                });
+            }
             obj[SYM] = args[0];
         }
         return obj[SYM];
