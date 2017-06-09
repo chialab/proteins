@@ -33,49 +33,75 @@ function pathToArray(path) {
     return path;
 }
 
-export default function keypath(obj, path, ...args) {
+/**
+ * Get a deep property of an object using paths
+ * @param {Object} obj The object scope
+ * @param {String|Array} path The path of the property to retrieve
+ * @return {*} The property value
+ * @throws {Error} throw error when object scope is undefined
+ * @throws {Error} throw error when paths is invalid or undefined
+ */
+export function get(obj, path) {
     assertArgs(obj, path);
     path = pathToArray(path);
-    if (args.length) {
-        let value = args[0];
-        let ensure = args.length > 1 ? args[1] : true;
-        if (path.length === 1) {
-            if (isArray(obj) && path[0] === '') {
-                obj.push(value);
-            } else {
-                obj[path[0]] = value;
-            }
-            return value;
-        }
-        let current = path.shift();
-        let currentObj;
-        if (!obj.hasOwnProperty(current)) {
-            if (ensure) {
-                let next = path[0];
-                if (isNaN(next) && next !== '') {
-                    currentObj = obj[current] = {};
-                } else {
-                    currentObj = obj[current] = [];
-                }
-            }
-        } else {
-            currentObj = obj[current];
-        }
-        return keypath(currentObj, path, ...args);
-    } else {
-        let current = path.shift();
-        let currentObj = obj[current];
-        if (path.length === 0) {
-            return currentObj;
-        }
-        if (!assertObject(currentObj)) {
-            return undefined;
-        }
-        return keypath(currentObj, path);
+    let current = path.shift();
+    let currentObj = obj[current];
+    if (path.length === 0) {
+        return currentObj;
     }
+    if (!assertObject(currentObj)) {
+        return undefined;
+    }
+    return get(currentObj, path);
 }
 
-keypath.has = (obj, path) => {
+/**
+ * Set a deep property of an object using paths
+ * @param {Object} obj The object scope
+ * @param {String|Array} path The path of the property to set
+ * @param {*} value The value to set
+ * @param {boolean} [ensure=true] Create path if does not exists
+ * @return {*} The property value
+ * @throws {Error} throw error when object scope is undefined
+ * @throws {Error} throw error when paths is invalid or undefined
+ */
+export function set(obj, path, value, ensure = true) {
+    assertArgs(obj, path);
+    path = pathToArray(path);
+    if (path.length === 1) {
+        if (isArray(obj) && path[0] === '') {
+            obj.push(value);
+        } else {
+            obj[path[0]] = value;
+        }
+        return value;
+    }
+    let current = path.shift();
+    let currentObj;
+    if (!obj.hasOwnProperty(current)) {
+        if (ensure) {
+            let next = path[0];
+            if (isNaN(next) && next !== '') {
+                currentObj = obj[current] = {};
+            } else {
+                currentObj = obj[current] = [];
+            }
+        }
+    } else {
+        currentObj = obj[current];
+    }
+    return set(currentObj, path, value, ensure);
+}
+
+/**
+ * Check deep object property existence using paths
+ * @param {Object} obj The object scope
+ * @param {String|Array} path The path of the property to retrieve
+ * @return {boolean} The property exists or not
+ * @throws {Error} throw error when object scope is undefined
+ * @throws {Error} throw error when paths is invalid or undefined
+ */
+export function has(obj, path) {
     if (!assertObject(obj)) {
         return false;
     }
@@ -87,7 +113,7 @@ keypath.has = (obj, path) => {
             if (path.length === 0) {
                 return true;
             }
-            return keypath.has(obj[current], path);
+            return has(obj[current], path);
         }
     }
     if (isArray(obj) && !isNaN(current)) {
@@ -96,25 +122,25 @@ keypath.has = (obj, path) => {
             if (path.length === 0) {
                 return true;
             }
-            return keypath.has(obj[current], path);
+            return has(obj[current], path);
         }
     }
     return false;
-};
+}
 
-keypath.ensure = (obj, path, value) => {
-    let val = keypath(obj, path);
+export function ensure(obj, path, value) {
+    let val = get(obj, path);
     if (!val) {
-        keypath(obj, path, value);
+        set(obj, path, value);
     }
     return val;
-};
+}
 
-keypath.insert = (obj, path, value, index) => {
+export function insert(obj, path, value, index) {
     assertArgs(obj, path);
     path = pathToArray(path);
     let arr = [];
-    arr = keypath.ensure(obj, path, arr) || arr;
+    arr = ensure(obj, path, arr) || arr;
     if (isArray(arr)) {
         if (!isFalsy(index)) {
             arr.splice(index, 0, value);
@@ -123,14 +149,14 @@ keypath.insert = (obj, path, value, index) => {
         }
     }
     return arr;
-};
+}
 
-keypath.empty = (obj, path) => {
+export function empty(obj, path) {
     assertArgs(obj, path);
     path = pathToArray(path);
     let parent = obj;
     if (path.length > 1) {
-        parent = keypath(obj, path.slice(0, -1));
+        parent = get(obj, path.slice(0, -1));
     }
     let current = path[path.length - 1];
     if (parent && parent.hasOwnProperty(current)) {
@@ -153,15 +179,15 @@ keypath.empty = (obj, path) => {
         return arr;
     }
     return null;
-};
+}
 
-keypath.del = (obj, path) => {
+export function del(obj, path) {
     assertArgs(obj, path);
     path = pathToArray(path);
     let pathToDelete = path.pop();
     let subObj = obj;
     if (path.length) {
-        subObj = keypath(obj, path);
+        subObj = get(obj, path);
     }
     if (isObject(subObj)) {
         delete subObj[pathToDelete];
@@ -169,4 +195,4 @@ keypath.del = (obj, path) => {
         subObj.splice(pathToDelete, 1);
     }
     return subObj;
-};
+}

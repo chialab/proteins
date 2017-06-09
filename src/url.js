@@ -1,5 +1,5 @@
 import internal from './internal.js';
-import keypath from './keypath.js';
+import * as keypath from './keypath.js';
 
 export const URL_REGEX = /((?:^(?:[a-z]+:))|^)?(?:\/\/)?([^?\/$]*)([^?]*)?(\?.*)?/i;
 
@@ -59,7 +59,7 @@ export function parse(url = '') {
 /**
  * Serialize an object in FormData format.
  * @param {Object} obj The object to convert.
- * @param {string} prefix? The prefix to use in case of recursion.
+ * @param {string} prefix The prefix to use in case of recursion.
  * @return {string} An object to serialize.
  */
 export function serialize(obj, prefix) {
@@ -100,7 +100,7 @@ export function unserialize(str) {
         if (chunk[0] && chunk[1]) {
             let key = chunk[0].replace(/\[(.*?)\]/g, '.$1');
             let val = decodeURIComponent(chunk[1]);
-            keypath(res, key, val);
+            keypath.set(res, key, val);
         }
     }
 

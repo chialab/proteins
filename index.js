@@ -9,8 +9,8 @@ import clone from './src/clone.js';
 import merge from './src/merge.js';
 import mix from './src/mixin.js';
 import internal from './src/internal.js';
-import keypath from './src/keypath.js';
 import symbolic from './src/symbolic.js';
+import * as keypath from './src/keypath.js';
 import * as Factory from './src/factory.js';
 
 export * from './src/types.js';

@@ -1,7 +1,7 @@
 import mix from './mixin.js';
 import internal from './internal.js';
 import symbolic from './symbolic.js';
-import keypath from './keypath.js';
+import * as keypath from './keypath.js';
 import clone from './clone.js';
 import { isArray, isObject, isString } from './types.js';
 import { on, off, trigger } from './events.js';
@@ -33,7 +33,6 @@ export const ObservableMixin = (SuperClass) => class extends SuperClass {
      *
      * @param {String} name Event name
      * @param {Array} ...args Arguments to pass to callback functions
-     * @exec callback functions
      * @return {Promise}
      */
     trigger(name, ...args) {
@@ -41,6 +40,11 @@ export const ObservableMixin = (SuperClass) => class extends SuperClass {
     }
 };
 
+/**
+ * @class Observable
+ * @extends BaseObservable
+ * @implements ObservableMixin
+ */
 export class Observable extends mix(BaseObservable).with(ObservableMixin) { }
 
 export const CONFIG_SYM = symbolic('config');
@@ -58,19 +62,22 @@ export const ConfigurableMixin = (SuperClass) => class extends SuperClass {
         }
     }
 
-    config(config, val) {
+    config(config, ...args) {
+        let current = CONFIG_SYM(this);
+        if (args.length === 0 && isString(config)) {
+            return keypath.get(current, config);
+        }
         if (isString(config)) {
             return this.config({
-                [config]: val,
+                [config]: args[0],
             });
         }
-        let current = CONFIG_SYM(this);
         if (isObject(config)) {
             for (let k in config) {
-                let oldValue = keypath(current, k);
+                let oldValue = keypath.get(current, k);
                 let newValue = config[k];
                 if (oldValue !== newValue) {
-                    keypath(current, k, newValue);
+                    keypath.set(current, k, newValue);
                     this.trigger('config:changed', k, oldValue, newValue);
                 }
             }
@@ -79,7 +86,12 @@ export const ConfigurableMixin = (SuperClass) => class extends SuperClass {
     }
 };
 
-export class BaseFactory extends mix(BaseObservable).with(ObservableMixin, ConfigurableMixin) {}
+/**
+ * @class BaseFactory
+ * @extends Observable
+ * @implements ConfigurableMixin
+ */
+export class BaseFactory extends mix(Observable).with(ConfigurableMixin) {}
 
 export const FactoryMixin = (SuperClass) => class extends SuperClass {
     static init(...args) {
@@ -195,6 +207,12 @@ export const InjectableMixin = (SuperClass) => class extends SuperClass {
     }
 };
 
+/**
+ * @class Factory
+ * @extends BaseFactory
+ * @implements FactoryMixin
+ * @implements InjectableMixin
+ */
 export class Factory extends mix(BaseFactory).with(FactoryMixin, InjectableMixin) {
     initialize(...args) {
         this.internal().listenTo = [];
