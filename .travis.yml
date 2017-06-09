@@ -42,7 +42,7 @@ matrix:
       os: linux
       node_js: 7
       env: CNAME=docs.chialab.io
-      before_install:
+      before_script:
         - pip install --user awscli
         - mkdir -p docs
         - npm install
