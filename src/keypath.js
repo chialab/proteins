@@ -155,6 +155,17 @@ export function has(obj, path) {
     return false;
 }
 
+/**
+ * Ensure the existance of a value for the given path.
+ * If the value already exists, do nothing.
+ * 
+ * @param {Object} obj The object scope
+ * @param {String|Array} path The path of the property to retrieve
+ * @param {*} The default value to set
+ * @return {*} The actual value for the given property
+ * @throws {Error} throw error when object scope is invalid undefined
+ * @throws {Error} throw error when paths is invalid or undefined
+ */
 export function ensure(obj, path, value) {
     let val = get(obj, path);
     if (!val) {
@@ -163,6 +174,17 @@ export function ensure(obj, path, value) {
     return val;
 }
 
+/**
+ * Push or replace a value in array.
+ * 
+ * @param {Object} obj The object scope
+ * @param {String|Array} path The path of the property to retrieve
+ * @param {*} The value to push
+ * @param {number} [index] The index to replace (empty, push at the end)
+ * @return {Array} The modified array
+ * @throws {Error} throw error when object scope is invalid undefined
+ * @throws {Error} throw error when paths is invalid or undefined
+ */
 export function insert(obj, path, value, index) {
     assertArgs(obj, path);
     path = pathToArray(path);
@@ -178,6 +200,20 @@ export function insert(obj, path, value, index) {
     return arr;
 }
 
+/**
+ * Reset the value at the given path.
+ * Object => remove all keys from the object
+ * Array => remove all values from the array
+ * String => reset to empty string
+ * Number => reset to 0
+ * * => reset to null
+ * 
+ * @param {Object} obj The object scope
+ * @param {String|Array} path The path of the property to retrieve
+ * @return {*} The modified object
+ * @throws {Error} throw error when object scope is invalid undefined
+ * @throws {Error} throw error when paths is invalid or undefined
+ */
 export function empty(obj, path) {
     assertArgs(obj, path);
     path = pathToArray(path);
@@ -208,6 +244,15 @@ export function empty(obj, path) {
     return null;
 }
 
+/**
+ * Remove a key from the parent path
+ * 
+ * @param {Object} obj The object scope
+ * @param {String|Array} path The path of the property to retrieve
+ * @return {*} The parent path object
+ * @throws {Error} throw error when object scope is invalid undefined
+ * @throws {Error} throw error when paths is invalid or undefined
+ */
 export function del(obj, path) {
     assertArgs(obj, path);
     path = pathToArray(path);
