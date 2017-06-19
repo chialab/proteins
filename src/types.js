@@ -76,7 +76,7 @@ export function isDate(obj) {
  * isObject(new Date()) // -> false
  */
 export function isObject(obj) {
-    return !isDate(obj) && !isArray(obj) && Object.prototype.toString.call(obj) === '[object Object]';
+    return Object.prototype.toString.call(obj) === '[object Object]';
 }
 /**
  * Check if a value is undefined.
