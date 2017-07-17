@@ -8,13 +8,15 @@ A set of JavaScript utils.
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/chialab-sl-014.svg)](https://saucelabs.com/u/chialab-sl-014)
 
+## Install
+
+```sh
+npm install @chialab/proteins
+```
 
 ## Documentation
 
-[API reference](./tutorials/api.md)
-
-**Tutorials**
-
+* [API references](./tutorials/api.md)
 * [Events](./tutorials/events.md)
 * [Mixins](./tutorials/mix.md)
 * [Clone and merge](./tutorials/clone-merge.md)
