@@ -1,10 +1,12 @@
 /**
  * Proteins
+ *
  * (c) 2017 Chialab (http://www.chialab.it) <dev@chialab.io>
  * http://chialab.io
  *
  * A set of JavaScript utils.
  */
+
 import clone from './src/clone.js';
 import merge from './src/merge.js';
 import mix from './src/mixin.js';

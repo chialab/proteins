@@ -3,6 +3,7 @@ const hasOwnProperty = Object.hasOwnProperty;
 /**
  * Return a symbolic property getter/setter.
  *
+ * @method symbolic
  * @param {string} property The symbolic property name.
  * @return {Function} The property getter/setter.
  */
@@ -26,6 +27,12 @@ export default function symbolic(property) {
         return obj[SYM];
     };
 
+    /**
+     * @method has
+     * @ignore
+     * @param {Object} object The scope to check if it has the symbol
+     * @return {boolean} The scope has the symbol or not
+     */
     fn.has = (obj) => hasOwnProperty.call(obj, SYM);
 
     return fn;

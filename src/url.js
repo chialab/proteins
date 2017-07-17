@@ -57,12 +57,28 @@ export function parse(url = '') {
     return res;
 }
 /**
+ * Serialize a key/value pair matching differente operators.
+ * @private
+ *
+ * @param {string} key The pair key.
+ * @param {string} val The pair value.
+ * @return {string} A serialized string of key/value pair.
+ */
+function chunk(key, val) {
+    if (val) {
+        return `${encodeURIComponent(key)}=${encodeURIComponent(val)}`;
+    }
+    return `${encodeURIComponent(key)}`;
+}
+
+/**
  * Serialize an object in FormData format.
  * @param {Object} obj The object to convert.
  * @param {string} prefix The prefix to use in case of recursion.
+ * @param {Function} chunkFn? The callback function to use for chunking a key/value pair.
  * @return {string} An object to serialize.
  */
-export function serialize(obj, prefix) {
+export function serialize(obj, prefix, chunkFn = chunk) {
     let str = [];
     let keys = Object.keys(obj);
     if (keys.length) {
@@ -76,12 +92,12 @@ export function serialize(obj, prefix) {
                 str.push(
                     (v !== null && typeof v === 'object') ?
                     serialize(v, k) :
-                    `${encodeURIComponent(k)}=${encodeURIComponent(v)}`
+                    chunkFn(k, `${v}`)
                 );
             }
         }
     } else if (prefix) {
-        str.push(`${encodeURIComponent(prefix)}`);
+        str.push(chunkFn(prefix));
     }
     return str.join('&');
 }

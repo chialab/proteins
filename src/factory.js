@@ -6,135 +6,49 @@ import clone from './clone.js';
 import { isArray, isObject, isString } from './types.js';
 import { on, off, trigger } from './events.js';
 
-export class BaseObservable {}
+/**
+ * A set of classes with super powers.
+ * For direct or extended use.
+ *
+ * @module Factory
+ */
 
+/**
+ * Symbol for Factory configuration.
+ * @memberof Factory
+ * @type Function
+ */
+export const CONFIG_SYM = symbolic('config');
+
+/**
+ * Factory base class.
+ * @class Base
+ * @memberof Factory
+ */
+export class Base {}
+
+/**
+ * Events emitter mixin.
+ * @memberof Factory
+ * @mixin ObservableMixin
+ */
 export const ObservableMixin = (SuperClass) => class extends SuperClass {
-    /**
-     * Add a callbacks for the specified trigger.
-     *
-     * @param {String} name The event name
-     * @param {Function} callback The callback function
-     * @return {Function} Destroy created listener with this function
-     */
     on(name, callback) {
         return on(this, name, callback);
     }
-    /**
-     * Remove one or all listeners.
-     *
-     * @param {String} name Optional event name to reset
-     * @param {Function} callback Optional callback to remove (empty, removes all listeners).
-     */
     off(name, callback) {
         return off(this, name, callback);
     }
-    /**
-     * Trigger a callback.
-     *
-     * @param {String} name Event name
-     * @param {Array} ...args Arguments to pass to callback functions
-     * @return {Promise}
-     */
     trigger(name, ...args) {
         return trigger(this, name, ...args);
     }
 };
 
 /**
- * @class Observable
- * @extends BaseObservable
- * @implements ObservableMixin
+ * Mixin for other multiple injections.
+ * @memberof Factory
+ * @mixin InjectableMixin
  */
-export class Observable extends mix(BaseObservable).with(ObservableMixin) { }
-
-export const CONFIG_SYM = symbolic('config');
-
-export const ConfigurableMixin = (SuperClass) => class extends SuperClass {
-    get defaultConfig() {
-        return {};
-    }
-
-    constructor(config) {
-        super(config);
-        CONFIG_SYM(this, clone(this.defaultConfig || {}));
-        if (config) {
-            this.config(config);
-        }
-    }
-
-    config(config, ...args) {
-        let current = CONFIG_SYM(this);
-        if (args.length === 0 && isString(config)) {
-            return keypath.get(current, config);
-        }
-        if (isString(config)) {
-            return this.config({
-                [config]: args[0],
-            });
-        }
-        if (isObject(config)) {
-            for (let k in config) {
-                let oldValue = keypath.get(current, k);
-                let newValue = config[k];
-                if (oldValue !== newValue) {
-                    keypath.set(current, k, newValue);
-                    this.trigger('config:changed', k, oldValue, newValue);
-                }
-            }
-        }
-        return current;
-    }
-};
-
-/**
- * @class BaseFactory
- * @extends Observable
- * @implements ConfigurableMixin
- */
-export class BaseFactory extends mix(Observable).with(ConfigurableMixin) {}
-
-export const FactoryMixin = (SuperClass) => class extends SuperClass {
-    static init(...args) {
-        let obj = new this(...args);
-        return obj.initialize(...args);
-    }
-
-    internal() {
-        return internal(this);
-    }
-
-    setContext(ctx) {
-        this.internal().ctx = ctx;
-    }
-
-    getContext() {
-        return this.internal().ctx || this;
-    }
-
-    initialize() {
-        this.internal().initialized = true;
-        return Promise.resolve(this);
-    }
-
-    init(Class, ...args) {
-        let obj = new Class(...args);
-        obj.setContext(this.getContext());
-        if (obj.internal().initialized) {
-            return Promise.resolve(obj);
-        }
-        return obj.initialize(...args);
-    }
-
-    isDestroyed() {
-        return !internal.has(this);
-    }
-
-    destroy() {
-        internal.destroy(this);
-        return Promise.resolve();
-    }
-};
-
 export const InjectableMixin = (SuperClass) => class extends SuperClass {
     static get injectors() {
         return {};
@@ -208,7 +122,103 @@ export const InjectableMixin = (SuperClass) => class extends SuperClass {
 };
 
 /**
+ * @class Observable
+ * @memberof Factory
+ * @extends Base
+ * @implements ObservableMixin
+ */
+export class Observable extends mix(Base).with(ObservableMixin) { }
+
+export const ConfigurableMixin = (SuperClass) => class extends SuperClass {
+    get defaultConfig() {
+        return {};
+    }
+
+    constructor(config) {
+        super(config);
+        CONFIG_SYM(this, clone(this.defaultConfig || {}));
+        if (config) {
+            this.config(config);
+        }
+    }
+
+    config(config, ...args) {
+        let current = CONFIG_SYM(this);
+        if (args.length === 0 && isString(config)) {
+            return keypath.get(current, config);
+        }
+        if (isString(config)) {
+            return this.config({
+                [config]: args[0],
+            });
+        }
+        if (isObject(config)) {
+            for (let k in config) {
+                let oldValue = keypath.get(current, k);
+                let newValue = config[k];
+                if (oldValue !== newValue) {
+                    keypath.set(current, k, newValue);
+                    this.trigger('config:changed', k, oldValue, newValue);
+                }
+            }
+        }
+        return current;
+    }
+};
+
+/**
+ * @class BaseFactory
+ * @memberof Factory
+ * @extends Observable
+ * @implements ConfigurableMixin
+ */
+export class BaseFactory extends mix(Observable).with(ConfigurableMixin) {}
+
+export const FactoryMixin = (SuperClass) => class extends SuperClass {
+    static init(...args) {
+        let obj = new this(...args);
+        return obj.initialize(...args);
+    }
+
+    internal() {
+        return internal(this);
+    }
+
+    setContext(ctx) {
+        this.internal().ctx = ctx;
+    }
+
+    getContext() {
+        return this.internal().ctx || this;
+    }
+
+    initialize() {
+        this.internal().initialized = true;
+        return Promise.resolve(this);
+    }
+
+    init(Class, ...args) {
+        let obj = new Class(...args);
+        obj.setContext(this.getContext());
+        if (obj.internal().initialized) {
+            return Promise.resolve(obj);
+        }
+        return obj.initialize(...args);
+    }
+
+    isDestroyed() {
+        return !internal.has(this);
+    }
+
+    destroy() {
+        internal.destroy(this);
+        return Promise.resolve();
+    }
+};
+
+/**
  * @class Factory
+ * @memberof Factory
  * @extends BaseFactory
  * @implements FactoryMixin
  * @implements InjectableMixin

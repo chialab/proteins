@@ -8,8 +8,13 @@ import {
 } from './types.js';
 
 /**
+ * @module keypath
+ */
+
+/**
  * Assert scope object is an array or an object
  * @private
+ * @ignore
  *
  * @param {*} obj The object to check
  * @return {boolean} The object is valid or not
@@ -21,6 +26,7 @@ function assertObject(obj) {
 /**
  * Assert scope object and path are valid
  * @private
+ * @ignore
  *
  * @param {*} obj The object to check
  * @param {*} path The property path
@@ -40,6 +46,7 @@ function assertArgs(obj, path) {
 /**
  * Normalize path argument in an array of paths
  * @private
+ * @ignore
  *
  * @param {Array|string|number} path The argument to normalize
  * @return {Array} An array of paths
@@ -59,7 +66,8 @@ function pathToArray(path) {
 
 /**
  * Get a deep property of an object using paths
- *
+ * @memberof keypath
+ * 
  * @param {Object} obj The object scope
  * @param {String|Array} path The path of the property to retrieve
  * @return {*} The property value
@@ -82,6 +90,7 @@ export function get(obj, path) {
 
 /**
  * Set a deep property of an object using paths
+ * @memberof keypath
  *
  * @param {Object} obj The object scope
  * @param {String|Array} path The path of the property to set
@@ -121,6 +130,7 @@ export function set(obj, path, value, ensure = true) {
 
 /**
  * Check deep object property existence using paths
+ * @memberof keypath
  *
  * @param {Object} obj The object scope
  * @param {String|Array} path The path of the property to retrieve
@@ -158,6 +168,7 @@ export function has(obj, path) {
 /**
  * Ensure the existance of a value for the given path.
  * If the value already exists, do nothing.
+ * @memberof keypath
  * 
  * @param {Object} obj The object scope
  * @param {String|Array} path The path of the property to retrieve
@@ -176,6 +187,7 @@ export function ensure(obj, path, value) {
 
 /**
  * Push or replace a value in array.
+ * @memberof keypath
  * 
  * @param {Object} obj The object scope
  * @param {String|Array} path The path of the property to retrieve
@@ -207,6 +219,7 @@ export function insert(obj, path, value, index) {
  * String => reset to empty string
  * Number => reset to 0
  * * => reset to null
+ * @memberof keypath
  * 
  * @param {Object} obj The object scope
  * @param {String|Array} path The path of the property to retrieve
@@ -245,7 +258,8 @@ export function empty(obj, path) {
 }
 
 /**
- * Remove a key from the parent path
+ * Remove a key from the parent path.
+ * @memberof keypath
  * 
  * @param {Object} obj The object scope
  * @param {String|Array} path The path of the property to retrieve

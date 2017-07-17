@@ -1,8 +1,9 @@
 /**
  * A Mixin helper class.
+ * @ignore
  * @private
  */
-class Mixin {
+class MixinScope {
     /**
      * Create a mixable class.
      * @param {Function} superClass The class to extend.
@@ -29,33 +30,10 @@ class Mixin {
  * Mix a class with a mixin.
  * Inspired by Justin Fagnani (https://github.com/justinfagnani).
  *
- * @param {Function} superClass The class to extend.
- * @return {Function} A mixed class.
- *
- * @example
- * // my-super.js
- * export class MySuperClass {
- *     constructor() {
- *         // do something
- *     }
- * }
- * @example
- * // mixin.js
- * export const Mixin = (superClass) => class extends superClass {
- *     constructor() {
- *         super();
- *         // do something else
- *     }
- * };
- * @example
- * import { mix } from '@chialab/proteins';
- * import { MySuperClass } from './my-super.js';
- * import { Mixin } from './mixin.js';
- *
- * export class MixedClass extends mix(MySuperClass).with(Mixin) {
- *     ...
- * }
+ * @method mix
+ * @param {Function} SuperClass The class to extend.
+ * @return {MixinScope} A MixinScope instance.
  */
-export default function mix(superClass) {
-    return new Mixin(superClass);
+export default function mix(SuperClass) {
+    return new MixinScope(SuperClass);
 }

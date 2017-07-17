@@ -87,26 +87,10 @@ jobs:
         - android-wait-for-emulator
       script:
         - npm run test-nativescript-android
-    - stage: docs
-      os: linux
-      node_js: 7
-      env: CNAME=docs.chialab.io
-      install:
-        - pip install --user awscli
-        - aws configure set preview.cloudfront true
-        - npm install
-      before_script:
-        - mkdir -p docs
-      script:
-        - npm run docs
-      after_success:
-        - aws s3 sync docs s3://$CNAME/~chialab/proteins/latest --region eu-west-1 --delete
-        - aws cloudfront create-invalidation --paths '/~chialab/proteins/latest/*' --distribution-id $(aws cloudfront list-distributions | python -c 'import json, os, sys; print([d["Id"] for d in json.loads(sys.stdin.read()).get("DistributionList", {}).get("Items", []) if os.environ.get("CNAME") in d.get("Aliases", {}).get("Items", [])][0])')
   allow_failures:
     - env: CI_BUILD_TYPE=electron
     - env: CI_BUILD_TYPE=saucelabs
     - env: CI_BUILD_TYPE=nativescript
-    - stage: docs
 
 addons:
   apt:

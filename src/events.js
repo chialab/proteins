@@ -27,7 +27,7 @@ export function on(scope, name, callback) {
  * Remove one or multiple listeners.
  *
  * @param {Object} scope The event scope
- * @param {String} name Optional event name to reset
+ * @param {String} [name] Optional event name to reset
  * @param {Function} [callback] Callback to remove (empty, removes all listeners).
  */
 export function off(scope, name, callback) {

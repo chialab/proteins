@@ -14,7 +14,7 @@
     "test-nativescript-ios": "gulp unit-nativescript-ios",
     "test-nativescript-android": "gulp unit-nativescript-android",
     "lint": "gulp lint",
-    "docs": "gulp docs"
+    "docs": "documentation build src/**/*.js -f md > ./tutorials/api.md"
   },
   "repository": {
     "type": "git",
@@ -40,7 +40,7 @@
     "child-process-promise": "^2.2.1",
     "codecov.io": "^0.1.6",
     "del": "^2.2.2",
-    "doxdox": "^2.0.3",
+    "documentation": "^4.0.0-rc.1",
     "eslint": "^3.15.0",
     "gulp": "^3.9.1",
     "gulp-eslint": "^3.0.1",

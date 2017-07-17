@@ -7,3 +7,20 @@ A set of JavaScript utils.
 [![NPM](https://img.shields.io/npm/v/@chialab/proteins.svg)](https://www.npmjs.com/package/@chialab/proteins)
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/chialab-sl-014.svg)](https://saucelabs.com/u/chialab-sl-014)
+
+
+## Documentation
+
+[API reference](./tutorials/api.md)
+
+**Tutorials**
+
+* [Events](./tutorials/events.md)
+* [Mixins](./tutorials/mix.md)
+* [Clone and merge](./tutorials/clone-merge.md)
+* [Symbols](./tutorials/symbols.md)
+* [Types](./tutorials/types.md)
+
+## License
+
+[MIT](./LICENSE)
