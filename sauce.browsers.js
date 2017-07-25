@@ -52,19 +52,19 @@ module.exports = {
     SL_Chrome_2: {
         base: 'SauceLabs',
         browserName: 'chrome',
-        platform: 'Linux',
+        platform: 'Windows 10',
         version: 'latest-2',
     },
     SL_Firefox_dev: {
         base: 'SauceLabs',
         browserName: 'firefox',
-        platform: 'Windows 10',
+        platform: 'macOS 10.12',
         version: 'dev',
     },
     SL_Firefox_beta: {
         base: 'SauceLabs',
         browserName: 'firefox',
-        platform: 'Windows 10',
+        platform: 'macOS 10.12',
         version: 'beta',
     },
     SL_Firefox: {
@@ -82,7 +82,7 @@ module.exports = {
     SL_Firefox_2: {
         base: 'SauceLabs',
         browserName: 'firefox',
-        platform: 'Linux',
+        platform: 'Windows 10',
         version: 'latest-2',
     },
     SL_Safari_8: {
