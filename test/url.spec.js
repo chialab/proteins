@@ -109,16 +109,20 @@ describe('Unit: Url', () => {
         assert.throws(() => new Url('/posts').resolve('/article'), Error);
     });
 
-    it('should serialize simple string', () => {
+    it('should serialize objects', () => {
         let person = {
             firstName: 'Alan',
             age: 21,
             birthday: new Date('1912-06-11T22:00:00.000Z'),
+            filter: {
+                tags: ['math'],
+                jobs: {},
+            },
         };
         let serialized = serialize(person);
         let unserialized = unserialize(serialized);
 
-        assert.equal(serialized, `firstName=Alan&age=21&birthday=${encodeURIComponent('1912-06-11T22:00:00.000Z')}`);
+        assert.equal(serialized, `firstName=Alan&age=21&birthday=${encodeURIComponent('1912-06-11T22:00:00.000Z')}&${encodeURIComponent('filter[tags][0]')}=math&${encodeURIComponent('filter[jobs]')}`);
         assert.equal(person.firstName, unserialized.firstName);
         assert.equal(person.age, unserialized.age);
         assert.equal(person.birthday.getTime(), new Date(unserialized.birthday).getTime());

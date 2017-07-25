@@ -22,15 +22,28 @@ const mixin = (Super) => class extends Super {
     }
 };
 
-const PersonClass = mix(SuperClass).with(mixin);
-
 describe('Unit: Mixin', () => {
-    let person = new PersonClass('Alan');
+    describe('class creation', () => {
+        const PersonClass = mix().with(mixin);
+        let person = new PersonClass();
+        person.name = 'Alan';
 
-    it('should extend a class', () => {
-        assert.equal(person.name, 'Alan');
-        assert.equal(person.lastName, 'Turing');
-        assert.equal(person.fullName, 'Alan Turing');
-        assert.equal(person.isPerson(), true);
+        it('should extend a class', () => {
+            assert.equal(person.name, 'Alan');
+            assert.equal(person.lastName, 'Turing');
+            assert.equal(person.fullName, 'Alan Turing');
+        });
+    });
+
+    describe('class extension', () => {
+        const PersonClass = mix(SuperClass).with(mixin);
+        let person = new PersonClass('Alan');
+
+        it('should extend a class', () => {
+            assert.equal(person.name, 'Alan');
+            assert.equal(person.lastName, 'Turing');
+            assert.equal(person.fullName, 'Alan Turing');
+            assert.equal(person.isPerson(), true);
+        });
     });
 });

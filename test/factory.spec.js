@@ -97,7 +97,7 @@ describe('Unit: Observable', () => {
     describe('off', () => {
         before((done) => {
             reset().then(() => {
-                obj.off();
+                obj.destroy();
                 Promise.all([
                     obj.trigger('test1', 2),
                     obj.trigger('test3', 1, 4, 2),

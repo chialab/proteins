@@ -22,10 +22,24 @@ export const CONFIG_SYM = symbolic('config');
 
 /**
  * Factory base class.
+ * @private
  * @class Base
  * @memberof Factory
  */
-export class Base {}
+class Base {
+    internal() {
+        return internal(this);
+    }
+
+    destroy() {
+        internal.destroy(this);
+        return Promise.resolve();
+    }
+
+    isDestroyed() {
+        return !internal.has(this);
+    }
+}
 
 /**
  * Events emitter mixin.
@@ -33,14 +47,42 @@ export class Base {}
  * @mixin ObservableMixin
  */
 export const ObservableMixin = (SuperClass) => class extends SuperClass {
+    constructor(...args) {
+        super(...args);
+        this.internal().listenTo = [];
+    }
+
     on(name, callback) {
         return on(this, name, callback);
     }
+
     off(name, callback) {
         return off(this, name, callback);
     }
+
     trigger(name, ...args) {
         return trigger(this, name, ...args);
+    }
+
+    listen(obj, name, callback) {
+        this.internal().listenTo.push(
+            on(obj, name, callback)
+        );
+    }
+
+    unlisten(obj, name, callback) {
+        if (obj) {
+            off(obj, name, callback);
+        } else {
+            this.internal().listenTo.forEach((offListener) => offListener());
+            this.internal().listenTo = [];
+        }
+    }
+
+    destroy() {
+        this.off();
+        this.unlisten();
+        return super.destroy();
     }
 };
 
@@ -172,16 +214,12 @@ export const ConfigurableMixin = (SuperClass) => class extends SuperClass {
  * @extends Observable
  * @implements ConfigurableMixin
  */
-export class BaseFactory extends mix(Observable).with(ConfigurableMixin) {}
+export class BaseFactory extends mix(Observable).with(ConfigurableMixin) { }
 
 export const FactoryMixin = (SuperClass) => class extends SuperClass {
     static init(...args) {
         let obj = new this(...args);
         return obj.initialize(...args);
-    }
-
-    internal() {
-        return internal(this);
     }
 
     setContext(ctx) {
@@ -205,15 +243,6 @@ export const FactoryMixin = (SuperClass) => class extends SuperClass {
         }
         return obj.initialize(...args);
     }
-
-    isDestroyed() {
-        return !internal.has(this);
-    }
-
-    destroy() {
-        internal.destroy(this);
-        return Promise.resolve();
-    }
 };
 
 /**
@@ -223,30 +252,4 @@ export const FactoryMixin = (SuperClass) => class extends SuperClass {
  * @implements FactoryMixin
  * @implements InjectableMixin
  */
-export class Factory extends mix(BaseFactory).with(FactoryMixin, InjectableMixin) {
-    initialize(...args) {
-        this.internal().listenTo = [];
-        return super.initialize(...args);
-    }
-
-    listen(obj, name, callback) {
-        this.internal().listenTo.push(
-            on(obj, name, callback)
-        );
-    }
-
-    unlisten(obj, name, callback) {
-        if (obj) {
-            off(obj, name, callback);
-        } else {
-            this.internal().listenTo.forEach((offListener) => offListener());
-            this.internal().listenTo = [];
-        }
-    }
-
-    destroy() {
-        this.off();
-        this.unlisten();
-        return super.destroy();
-    }
-}
+export class Factory extends mix(BaseFactory).with(FactoryMixin, InjectableMixin) { }
