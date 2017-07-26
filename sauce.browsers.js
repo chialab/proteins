@@ -58,7 +58,7 @@ module.exports = {
     SL_Firefox_dev: {
         base: 'SauceLabs',
         browserName: 'firefox',
-        platform: 'macOS 10.12',
+        platform: 'Windows 10',
         version: 'dev',
     },
     SL_Firefox_beta: {
