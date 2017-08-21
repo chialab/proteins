@@ -1,4 +1,4 @@
-import internal from './internal.js';
+import { Base } from './factory.js';
 import * as keypath from './keypath.js';
 
 export const URL_REGEX = /((?:^(?:[a-z]+:))|^)?(?:\/\/)?([^?\/$]*)([^?]*)?(\?.*)?/i;
@@ -188,13 +188,14 @@ function entriesToString(entries) {
     return serialize(unserialized);
 }
 
-class SearchParams {
+class SearchParams extends Base {
     constructor(urlRef) {
-        internal(this).ref = urlRef;
+        super();
+        this.internal().ref = urlRef;
     }
 
     get url() {
-        return internal(this).ref;
+        return this.internal().ref;
     }
 
     delete(name) {
@@ -266,8 +267,9 @@ class SearchParams {
     }
 }
 
-export class Url {
+export class Url extends Base {
     constructor(path, baseUrl) {
+        super();
         if (baseUrl) {
             this.href = resolve(baseUrl, path);
         } else {
@@ -277,12 +279,12 @@ export class Url {
     }
 
     get href() {
-        return internal(this).href;
+        return this.internal().href;
     }
 
     set href(href) {
         let info = parse(href);
-        internal(this).href = href;
+        this.internal().href = href;
         for (let k in info) {
             this[k] = info[k];
         }

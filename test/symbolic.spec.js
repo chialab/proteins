@@ -1,14 +1,14 @@
 /* eslint-env mocha */
-import symbolic from '../src/symbolic.js';
+import Symbolic from '../src/symbolic.js';
 
 describe('Unit: Symbolic', () => {
     it('should set a symbolic property', () => {
-        const AGE = symbolic('age');
+        const AGE = new Symbolic('age');
         let user = {
             firstName: 'Alan',
             lastName: 'Turing',
         };
-        AGE(user, 29);
+        AGE.set(user, 29);
 
         let enumKeys = [];
         for (let k in user) {
@@ -17,7 +17,7 @@ describe('Unit: Symbolic', () => {
 
         assert.equal(user.firstName, 'Alan');
         assert.equal(user.lastName, 'Turing');
-        assert.equal(AGE(user), 29);
+        assert.equal(AGE.get(user), 29);
         assert.equal(Object.keys(user).length, 2);
         assert.equal(enumKeys.length, 2);
         assert(AGE.has(user));

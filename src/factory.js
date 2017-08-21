@@ -1,6 +1,5 @@
 import mix from './mixin.js';
-import internal from './internal.js';
-import symbolic from './symbolic.js';
+import Symbolic from './symbolic.js';
 import * as keypath from './keypath.js';
 import clone from './clone.js';
 import { isArray, isObject, isString } from './types.js';
@@ -13,33 +12,58 @@ import { on, off, trigger } from './events.js';
  * @module Factory
  */
 
+ /**
+ * Symbol for Factory private fields.
+ * @memberof Factory
+ * @type Function
+ */
+export const PRIVATE_SYM = new Symbolic('private');
+
 /**
  * Symbol for Factory configuration.
  * @memberof Factory
  * @type Function
  */
-export const CONFIG_SYM = symbolic('config');
+export const CONFIG_SYM = new Symbolic('config');
 
 /**
- * Factory base class.
- * @private
- * @class Base
+ * Symbol for Factory context.
+ * @memberof Factory
+ * @type Function
+ */
+export const CONTEXT_SYM = new Symbolic('context');
+
+/**
+ * Symbol for Factory injections.
+ * @memberof Factory
+ * @type Function
+ */
+export const INJECTIONS_SYM = new Symbolic('injections');
+
+/**
+ * Factory base mixin.
+ * @mixin BaseMixin
  * @memberof Factory
  */
-class Base {
+export const BaseMixin = (SuperClass) => class extends SuperClass {
+    constructor(...args) {
+        super(...args);
+        PRIVATE_SYM.set(this, {});
+    }
+
     internal() {
-        return internal(this);
+        return PRIVATE_SYM.get(this);
     }
 
     destroy() {
-        internal.destroy(this);
+        PRIVATE_SYM.destroy(this);
         return Promise.resolve();
     }
 
     isDestroyed() {
-        return !internal.has(this);
+        return !PRIVATE_SYM.has(this);
     }
-}
+};
 
 /**
  * Events emitter mixin.
@@ -86,91 +110,6 @@ export const ObservableMixin = (SuperClass) => class extends SuperClass {
     }
 };
 
-/**
- * Mixin for other multiple injections.
- * @memberof Factory
- * @mixin InjectableMixin
- */
-export const InjectableMixin = (SuperClass) => class extends SuperClass {
-    static get injectors() {
-        return {};
-    }
-
-    initialize(...args) {
-        this.internal().injected = {};
-        return super.initialize(...args)
-            .then(() =>
-                this.beforeInjection(...args)
-                    .then((injectors) =>
-                        this.inject(injectors)
-                    )
-                    .then(() => this.afterInjection())
-            ).then(() =>
-                Promise.resolve(this)
-            );
-    }
-
-    beforeInjection() {
-        return Promise.resolve([
-            this.constructor.injectors,
-        ]);
-    }
-
-    afterInjection() {
-        return Promise.resolve();
-    }
-
-    injected() {
-        return this.internal().injected;
-    }
-
-    inject(inject, Fn) {
-        let promise = Promise.resolve();
-        if (isArray(inject)) {
-            inject.forEach((injs) => {
-                promise = promise.then(() => this.inject(injs));
-            });
-        } else if (isObject(inject)) {
-            for (let name in inject) {
-                promise = promise.then(() => this.inject(name, inject[name]));
-            }
-        } else {
-            let resolve = Promise.resolve(Fn);
-            let contextInjected = this.getContext().injected();
-            if (contextInjected.hasOwnProperty(inject)) {
-                resolve = Promise.resolve(contextInjected[inject]);
-            } else {
-                let args = [];
-                if (isArray(Fn)) {
-                    args = Fn.slice(1);
-                    Fn = Fn[0];
-                }
-                resolve = this.init(Fn, ...args);
-            }
-            promise = resolve
-                .then((fn) => {
-                    contextInjected[inject] = fn;
-                    this.internal().injected[inject] = fn;
-                    return this.trigger('inject:ready', inject, fn);
-                });
-        }
-        return promise;
-    }
-
-    factory(name) {
-        let injected = this.getContext().injected();
-        return injected && injected[name];
-    }
-};
-
-/**
- * @class Observable
- * @memberof Factory
- * @extends Base
- * @implements ObservableMixin
- */
-export class Observable extends mix(Base).with(ObservableMixin) { }
-
 export const ConfigurableMixin = (SuperClass) => class extends SuperClass {
     get defaultConfig() {
         return {};
@@ -178,14 +117,14 @@ export const ConfigurableMixin = (SuperClass) => class extends SuperClass {
 
     constructor(config) {
         super(config);
-        CONFIG_SYM(this, clone(this.defaultConfig || {}));
+        CONFIG_SYM.set(this, clone(this.defaultConfig || {}));
         if (config) {
             this.config(config);
         }
     }
 
     config(config, ...args) {
-        let current = CONFIG_SYM(this);
+        let current = CONFIG_SYM.get(this);
         if (args.length === 0 && isString(config)) {
             return keypath.get(current, config);
         }
@@ -206,28 +145,22 @@ export const ConfigurableMixin = (SuperClass) => class extends SuperClass {
         }
         return current;
     }
+
+    destroy() {
+        CONFIG_SYM.destroy(this);
+        return super.destroy();
+    }
 };
 
-/**
- * @class BaseFactory
- * @memberof Factory
- * @extends Observable
- * @implements ConfigurableMixin
- */
-export class BaseFactory extends mix(Observable).with(ConfigurableMixin) { }
-
-export const FactoryMixin = (SuperClass) => class extends SuperClass {
+export const ContextualMixin = (SuperClass) => class extends SuperClass {
     static init(...args) {
         let obj = new this(...args);
         return obj.initialize(...args);
     }
 
-    setContext(ctx) {
-        this.internal().ctx = ctx;
-    }
-
-    getContext() {
-        return this.internal().ctx || this;
+    constructor(...args) {
+        super(...args);
+        CONTEXT_SYM.set(this, this);
     }
 
     initialize() {
@@ -237,19 +170,116 @@ export const FactoryMixin = (SuperClass) => class extends SuperClass {
 
     init(Class, ...args) {
         let obj = new Class(...args);
-        obj.setContext(this.getContext());
+        CONTEXT_SYM.set(obj, CONTEXT_SYM.get(this));
         if (obj.internal().initialized) {
             return Promise.resolve(obj);
         }
         return obj.initialize(...args);
     }
+
+    destroy() {
+        CONTEXT_SYM.destroy(this);
+        return super.destroy();
+    }
 };
+
+/**
+ * Mixin for other multiple injections.
+ * @memberof Factory
+ * @mixin InjectableMixin
+ */
+export const InjectableMixin = (SuperClass) => class extends SuperClass {
+    static get injectors() {
+        return {};
+    }
+
+    initialize(...args) {
+        return super.initialize(...args)
+            .then(() => {
+                let context = CONTEXT_SYM.get(this);
+                if (!INJECTIONS_SYM.has(context)) {
+                    INJECTIONS_SYM.set(context, {});
+                }
+                let injectors = this.config('injectors') || this.constructor.injectors;
+                return this.inject(injectors);
+            }).then(() =>
+                Promise.resolve(this)
+            );
+    }
+
+    inject(inject, Fn) {
+        let promise = Promise.resolve();
+        if (isArray(inject)) {
+            inject.forEach((injs) => {
+                promise = promise.then(() => this.inject(injs));
+            });
+        } else if (isObject(inject)) {
+            for (let name in inject) {
+                promise = promise.then(() => this.inject(name, inject[name]));
+            }
+        } else {
+            let resolve = Promise.resolve(Fn);
+            let context = CONTEXT_SYM.get(this);
+            let contextInjected = INJECTIONS_SYM.get(context);
+            if (contextInjected.hasOwnProperty(inject)) {
+                resolve = Promise.resolve(contextInjected[inject]);
+            } else {
+                let args = [];
+                if (isArray(Fn)) {
+                    args = Fn.slice(1);
+                    Fn = Fn[0];
+                }
+                resolve = this.init(Fn, ...args);
+            }
+            promise = resolve
+                .then((fn) => {
+                    contextInjected[inject] = fn;
+                    return this.trigger('inject:ready', inject, fn);
+                });
+        }
+        return promise;
+    }
+
+    factory(name) {
+        let context = CONTEXT_SYM.get(this);
+        let contextInjected = INJECTIONS_SYM.get(context);
+        return contextInjected && contextInjected[name];
+    }
+
+    destroy() {
+        INJECTIONS_SYM.destroy(this);
+        return super.destroy();
+    }
+};
+
+/**
+ * @class Base
+ * @memberof Factory
+ * @implements BaseMixin
+ */
+export class Base extends mix().with(BaseMixin) { }
+
+/**
+ * @class Observable
+ * @memberof Factory
+ * @extends Base
+ * @implements ObservableMixin
+ */
+export class Observable extends mix(Base).with(ObservableMixin) { }
+
+/**
+ * @class Configurable
+ * @memberof Factory
+ * @extends Observable
+ * @implements ConfigurableMixin
+ */
+export class Configurable extends mix(Observable).with(ConfigurableMixin) { }
 
 /**
  * @class Factory
  * @memberof Factory
- * @extends BaseFactory
- * @implements FactoryMixin
+ * @extends Configurable
+ * @implements ContextualMixin
  * @implements InjectableMixin
  */
-export class Factory extends mix(BaseFactory).with(FactoryMixin, InjectableMixin) { }
+export class Factory extends mix(Configurable).with(ContextualMixin, InjectableMixin) { }

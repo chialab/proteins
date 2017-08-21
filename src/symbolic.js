@@ -1,39 +1,69 @@
-const hasOwnProperty = Object.hasOwnProperty;
+const getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 
-/**
- * Return a symbolic property getter/setter.
- *
- * @method symbolic
- * @param {string} property The symbolic property name.
- * @return {Function} The property getter/setter.
- */
-export default function symbolic(property) {
-    let SYM = `__${property}`;
-    if (typeof Symbol !== 'undefined') {
-        SYM = Symbol(property);
-    }
-    let fn = (obj, ...args) => {
-        if (args.length) {
-            if (!fn.has(obj)) {
-                Object.defineProperty(obj, SYM, {
-                    enumerable: false,
-                    configurable: false,
-                    writable: true,
-                    value: undefined,
-                });
-            }
-            obj[SYM] = args[0];
+const PRIVATE_FIELD = {};
+
+export default class Symbolic {
+    constructor(property) {
+        this.SYM = `__${property}`;
+        if (typeof Symbol !== 'undefined') {
+            this.SYM = Symbol(property);
         }
-        return obj[SYM];
-    };
+    }
 
     /**
-     * @method has
-     * @ignore
+     * Get Symbolic property of an object.
+     *
+     * @param {Object} object The scope of the property
+     * @return {*} The scope property value
+     */
+    get(object) {
+        return object[this.SYM];
+    }
+
+    /**
+     * Set Symbolic property of an object.
+     *
+     * @param {Object} object The scope of the property
+     * @param {*} The data to set
+     */
+    set(object, data) {
+        if (!this.has(object)) {
+            Object.defineProperty(object, this.SYM, {
+                enumerable: false,
+                configurable: true,
+                writable: true,
+                value: undefined,
+            });
+        }
+        object[this.SYM] = data;
+    }
+
+    /**
+     * Check if an object has a Symbolic definition.
+     *
      * @param {Object} object The scope to check if it has the symbol
      * @return {boolean} The scope has the symbol or not
      */
-    fn.has = (obj) => hasOwnProperty.call(obj, SYM);
+    has(object) {
+        let descriptor = getOwnPropertyDescriptor(object, this.SYM);
+        return descriptor && descriptor.writable && descriptor.value !== PRIVATE_FIELD;
+    }
 
-    return fn;
+    /**
+     * Block Symbolic definition on object
+     *
+     * @method destroy
+     * @param {Object} object The scope of the internal symbol to destroy
+     */
+    destroy(object) {
+        if (this.has(object)) {
+            Object.defineProperty(object, this.SYM, {
+                enumerable: false,
+                configurable: true,
+                writable: false,
+                value: PRIVATE_FIELD,
+            });
+        }
+    }
 }
+

@@ -1,7 +1,7 @@
-import symbolic from './symbolic.js';
+import Symbolic from './symbolic.js';
 import { isFunction } from './types.js';
 
-const SYM = symbolic('listeners');
+const SYM = new Symbolic('listeners');
 
 /**
  * Add a callback for the specified trigger.
@@ -16,9 +16,9 @@ export function on(scope, name, callback) {
         throw new TypeError('callback is not a function');
     }
     if (!SYM.has(scope)) {
-        SYM(scope, {});
+        SYM.set(scope, {});
     }
-    let callbacks = SYM(scope);
+    let callbacks = SYM.get(scope);
     let evtCallbacks = callbacks[name] = callbacks[name] || [];
     evtCallbacks.push(callback);
     return off.bind(null, scope, name, callback);
@@ -32,7 +32,7 @@ export function on(scope, name, callback) {
  */
 export function off(scope, name, callback) {
     if (callback) {
-        let callbacks = SYM(scope);
+        let callbacks = SYM.get(scope);
         if (callbacks) {
             let evtCallbacks = callbacks[name] = callbacks[name] || [];
             let io = evtCallbacks.indexOf(callback);
@@ -41,12 +41,12 @@ export function off(scope, name, callback) {
             }
         }
     } else if (name) {
-        let callbacks = SYM(scope);
+        let callbacks = SYM.get(scope);
         if (callbacks) {
             delete callbacks[name];
         }
     } else {
-        SYM(scope, {});
+        SYM.set(scope, {});
     }
 }
 /**
@@ -58,7 +58,7 @@ export function off(scope, name, callback) {
  * @return {Promise} The final Promise of the callbacks chain
  */
 export function trigger(scope, name, ...args) {
-    let callbacks = SYM(scope);
+    let callbacks = SYM.get(scope);
     if (callbacks) {
         let evtCallbacks = callbacks[name] || [];
         let promise = Promise.resolve();

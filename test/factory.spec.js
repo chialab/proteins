@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 import { trigger } from '../src/events.js';
-import { Factory, Observable } from '../src/factory.js';
+import { Factory, Observable, CONTEXT_SYM } from '../src/factory.js';
 
 describe('Unit: Observable', () => {
     let obj = new Observable();
@@ -201,13 +201,13 @@ describe('Unit: Factory', () => {
 
     it('should instantiate a factory', () => {
         assert(factory instanceof MainFactory);
-        assert.equal(factory.getContext(), factory);
+        assert.equal(CONTEXT_SYM.get(factory), factory);
     });
 
     it('should instantiate a factory in the same context', () => {
         assert(child instanceof ChildFactory);
         assert.equal(child.prop, 11);
-        assert.equal(child.getContext(), factory);
+        assert.equal(CONTEXT_SYM.get(child), factory);
     });
 
     it('should instantiate a factory with configuration', () => {
@@ -237,7 +237,7 @@ describe('Unit: Factory', () => {
         child.destroy();
         assert(child instanceof ChildFactory);
         assert(child.isDestroyed());
-        assert.equal(child.getContext(), child);
+        assert(!CONTEXT_SYM.has(child));
     });
 
     describe('listener', () => {
