@@ -14,15 +14,6 @@ A set of JavaScript utils.
 npm install @chialab/proteins
 ```
 
-## Documentation
-
-* [API references](./tutorials/api.md)
-* [Events](./tutorials/events.md)
-* [Mixins](./tutorials/mix.md)
-* [Clone and merge](./tutorials/clone-merge.md)
-* [Symbols](./tutorials/symbols.md)
-* [Types](./tutorials/types.md)
-
 ## License
 
 [MIT](./LICENSE)

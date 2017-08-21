@@ -99,7 +99,7 @@ jobs:
       script:
         - git config --global user.email "travis@travis-ci.org"
         - git config --global user.name "travis-ci"
-        - git clone https://github.com/Chialab/proteins.wiki.git wiki
+        - git clone https://${GH_TOKEN}@github.com/Chialab/proteins.wiki.git wiki
         - ./node_modules/.bin/documentation build src/**/*.js -f md > ./wiki/API.md
         - cd wiki
         - git add .
