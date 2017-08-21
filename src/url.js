@@ -1,8 +1,9 @@
-import { Base } from './factory.js';
 import * as keypath from './keypath.js';
+import Symbolic from './symbolic.js';
+
+const REF_SYM = new Symbolic('ref');
 
 export const URL_REGEX = /((?:^(?:[a-z]+:))|^)?(?:\/\/)?([^?\/$]*)([^?]*)?(\?.*)?/i;
-
 const PORT_REGEX = /\:\d*$/;
 
 export function parse(url = '') {
@@ -188,14 +189,13 @@ function entriesToString(entries) {
     return serialize(unserialized);
 }
 
-class SearchParams extends Base {
+class SearchParams {
     constructor(urlRef) {
-        super();
-        this.internal().ref = urlRef;
+        REF_SYM.set(this, urlRef);
     }
 
     get url() {
-        return this.internal().ref;
+        return REF_SYM.get(this);
     }
 
     delete(name) {
@@ -267,9 +267,8 @@ class SearchParams extends Base {
     }
 }
 
-export class Url extends Base {
+export class Url {
     constructor(path, baseUrl) {
-        super();
         if (baseUrl) {
             this.href = resolve(baseUrl, path);
         } else {
@@ -279,12 +278,12 @@ export class Url extends Base {
     }
 
     get href() {
-        return this.internal().href;
+        return REF_SYM.get(this);
     }
 
     set href(href) {
         let info = parse(href);
-        this.internal().href = href;
+        REF_SYM.set(this, href);
         for (let k in info) {
             this[k] = info[k];
         }

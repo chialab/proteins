@@ -236,7 +236,6 @@ describe('Unit: Factory', () => {
     it('should destroy a factory in the same context', () => {
         child.destroy();
         assert(child instanceof ChildFactory);
-        assert(child.isDestroyed());
         assert(!CONTEXT_SYM.has(child));
     });
 

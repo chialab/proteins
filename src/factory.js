@@ -12,19 +12,19 @@ import { on, off, trigger } from './events.js';
  * @module Factory
  */
 
- /**
- * Symbol for Factory private fields.
- * @memberof Factory
- * @type Function
- */
-export const PRIVATE_SYM = new Symbolic('private');
-
 /**
  * Symbol for Factory configuration.
  * @memberof Factory
  * @type Function
  */
 export const CONFIG_SYM = new Symbolic('config');
+
+/**
+ * Symbol for Factory listeners.
+ * @memberof Factory
+ * @type Function
+ */
+export const LISTENERS_SYM = new Symbolic('listeners');
 
 /**
  * Symbol for Factory context.
@@ -41,31 +41,6 @@ export const CONTEXT_SYM = new Symbolic('context');
 export const INJECTIONS_SYM = new Symbolic('injections');
 
 /**
- * Factory base mixin.
- * @mixin BaseMixin
- * @memberof Factory
- */
-export const BaseMixin = (SuperClass) => class extends SuperClass {
-    constructor(...args) {
-        super(...args);
-        PRIVATE_SYM.set(this, {});
-    }
-
-    internal() {
-        return PRIVATE_SYM.get(this);
-    }
-
-    destroy() {
-        PRIVATE_SYM.destroy(this);
-        return Promise.resolve();
-    }
-
-    isDestroyed() {
-        return !PRIVATE_SYM.has(this);
-    }
-};
-
-/**
  * Events emitter mixin.
  * @memberof Factory
  * @mixin ObservableMixin
@@ -73,7 +48,7 @@ export const BaseMixin = (SuperClass) => class extends SuperClass {
 export const ObservableMixin = (SuperClass) => class extends SuperClass {
     constructor(...args) {
         super(...args);
-        this.internal().listenTo = [];
+        LISTENERS_SYM.set(this, []);
     }
 
     on(name, callback) {
@@ -89,7 +64,7 @@ export const ObservableMixin = (SuperClass) => class extends SuperClass {
     }
 
     listen(obj, name, callback) {
-        this.internal().listenTo.push(
+        LISTENERS_SYM.get(this).push(
             on(obj, name, callback)
         );
     }
@@ -98,15 +73,15 @@ export const ObservableMixin = (SuperClass) => class extends SuperClass {
         if (obj) {
             off(obj, name, callback);
         } else {
-            this.internal().listenTo.forEach((offListener) => offListener());
-            this.internal().listenTo = [];
+            LISTENERS_SYM.get(this).forEach((offListener) => offListener());
+            LISTENERS_SYM.set(this, []);
         }
     }
 
     destroy() {
         this.off();
         this.unlisten();
-        return super.destroy();
+        return SuperClass.prototype.destroy && super.destroy();
     }
 };
 
@@ -148,7 +123,7 @@ export const ConfigurableMixin = (SuperClass) => class extends SuperClass {
 
     destroy() {
         CONFIG_SYM.destroy(this);
-        return super.destroy();
+        return SuperClass.prototype.destroy && super.destroy();
     }
 };
 
@@ -164,22 +139,18 @@ export const ContextualMixin = (SuperClass) => class extends SuperClass {
     }
 
     initialize() {
-        this.internal().initialized = true;
         return Promise.resolve(this);
     }
 
     init(Class, ...args) {
         let obj = new Class(...args);
         CONTEXT_SYM.set(obj, CONTEXT_SYM.get(this));
-        if (obj.internal().initialized) {
-            return Promise.resolve(obj);
-        }
         return obj.initialize(...args);
     }
 
     destroy() {
         CONTEXT_SYM.destroy(this);
-        return super.destroy();
+        return SuperClass.prototype.destroy && super.destroy();
     }
 };
 
@@ -248,16 +219,9 @@ export const InjectableMixin = (SuperClass) => class extends SuperClass {
 
     destroy() {
         INJECTIONS_SYM.destroy(this);
-        return super.destroy();
+        return SuperClass.prototype.destroy && super.destroy();
     }
 };
-
-/**
- * @class Base
- * @memberof Factory
- * @implements BaseMixin
- */
-export class Base extends mix().with(BaseMixin) { }
 
 /**
  * @class Observable
@@ -265,7 +229,7 @@ export class Base extends mix().with(BaseMixin) { }
  * @extends Base
  * @implements ObservableMixin
  */
-export class Observable extends mix(Base).with(ObservableMixin) { }
+export class Observable extends mix().with(ObservableMixin) { }
 
 /**
  * @class Configurable
