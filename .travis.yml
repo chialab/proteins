@@ -1,5 +1,7 @@
 language: node_js
 
+secure: Alheh6Xw8NL90Enj4QxdbEQdhZjXq2zyS0o6iZo8GROac12cgSUh4r5qqxh+1gKqtjuo1bJnnQoLvx1JjXFz75o/+cNHLLYgPCH+MMS6KduBsoDU6TxEZW5xY9HGjtkx+lte3tpDHOQ30jfJdqWKTEAyCb6SVSK0/p2dxSGp1pzwahc++FGerDzfbNnHXgo5MhFdpU2zrkPyP5/9ixOaFzlRiltsHCCqZecn3+XcSCa/tRhq+TsfRMxz0SK6xDQER1MPRZ0srFJ+72oAO0TT1YCRbpTM50t3WD3xZwg694JOhP8VfQugHTRdbEwqROkzk26HFjDNBKdj/18OpORaJR1XDg5vtAozapqCcr5mU0quamt/pt99xOFBiRELAXjOh0w5NOBBzXryJ8dxazdwi5ENHKbsIXpWvPznywHAivMilOQ1Gpptg/xVQql3nJr2mKumE/UDnRHBEAogbiAxBmdMiNouB+l8jaTIhiw3iL5VZ1dFtTDtRxk+fLDxJGX5026/QW/HEsrRUJBYQn5G4ll2aauJOLENFB2mzjHnVKQCawCMKzCehVF3iG6C227I9RqLp9BR3E/2rZ+uqxHJ1VZPZqavue6KJFHxjktTBXMbPHe3DVmyjBGkgFGq58b0NBNJOU2u3RHvshl8NaONrs2rIjgOXsvTdhfjLug21ec=
+
 jobs:
   include:
     - stage: test
@@ -87,10 +89,27 @@ jobs:
         - android-wait-for-emulator
       script:
         - npm run test-nativescript-android
+    - stage: deploy
+      os: linux
+      env: CI_BUILD_TYPE=docs
+      node_js: 7
+      install:
+        - npm install documentation
+        - npm install
+      script:
+        - git config --global user.email "travis@travis-ci.org"
+        - git config --global user.name "travis-ci"
+        - git clone https://github.com/Chialab/proteins.wiki.git wiki
+        - ./node_modules/.bin/documentation build src/**/*.js -f md > ./wiki/API.md
+        - cd wiki
+        - git add .
+        - git commit -m "Lastest api reference on successful travis build $TRAVIS_BUILD_NUMBER auto-pushed to wiki"
+        - git push --quiet origin
   allow_failures:
     - env: CI_BUILD_TYPE=electron
     - env: CI_BUILD_TYPE=saucelabs
     - env: CI_BUILD_TYPE=nativescript
+    - env: CI_BUILD_TYPE=docs
 
 addons:
   apt:
