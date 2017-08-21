@@ -101,7 +101,7 @@ jobs:
         - ./node_modules/.bin/documentation build src/**/*.js -f md > ./wiki/API.md
         - cd wiki
         - git add .
-        - git commit -m "Lastest api reference on successful travis build $TRAVIS_BUILD_NUMBER auto-pushed to wiki"
+        - git diff-index --quiet HEAD || git commit -m "Lastest api reference on successful travis build ${TRAVIS_BUILD_NUMBER} auto-pushed to wiki"
         - git push origin
   allow_failures:
     - env: CI_BUILD_TYPE=electron
