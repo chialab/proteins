@@ -1,30 +1,6 @@
-/**
- * A Mixin helper class.
- * @ignore
- * @private
- */
-class MixinScope {
-    /**
-     * Create a mixable class.
-     * @param {Function} superClass The class to extend.
-     */
-    constructor(superclass) {
-        superclass = superclass || class { };
-        this.superclass = superclass;
-    }
-    /**
-     * Mix the super class with a list of mixins.
-     * @param {...Function} mixins *N* mixin functions.
-     * @return {Function} The extended class.
-     */
-    with(...args) {
-        let Class = this.superclass;
-        args.forEach((mixin) => {
-            Class = mixin(Class);
-        });
-        return Class;
-    }
-}
+import Symbolic from './symbolic.js';
+
+const MIXINS_SYM = new Symbolic('mixins');
 
 /**
  * Mix a class with a mixin.
@@ -33,7 +9,63 @@ class MixinScope {
  * @method mix
  * @param {Function} SuperClass The class to extend.
  * @return {MixinScope} A MixinScope instance.
+ * @module mix
  */
 export default function mix(SuperClass) {
     return new MixinScope(SuperClass);
+}
+
+/**
+ * A Mixin helper class.
+ * @class MixinScope
+ * @memberof mix
+ */
+class MixinScope {
+    /**
+     * Create a mixable class.
+     * @private
+     * @param {Function} superClass The class to extend.
+     */
+    constructor(superclass) {
+        superclass = superclass || class { };
+        this.superclass = superclass;
+    }
+    /**
+     * Mix the super class with a list of mixins.
+     * @memberof mix.MixinScope
+     *
+     * @param {...Function} mixins *N* mixin functions.
+     * @return {Function} The extended class.
+     */
+    with(...mixins) {
+        let Class = this.superclass;
+        mixins.forEach((mixin) => {
+            if (!this.has(mixin)) {
+                Class = mixin(Class);
+            }
+        });
+        if (!MIXINS_SYM.has(Class)) {
+            MIXINS_SYM.set(Class, []);
+        }
+        MIXINS_SYM.get(Class).push(...mixins);
+        return Class;
+    }
+    /**
+     * Check if the SuperClass has been already mixed with a mixin function.
+     * @memberof mix.MixinScope
+     *
+     * @param {Function} mixin The mixin function.
+     * @return {Boolean}
+     */
+    has(mixin) {
+        let Class = this.superClass;
+        while (Class && Class !== Object) {
+            let attached = MIXINS_SYM.get(Class) || [];
+            if (attached.indexOf(mixin) !== -1) {
+                return true;
+            }
+            Class = Object.getPrototypeOf(Class);
+        }
+        return false;
+    }
 }
