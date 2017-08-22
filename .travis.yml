@@ -103,6 +103,25 @@ jobs:
         - git add .
         - git diff-index --quiet HEAD || git commit -m "Lastest api reference on successful travis build ${TRAVIS_BUILD_NUMBER} auto-pushed to wiki"
         - git push origin
+    - stage: deploy
+      os: linux
+      env: CI_BUILD_TYPE=docs CNAME=proteins.chialab.io
+      node_js: 7
+      install:
+        - pip install --user awscli
+        - aws configure set preview.cloudfront true
+        - npm install
+      before_script:
+        - mkdir -p public
+      script:
+        - git config --global user.email "travis@travis-ci.org"
+        - git config --global user.name "travis-ci"
+        - git clone https://gitlab.com/chialab/project-pages.git pages
+        - node ./pages/index.js .
+      after_success:
+        - aws s3 sync public s3://$CNAME/ --region eu-west-1 --delete
+        - aws cloudfront create-invalidation --distribution-id $(aws cloudfront list-distributions | python -c 'import json, os, sys; print([d["Id"] for d in json.loads(sys.stdin.read()).get("DistributionList", {}).get("Items", []) if os.environ.get("CNAME") in d.get("Aliases", {}).get("Items", [])][0])')
+
   allow_failures:
     - env: CI_BUILD_TYPE=electron
     - env: CI_BUILD_TYPE=saucelabs
