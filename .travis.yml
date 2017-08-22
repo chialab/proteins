@@ -117,6 +117,9 @@ jobs:
         - git config --global user.email "travis@travis-ci.org"
         - git config --global user.name "travis-ci"
         - git clone https://gitlab.com/chialab/project-pages.git pages
+        - cd pages
+        - npm install
+        - cd ..
         - node ./pages/index.js .
       after_success:
         - aws s3 sync public s3://$CNAME/ --region eu-west-1 --delete
