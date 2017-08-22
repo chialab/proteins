@@ -2,11 +2,14 @@ const getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 
 const PRIVATE_FIELD = {};
 
+let count = 0;
+
 export default class Symbolic {
     constructor(property) {
-        this.SYM = `__${property}`;
         if (typeof Symbol !== 'undefined') {
             this.SYM = Symbol(property);
+        } else {
+            this.SYM = `__${property}_${count++}`;
         }
     }
 
