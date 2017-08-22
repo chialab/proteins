@@ -1,15 +1,5 @@
 language: node_js
 
-before_cache:
-  # Do not cache a few Gradle files/directories (see https://docs.travis-ci.com/user/languages/java/#Caching)
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-cache:
-  directories:
-    # Android SDK
-    - $HOME/android-sdk-dl
-    - $HOME/android-sdk
-
 jobs:
   include:
     - stage: test
@@ -76,18 +66,28 @@ jobs:
       language: android
       jdk: oraclejdk8
       node_js: 7
+      before_cache:
+        # Do not cache a few Gradle files/directories (see https://docs.travis-ci.com/user/languages/java/#Caching)
+        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+      cache:
+        directories:
+          # Android SDK
+          - $HOME/android-sdk-dl
+          - $HOME/android-sdk
       install:
         # Download and unzip the Android SDK tools (if not already there thanks to the cache mechanism)
         - if test ! -e $HOME/android-sdk-dl/tools_r25.2.5-linux.zip ; then curl https://dl.google.com/android/repository/tools_r25.2.5-linux.zip > $HOME/android-sdk-dl/tools_r25.2.5-linux.zip ; fi
         - unzip -n $HOME/android-sdk-dl/tools_r25.2.5-linux.zip -d $HOME/android-sdk
 
         # Install or update Android SDK components (will not do anything if already up to date thanks to the cache mechanism)
-        - yes | $HOME/android-sdk/tools/bin/sdkmanager 'tools'
-        - yes | $HOME/android-sdk/tools/bin/sdkmanager 'platform-tools'
-        - yes | $HOME/android-sdk/tools/bin/sdkmanager 'build-tools;23.0.1'
-        - yes | $HOME/android-sdk/tools/bin/sdkmanager 'platforms;android-23'
-        - yes | $HOME/android-sdk/tools/bin/sdkmanager 'extras;android;m2repository'
-        - yes | $HOME/android-sdk/tools/bin/sdkmanager 'system-images;android-19;default;armeabi-v7a'
+        - yes | $HOME/android-sdk/tools/bin/sdkmanager --licenses
+        - $HOME/android-sdk/tools/bin/sdkmanager 'tools'
+        - $HOME/android-sdk/tools/bin/sdkmanager 'platform-tools'
+        - $HOME/android-sdk/tools/bin/sdkmanager 'build-tools;23.0.1'
+        - $HOME/android-sdk/tools/bin/sdkmanager 'platforms;android-23'
+        - $HOME/android-sdk/tools/bin/sdkmanager 'extras;android;m2repository'
+        - $HOME/android-sdk/tools/bin/sdkmanager 'system-images;android-19;default;armeabi-v7a'
 
         - export DISPLAY=':99.0'
         - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
