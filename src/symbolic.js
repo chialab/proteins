@@ -17,7 +17,9 @@ export default class Symbolic {
      * @return {*} The scope property value
      */
     get(object) {
-        return object[this.SYM];
+        if (this.has(object)) {
+            return object[this.SYM];
+        }
     }
 
     /**
