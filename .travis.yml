@@ -105,7 +105,7 @@ jobs:
         - git push origin
     - stage: deploy
       os: linux
-      env: CI_BUILD_TYPE=docs CNAME=proteins.chialab.io
+      env: CI_BUILD_TYPE=website CNAME=proteins.chialab.io
       node_js: 7
       install:
         - pip install --user awscli
@@ -132,6 +132,7 @@ jobs:
     - env: CI_BUILD_TYPE=saucelabs
     - env: CI_BUILD_TYPE=nativescript
     - env: CI_BUILD_TYPE=docs
+    - env: CI_BUILD_TYPE=website
 
 addons:
   apt:
