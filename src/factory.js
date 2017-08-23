@@ -2,8 +2,10 @@ import mix from './mixin.js';
 import Symbolic from './symbolic.js';
 import * as keypath from './keypath.js';
 import clone from './clone.js';
-import { isArray, isObject, isString } from './types.js';
+import merge from './merge.js';
+import { isObject, isString } from './types.js';
 import { on, off, trigger } from './events.js';
+import { init, getContext, setContext } from './context.js';
 
 /**
  * A set of classes with super powers.
@@ -12,33 +14,46 @@ import { on, off, trigger } from './events.js';
  * @module Factory
  */
 
+const FACTORY_SYM = new Symbolic('fsymbol');
+
 /**
  * Symbol for Factory configuration.
  * @memberof Factory
- * @type Function
+ * @type {Symbolic}
  */
 export const CONFIG_SYM = new Symbolic('config');
 
 /**
  * Symbol for Factory listeners.
  * @memberof Factory
- * @type Function
+ * @type {Symbolic}
  */
 export const LISTENERS_SYM = new Symbolic('listeners');
 
-/**
- * Symbol for Factory context.
- * @memberof Factory
- * @type Function
- */
-export const CONTEXT_SYM = new Symbolic('context');
+export const FactoryMixin = (SuperClass) => class extends SuperClass {
+    static get SYM() {
+        if (!FACTORY_SYM.has(this)) {
+            let sym = new Symbolic(this.name);
+            sym.Ctr = this;
+            this[FACTORY_SYM] = sym;
+        }
+        return this[FACTORY_SYM];
+    }
 
-/**
- * Symbol for Factory injections.
- * @memberof Factory
- * @type Function
- */
-export const INJECTIONS_SYM = new Symbolic('injections');
+    constructor(...args) {
+        super(...args);
+        setContext(this);
+    }
+
+    init(...args) {
+        return init(this, ...args);
+    }
+
+    destroy() {
+        setContext(this, null);
+        return SuperClass.prototype.destroy && super.destroy();
+    }
+};
 
 /**
  * Events emitter mixin.
@@ -48,109 +63,148 @@ export const INJECTIONS_SYM = new Symbolic('injections');
 export const ObservableMixin = (SuperClass) => class extends SuperClass {
     constructor(...args) {
         super(...args);
-        LISTENERS_SYM.set(this, []);
+        this[LISTENERS_SYM] = [];
     }
 
+    /**
+     * Add an event listener.
+     * @memberof Factory.ObservableMixin
+     *
+     * @param {string} name The event name.
+     * @param {Function} callback The callback to exec for the event.
+     * @return {Function} A listener destroyer.
+     */
     on(name, callback) {
         return on(this, name, callback);
     }
 
+    /**
+     * Remove an event(s) listener(s).
+     * @memberof Factory.ObservableMixin
+     *
+     * @param {string} name? The event name.
+     * @param {Function} callback? The optional callback to remove.
+     */
     off(name, callback) {
         return off(this, name, callback);
     }
 
+    /**
+     * Dispatch an event.
+     * @memberof Factory.ObservableMixin
+     *
+     * @param {string} name The event name.
+     * @param {...*} args A list of arguments to pass to listeners.
+     * @return {Promise} It resolves when all listeners have been triggered.
+     */
     trigger(name, ...args) {
         return trigger(this, name, ...args);
     }
 
+    /**
+     * Listen events from another object.
+     * @memberof Factory.ObservableMixin
+     *
+     * @param {Object} obj The object to listen.
+     * @param {string} name The event name.
+     * @param {Function} callback The callback to exec for the event.
+     * @return {Function} A listener destroyer.
+     */
     listen(obj, name, callback) {
-        LISTENERS_SYM.get(this).push(
-            on(obj, name, callback)
-        );
+        let destroyer = on(obj, name, callback);
+        this[LISTENERS_SYM].push(destroyer);
+        return destroyer;
     }
 
+    /**
+     * Unlisten event(s) from another object(s).
+     * @memberof Factory.ObservableMixin
+     *
+     * @param {Object} obj? The object to unlisten.
+     * @param {string} name? The event name.
+     * @param {Function} callback? The callback to exec for the event.
+     * @return {Function} A listener destroyer.
+     */
     unlisten(obj, name, callback) {
         if (obj) {
             off(obj, name, callback);
         } else {
-            LISTENERS_SYM.get(this).forEach((offListener) => offListener());
-            LISTENERS_SYM.set(this, []);
+            this[LISTENERS_SYM].forEach((offListener) => offListener());
+            this[LISTENERS_SYM] = [];
         }
     }
 
+    /**
+     * Clear all listeners.
+     * @memberof Factory.ObservableMixin
+     */
     destroy() {
         this.off();
         this.unlisten();
-        return SuperClass.prototype.destroy && super.destroy();
+        return super.destroy();
     }
 };
 
+/**
+ * Configurable mixin.
+ * @memberof Factory
+ * @mixin ConfigurableMixin
+ *
+ * @param {Object} config? The instance configuration object.
+ */
 export const ConfigurableMixin = (SuperClass) => class extends SuperClass {
+    /**
+     * Default config object.
+     * @type {Object}
+     * @memberof Factory.ConfigurableMixin
+     */
     get defaultConfig() {
         return {};
     }
 
     constructor(config) {
         super(config);
-        CONFIG_SYM.set(this, clone(this.defaultConfig || {}));
+        this[CONFIG_SYM] = clone(this.defaultConfig || {});
         if (config) {
             this.config(config);
         }
     }
 
+    /**
+     * Update instance configuration.
+     * @memberof Factory.ConfigurableMixin
+     *
+     * @param {Object|string} config The configuration to update (or the path of the configuration property).
+     * @param {*} value? The value to update for the given config name.
+     * @return {Object} Final configuration of the instance.
+     */
     config(config, ...args) {
-        let current = CONFIG_SYM.get(this);
+        let current = this[CONFIG_SYM];
         if (args.length === 0 && isString(config)) {
             return keypath.get(current, config);
         }
+        let value = args[0];
         if (isString(config)) {
-            return this.config({
-                [config]: args[0],
-            });
-        }
-        if (isObject(config)) {
-            for (let k in config) {
-                let oldValue = keypath.get(current, k);
-                let newValue = config[k];
-                if (oldValue !== newValue) {
-                    keypath.set(current, k, newValue);
-                    this.trigger('config:changed', k, oldValue, newValue);
-                }
+            let oldValue = keypath.get(current, config);
+            if (oldValue !== value) {
+                keypath.set(current, config, value);
+                this.trigger('config:changed', config, oldValue, value);
             }
         }
+        if (isObject(config)) {
+            current = merge(current, config);
+        }
+        this[CONFIG_SYM] = current;
         return current;
     }
 
+    /**
+     * Clear the configuration.
+     * @memberof Factory.ConfigurableMixin
+     */
     destroy() {
-        CONFIG_SYM.destroy(this);
-        return SuperClass.prototype.destroy && super.destroy();
-    }
-};
-
-export const ContextualMixin = (SuperClass) => class extends SuperClass {
-    static init(...args) {
-        let obj = new this(...args);
-        return obj.initialize(...args);
-    }
-
-    constructor(...args) {
-        super(...args);
-        CONTEXT_SYM.set(this, this);
-    }
-
-    initialize() {
-        return Promise.resolve(this);
-    }
-
-    init(Class, ...args) {
-        let obj = new Class(...args);
-        CONTEXT_SYM.set(obj, CONTEXT_SYM.get(this));
-        return obj.initialize(...args);
-    }
-
-    destroy() {
-        CONTEXT_SYM.destroy(this);
-        return SuperClass.prototype.destroy && super.destroy();
+        delete this[CONFIG_SYM];
+        return super.destroy();
     }
 };
 
@@ -160,76 +214,44 @@ export const ContextualMixin = (SuperClass) => class extends SuperClass {
  * @mixin InjectableMixin
  */
 export const InjectableMixin = (SuperClass) => class extends SuperClass {
-    static get injectors() {
-        return {};
+    get inject() {
+        return [];
     }
 
-    initialize(...args) {
-        return super.initialize(...args)
-            .then(() => {
-                let context = CONTEXT_SYM.get(this);
-                if (!INJECTIONS_SYM.has(context)) {
-                    INJECTIONS_SYM.set(context, {});
-                }
-                let injectors = this.config('injectors') || this.constructor.injectors;
-                return this.inject(injectors);
-            }).then(() =>
-                Promise.resolve(this)
-            );
-    }
-
-    inject(inject, Fn) {
-        let promise = Promise.resolve();
-        if (isArray(inject)) {
-            inject.forEach((injs) => {
-                promise = promise.then(() => this.inject(injs));
-            });
-        } else if (isObject(inject)) {
-            for (let name in inject) {
-                promise = promise.then(() => this.inject(name, inject[name]));
+    constructor(...args) {
+        super(...args);
+        let injectors = (this.config('inject') || []).concat(this.inject);
+        let ctx = getContext(this);
+        injectors.forEach((Injector) => {
+            if (Injector instanceof Symbolic) {
+                Injector = Injector.Ctr;
             }
-        } else {
-            let resolve = Promise.resolve(Fn);
-            let context = CONTEXT_SYM.get(this);
-            let contextInjected = INJECTIONS_SYM.get(context);
-            if (contextInjected.hasOwnProperty(inject)) {
-                resolve = Promise.resolve(contextInjected[inject]);
-            } else {
-                let args = [];
-                if (isArray(Fn)) {
-                    args = Fn.slice(1);
-                    Fn = Fn[0];
+            if (!this[Injector.SYM]) {
+                if (ctx) {
+                    this[Injector.SYM] = ctx[Injector.SYM] = ctx[Injector.SYM] || this.init(Injector);
+                } else {
+                    this[Injector.SYM] = this.init(Injector);
                 }
-                resolve = this.init(Fn, ...args);
             }
-            promise = resolve
-                .then((fn) => {
-                    contextInjected[inject] = fn;
-                    return this.trigger('inject:ready', inject, fn);
-                });
-        }
-        return promise;
-    }
-
-    factory(name) {
-        let context = CONTEXT_SYM.get(this);
-        let contextInjected = INJECTIONS_SYM.get(context);
-        return contextInjected && contextInjected[name];
+        });
     }
 
     destroy() {
-        INJECTIONS_SYM.destroy(this);
-        return SuperClass.prototype.destroy && super.destroy();
+        let injectors = (this.config('inject') || []).concat(this.inject);
+        injectors.forEach((Injector) => {
+            let SYM = (Injector instanceof Symbolic) ? Injector : Injector.SYM;
+            delete this[SYM];
+        });
+        return super.destroy();
     }
 };
 
 /**
  * @class Observable
  * @memberof Factory
- * @extends Base
  * @implements ObservableMixin
  */
-export class Observable extends mix().with(ObservableMixin) { }
+export class Observable extends mix().with(FactoryMixin, ObservableMixin) { }
 
 /**
  * @class Configurable
@@ -246,4 +268,4 @@ export class Configurable extends mix(Observable).with(ConfigurableMixin) { }
  * @implements ContextualMixin
  * @implements InjectableMixin
  */
-export class Factory extends mix(Configurable).with(ContextualMixin, InjectableMixin) { }
+export class Factory extends mix(Configurable).with(InjectableMixin) { }

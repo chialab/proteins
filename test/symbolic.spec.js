@@ -8,7 +8,7 @@ describe('Unit: Symbolic', () => {
             firstName: 'Alan',
             lastName: 'Turing',
         };
-        AGE.set(user, 29);
+        user[AGE] = 29;
 
         let enumKeys = [];
         for (let k in user) {
@@ -17,7 +17,7 @@ describe('Unit: Symbolic', () => {
 
         assert.equal(user.firstName, 'Alan');
         assert.equal(user.lastName, 'Turing');
-        assert.equal(AGE.get(user), 29);
+        assert.equal(user[AGE], 29);
         assert.equal(Object.keys(user).length, 2);
         assert.equal(enumKeys.length, 2);
         assert(AGE.has(user));

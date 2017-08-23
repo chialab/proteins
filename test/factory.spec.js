@@ -1,6 +1,7 @@
 /* eslint-env mocha */
 import { trigger } from '../src/events.js';
-import { Factory, Observable, CONTEXT_SYM } from '../src/factory.js';
+import { Factory, Observable } from '../src/factory.js';
+import { getContext } from '../src/context.js';
 
 describe('Unit: Observable', () => {
     let obj = new Observable();
@@ -134,30 +135,37 @@ class Injected2Factory extends Factory {
     test() {
         return 11;
     }
+}
 
-    initialize(conf) {
-        return super.initialize(conf)
-            .then(() => {
-                this.conf = conf;
-                return Promise.resolve(this);
-            });
+class Injected3Factory extends Factory {
+    get inject() {
+        return [Injected2Factory.SYM];
+    }
+
+    test() {
+        return 2;
+    }
+}
+
+class Injected4Factory extends Factory {
+    get inject() {
+        return [Injected3Factory.SYM];
+    }
+
+    test() {
+        return this[Injected3Factory.SYM].test();
     }
 }
 
 class MainFactory extends Factory {
-    static get injectors() {
-        return {
-            test: InjectedFactory,
-        };
+    get inject() {
+        return [InjectedFactory.SYM];
     }
 }
 
 class ChildFactory extends Factory {
-    static get injectors() {
-        return {
-            test: Injected2Factory,
-            test2: [Injected2Factory, '__TEST__'],
-        };
+    get inject() {
+        return [InjectedFactory.SYM, Injected2Factory.SYM, Injected4Factory.SYM];
     }
 
     get defaultConfig() {
@@ -168,46 +176,35 @@ class ChildFactory extends Factory {
         };
     }
 
-    initialize(...args) {
-        return super.initialize(...args)
-            .then(() => {
-                this.prop = 11;
-                return Promise.resolve(this);
-            });
+    constructor(...args) {
+        super(...args);
+        this.prop = 11;
     }
 }
 
 describe('Unit: Factory', () => {
-    let factory;
-    let child;
-
-    before((done) => {
-        MainFactory.init()
-            .then((object) => {
-                factory = object;
-                return factory.init(ChildFactory, {
-                    mode: 2,
-                    filters: ['lastName'],
-                })
-                    .then((object) => {
-                        child = object;
-                        done();
-                    });
-            })
-            .catch(() => {
-                done();
-            });
+    let factory = new MainFactory();
+    let child = factory.init(ChildFactory, {
+        mode: 2,
+        filters: ['lastName'],
     });
 
     it('should instantiate a factory', () => {
         assert(factory instanceof MainFactory);
-        assert.equal(CONTEXT_SYM.get(factory), factory);
+        assert.equal(getContext(factory), undefined);
     });
 
     it('should instantiate a factory in the same context', () => {
         assert(child instanceof ChildFactory);
+        assert.equal(child[InjectedFactory.SYM], factory[InjectedFactory.SYM]);
         assert.equal(child.prop, 11);
-        assert.equal(CONTEXT_SYM.get(child), factory);
+        assert.equal(getContext(child), factory);
+    });
+
+    it('should instantiate sub factories', () => {
+        assert(child[Injected4Factory.SYM] instanceof Factory);
+        assert.equal(child[Injected4Factory.SYM].test(), 2);
+        assert.equal(child[Injected4Factory.SYM][Injected3Factory.SYM][Injected2Factory.SYM], child[Injected2Factory.SYM]);
     });
 
     it('should instantiate a factory with configuration', () => {
@@ -226,17 +223,16 @@ describe('Unit: Factory', () => {
     });
 
     it('should handle injected', () => {
-        assert(child.factory('test') instanceof InjectedFactory);
-        assert(child.factory('test2') instanceof Injected2Factory);
-        assert.equal(child.factory('test').test(), '__TEST__');
-        assert.equal(child.factory('test2').conf, '__TEST__');
-        assert.equal(child.factory('test2').test(), 11);
+        assert(child[InjectedFactory.SYM] instanceof InjectedFactory);
+        assert(child[Injected2Factory.SYM] instanceof Injected2Factory);
+        assert.equal(child[InjectedFactory.SYM].test(), '__TEST__');
+        assert.equal(child[Injected2Factory.SYM].test(), 11);
     });
 
     it('should destroy a factory in the same context', () => {
         child.destroy();
         assert(child instanceof ChildFactory);
-        assert(!CONTEXT_SYM.has(child));
+        assert(!getContext(child));
     });
 
     describe('listener', () => {

@@ -45,9 +45,9 @@ class MixinScope {
             }
         });
         if (!MIXINS_SYM.has(Class)) {
-            MIXINS_SYM.set(Class, []);
+            Class[MIXINS_SYM] = [];
         }
-        MIXINS_SYM.get(Class).push(...mixins);
+        Class[MIXINS_SYM].push(...mixins);
         return Class;
     }
     /**
@@ -60,7 +60,7 @@ class MixinScope {
     has(mixin) {
         let Class = this.superClass;
         while (Class && Class !== Object) {
-            let attached = MIXINS_SYM.get(Class) || [];
+            let attached = Class[MIXINS_SYM] || [];
             if (attached.indexOf(mixin) !== -1) {
                 return true;
             }

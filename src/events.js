@@ -16,9 +16,9 @@ export function on(scope, name, callback) {
         throw new TypeError('callback is not a function');
     }
     if (!SYM.has(scope)) {
-        SYM.set(scope, {});
+        scope[SYM] = {};
     }
-    let callbacks = SYM.get(scope);
+    let callbacks = scope[SYM];
     let evtCallbacks = callbacks[name] = callbacks[name] || [];
     evtCallbacks.push(callback);
     return off.bind(null, scope, name, callback);
@@ -32,7 +32,7 @@ export function on(scope, name, callback) {
  */
 export function off(scope, name, callback) {
     if (callback) {
-        let callbacks = SYM.get(scope);
+        let callbacks = scope[SYM];
         if (callbacks) {
             let evtCallbacks = callbacks[name] = callbacks[name] || [];
             let io = evtCallbacks.indexOf(callback);
@@ -41,12 +41,12 @@ export function off(scope, name, callback) {
             }
         }
     } else if (name) {
-        let callbacks = SYM.get(scope);
+        let callbacks = scope[SYM];
         if (callbacks) {
             delete callbacks[name];
         }
     } else {
-        SYM.set(scope, {});
+        scope[SYM] = {};
     }
 }
 /**
@@ -58,7 +58,7 @@ export function off(scope, name, callback) {
  * @return {Promise} The final Promise of the callbacks chain
  */
 export function trigger(scope, name, ...args) {
-    let callbacks = SYM.get(scope);
+    let callbacks = scope[SYM];
     if (callbacks) {
         let evtCallbacks = callbacks[name] || [];
         let promise = Promise.resolve();

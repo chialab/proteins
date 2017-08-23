@@ -281,11 +281,11 @@ function entriesToString(entries) {
  */
 export class SearchParams {
     constructor(ref) {
-        REF_SYM.set(this, ref);
+        this[REF_SYM] = ref;
     }
 
     get url() {
-        return REF_SYM.get(this);
+        return this[REF_SYM];
     }
 
     /**
@@ -427,12 +427,12 @@ export class Url {
     }
 
     get href() {
-        return REF_SYM.get(this);
+        return this[REF_SYM];
     }
 
     set href(href) {
         let info = parse(href);
-        REF_SYM.set(this, href);
+        this[REF_SYM] = href;
         for (let k in info) {
             this[k] = info[k];
         }
