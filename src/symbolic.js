@@ -1,3 +1,6 @@
+import { isFunction } from './types.js';
+
+let support = isFunction(Symbol);
 let count = 0;
 
 /**
@@ -7,7 +10,7 @@ let count = 0;
  */
 export default class Symbolic {
     constructor(property) {
-        if (typeof Symbol !== 'undefined') {
+        if (support) {
             this.SYM = Symbol(property);
         } else {
             this.SYM = `__${property}_${count++}`;
@@ -29,3 +32,12 @@ export default class Symbolic {
     }
 }
 
+try {
+    if (support) {
+        let check = new Symbolic('check');
+        let test = {};
+        test[check] = 2;
+    }
+} catch(ex) {
+    support = false;
+}
