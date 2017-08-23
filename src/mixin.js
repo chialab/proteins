@@ -44,9 +44,8 @@ class MixinScope {
                 Class = mixin(Class);
             }
         });
-        if (!MIXINS_SYM.has(Class)) {
-            Class[MIXINS_SYM] = [];
-        }
+        MIXINS_SYM.define(Class);
+        Class[MIXINS_SYM] = Class[MIXINS_SYM] || [];
         Class[MIXINS_SYM].push(...mixins);
         return Class;
     }

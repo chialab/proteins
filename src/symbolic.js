@@ -15,14 +15,14 @@ export default class Symbolic {
         }
     }
 
-    /**
-     * Check if an object has a Symbolic definition.
-     *
-     * @param {Object} object The scope to check if it has the symbol
-     * @return {boolean} The scope has the symbol or not
-     */
-    has(object) {
-        return object.hasOwnProperty(this);
+    define(obj) {
+        if (!support && !obj.hasOwnProperty(this.SYM)) {
+            Object.defineProperty(obj, this.SYM, {
+                configurable: true,
+                enumerable: false,
+                writable: true,
+            });
+        }
     }
 
     toString() {

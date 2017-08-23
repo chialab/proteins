@@ -15,9 +15,8 @@ export function on(scope, name, callback) {
     if (!isFunction(callback)) {
         throw new TypeError('callback is not a function');
     }
-    if (!SYM.has(scope)) {
-        scope[SYM] = {};
-    }
+    SYM.define(scope);
+    scope[SYM] = scope[SYM] || {};
     let callbacks = scope[SYM];
     let evtCallbacks = callbacks[name] = callbacks[name] || [];
     evtCallbacks.push(callback);

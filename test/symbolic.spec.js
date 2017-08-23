@@ -8,6 +8,7 @@ describe('Unit: Symbolic', () => {
             firstName: 'Alan',
             lastName: 'Turing',
         };
+        AGE.define(user);
         user[AGE] = 29;
 
         let enumKeys = [];
@@ -18,12 +19,8 @@ describe('Unit: Symbolic', () => {
         assert.equal(user.firstName, 'Alan');
         assert.equal(user.lastName, 'Turing');
         assert.equal(user[AGE], 29);
-        if (typeof AGE.SYM !== 'string') {
-            assert.equal(Object.keys(user).length, 2);
-            assert.equal(enumKeys.length, 2);
-        }
-        assert(AGE.has(user));
-        assert(!AGE.has({}));
+        assert.equal(Object.keys(user).length, 2);
+        assert.equal(enumKeys.length, 2);
         assert(!Object.hasOwnProperty('age'));
     });
 });
