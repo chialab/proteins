@@ -1,6 +1,6 @@
 [![Logo](http://logos.chialab.io.s3-website-eu-west-1.amazonaws.com/@chialab/proteins.svg)](https://proteins.chialab.io)
 
-A set of JavaScript utils.
+A primer for JavaScript libraries and frameworks development.
 
 
 [Documentation](https://proteins.chialab.io/docs/home) | [Issue tracker](https://github.com/Chialab/proteins/issues) | [Project home page](https://proteins.chialab.io) | [Author home page](http://www.chialab.it)

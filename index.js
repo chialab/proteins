@@ -4,7 +4,7 @@
  * (c) 2017 Chialab (http://www.chialab.it) <dev@chialab.io>
  * http://chialab.io
  *
- * A set of JavaScript utils.
+ * A primer for JavaScript libraries and frameworks development.
  */
 
 import clone from './src/clone.js';
