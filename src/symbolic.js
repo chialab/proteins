@@ -1,6 +1,4 @@
-import { isFunction } from './types.js';
-
-let support = isFunction(Symbol);
+let support = typeof Symbol !== 'function';
 let count = 0;
 
 /**
