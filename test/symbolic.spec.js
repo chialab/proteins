@@ -18,8 +18,10 @@ describe('Unit: Symbolic', () => {
         assert.equal(user.firstName, 'Alan');
         assert.equal(user.lastName, 'Turing');
         assert.equal(user[AGE], 29);
-        assert.equal(Object.keys(user).length, 2);
-        assert.equal(enumKeys.length, 2);
+        if (typeof AGE.SYM !== 'string') {
+            assert.equal(Object.keys(user).length, 2);
+            assert.equal(enumKeys.length, 2);
+        }
         assert(AGE.has(user));
         assert(!AGE.has({}));
         assert(!Object.hasOwnProperty('age'));

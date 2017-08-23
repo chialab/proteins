@@ -10,7 +10,7 @@ export default class Symbolic {
         if (typeof Symbol !== 'undefined') {
             this.SYM = Symbol(property);
         } else {
-            this.SYM = new String(`__${property}_${count++}`);
+            this.SYM = `__${property}_${count++}`;
         }
     }
 
