@@ -52,7 +52,7 @@ describe('Unit: Merge', () => {
     });
 
     it('should set merge two objects in strict mode', () => {
-        let hybrid = merge(obj1, obj2, { strictMerge: true });
+        let hybrid = merge.config({ strictMerge: true })(obj1, obj2);
         assert.equal(hybrid.firstName, 'Alan');
         assert.equal(hybrid.lastName, 'Rickman');
         assert.equal(hybrid.birthday.getTime(), new Date('1946/02/21').getTime());
@@ -65,7 +65,7 @@ describe('Unit: Merge', () => {
     });
 
     it('should set merge two objects with array join', () => {
-        let hybrid = merge(obj1, obj2, { joinArrays: true });
+        let hybrid = merge.config({ joinArrays: true })(obj1, obj2);
         assert.equal(hybrid.firstName, 'Alan');
         assert.equal(hybrid.lastName, 'Rickman');
         assert.equal(hybrid.birthday.getTime(), new Date('1946/02/21').getTime());
