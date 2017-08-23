@@ -10,17 +10,15 @@
 import clone from './src/clone.js';
 import merge from './src/merge.js';
 import mix from './src/mixin.js';
-import internal from './src/internal.js';
-import symbolic from './src/symbolic.js';
+import Symbolic from './src/symbolic.js';
 import * as keypath from './src/keypath.js';
 import * as Factory from './src/factory.js';
 
 export * from './src/types.js';
+export { Symbolic };
 export { clone };
 export { merge };
 export { mix };
-export { symbolic };
-export { internal };
 export { keypath };
 export * from './src/url.js';
 export * from './src/events.js';
