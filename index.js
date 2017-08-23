@@ -13,13 +13,14 @@ import mix from './src/mixin.js';
 import Symbolic from './src/symbolic.js';
 import * as keypath from './src/keypath.js';
 import * as Factory from './src/factory.js';
+import * as Url from './src/url.js';
 
 export * from './src/types.js';
+export * from './src/events.js';
 export { Symbolic };
 export { clone };
 export { merge };
 export { mix };
 export { keypath };
-export * from './src/url.js';
-export * from './src/events.js';
+export { Url };
 export { Factory };

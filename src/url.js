@@ -3,9 +3,35 @@ import Symbolic from './symbolic.js';
 
 const REF_SYM = new Symbolic('ref');
 
-export const URL_REGEX = /((?:^(?:[a-z]+:))|^)?(?:\/\/)?([^?\/$]*)([^?]*)?(\?.*)?/i;
+/**
+ * @module Url
+ */
+
+const URL_REGEX = /((?:^(?:[a-z]+:))|^)?(?:\/\/)?([^?\/$]*)([^?]*)?(\?.*)?/i;
 const PORT_REGEX = /\:\d*$/;
 
+/**
+ * @typedef {Object} UrlProperties
+ * @memberof Url
+ * @property {string} protocol The url's protocol (if defined).
+ * @property {string} username The username used (if defined).
+ * @property {string} password The password used (if defined).
+ * @property {string} host The url's host.
+ * @property {string} hostname The url's hostname.
+ * @property {string} port The url's port (if defined).
+ * @property {string} search The url's query params.
+ * @property {string} hash The url's hash.
+ */
+// eslint-disable-next-line
+function UrlProperties() { }
+
+/**
+ * Parse and split an url in its components.
+ * @memberof Url
+ *
+ * @param {string} url The url to parse.
+ * @return {UrlProperties} The url properties
+ */
 export function parse(url = '') {
     let hashSplit = url.split('#');
     let hash = hashSplit.length > 1 ? hashSplit.pop() : undefined;
@@ -57,6 +83,7 @@ export function parse(url = '') {
     }
     return res;
 }
+
 /**
  * Serialize a key/value pair matching differente operators.
  * @private
@@ -74,6 +101,8 @@ function chunk(key, val) {
 
 /**
  * Serialize an object in FormData format.
+ * @memberof Url
+ *
  * @param {Object} obj The object to convert.
  * @param {string} prefix The prefix to use in case of recursion.
  * @param {Function} chunkFn? The callback function to use for chunking a key/value pair.
@@ -102,8 +131,11 @@ export function serialize(obj, prefix, chunkFn = chunk) {
     }
     return str.join('&');
 }
+
 /**
  * Unserialize a string in FormData format to an object.
+ * @memberof Url
+ *
  * @param {string} str A search string to unserialize.
  * @return {object} The unserialized object.
  */
@@ -124,6 +156,13 @@ export function unserialize(str) {
     return res;
 }
 
+/**
+ * Join url paths.
+ * @memberof Url
+ *
+ * @param {...string} paths A list of paths to join.
+ * @return {string} The final joint string.
+ */
 export function join(...paths) {
     let len = paths.length - 1;
     return paths
@@ -139,6 +178,14 @@ export function join(...paths) {
         .join('/');
 }
 
+/**
+ * Resolve relative url path.
+ * @memberof Url
+ *
+ * @param {string} base The base path.
+ * @param {string} relative The relative path.
+ * @return {string} The rsolved path.
+ */
 export function resolve(base, relative) {
     if (relative[0] === '/') {
         let baseInfo = parse(base);
@@ -164,23 +211,58 @@ export function resolve(base, relative) {
     return stack.join('/');
 }
 
+/**
+ * Check if an url is absolute.
+ * @memberof Url
+ *
+ * @param {string} url The url to check.
+ * @return {boolean}
+ */
 export function isAbsoluteUrl(url) {
     return !!parse(url).protocol;
 }
 
+/**
+ * Check if an url is a data url.
+ * @memberof Url
+ *
+ * @param {string} url The url to check.
+ * @return {boolean}
+ */
 export function isDataUrl(url) {
     return parse(url).protocol === 'data:';
 }
 
+/**
+ * Check if an url points to a local file.
+ * @memberof Url
+ *
+ * @param {string} url The url to check.
+ * @return {boolean}
+ */
 export function isLocalUrl(url) {
     return parse(url).protocol === 'file:';
 }
 
+/**
+ * Update query string params to an url
+ * @private
+ *
+ * @param {Url} url The url to update.
+ * @param {string} path The query string.
+ */
 function updateSearchPath(url, path) {
     let href = url.href.split('?')[0];
     url.href = `${href}?${path}`;
 }
 
+/**
+ * Convert search params entries to a query string.
+ * @private
+ *
+ * @param {Array} entries Search params entries.
+ * @return {string} The query string.
+ */
 function entriesToString(entries) {
     let unserialized = {};
     entries.forEach((entry) => {
@@ -189,24 +271,51 @@ function entriesToString(entries) {
     return serialize(unserialized);
 }
 
-class SearchParams {
-    constructor(urlRef) {
-        REF_SYM.set(this, urlRef);
+/**
+ * Search params interface for Url.
+ * @class SearchParams
+ * @memberof Url
+ * @property {Url} url The referenced Url.
+ *
+ * @param {Url} ref The referenced Url instance.
+ */
+export class SearchParams {
+    constructor(ref) {
+        REF_SYM.set(this, ref);
     }
 
     get url() {
         return REF_SYM.get(this);
     }
 
-    delete(name) {
-        updateSearchPath(
-            this.url,
-            entriesToString(
-                this.entries().filter((entry) => entry[0] !== name)
-            )
-        );
+    /**
+     * List all entry keys.
+     * @memberof Url.SearchParams
+     *
+     * @return {Array} Entry keys list.
+     */
+    keys() {
+        return this.entries()
+            .map((entry) => entry[0]);
     }
 
+     /**
+     * List all entry values.
+     * @memberof Url.SearchParams
+     *
+     * @return {Array} Entry values list.
+     */
+    values() {
+        return this.entries()
+            .map((entry) => entry[1]);
+    }
+
+    /**
+     * List all entries.
+     * @memberof Url.SearchParams
+     *
+     * @return {Array} Entries list in format [[key, value], [...]].
+     */
     entries() {
         let search = this.url.search.substring(1);
         let unserialized = unserialize(search);
@@ -214,6 +323,13 @@ class SearchParams {
             .map((key) => [key, unserialized[key]]);
     }
 
+    /**
+     * Retrieve an entry.
+     * @memberof Url.SearchParams
+     *
+     * @param {string} name The entity name to get.
+     * @return {*} The entity value.
+     */
     get(name) {
         let entries = this.entries();
         for (let i = 0, len = entries.length; i < len; i++) {
@@ -223,15 +339,24 @@ class SearchParams {
         }
     }
 
+    /**
+     * Check if entity is defined.
+     * @memberof Url.SearchParams
+     *
+     * @param {string} name The entity name to check.
+     * @return {Boolean}
+     */
     has(name) {
         return !!this.get(name);
     }
 
-    keys() {
-        return this.entries()
-            .map((entry) => entry[0]);
-    }
-
+    /**
+     * Set an entry value.
+     * @memberof Url.SearchParams
+     *
+     * @param {string} name The entity name to set.
+     * @param {*} value The entity value to set
+     */
     set(name, value) {
         this.delete(name);
         let entries = this.entries();
@@ -242,6 +367,25 @@ class SearchParams {
         );
     }
 
+    /**
+     * Remove an entity from the search params.
+     * @memberof Url.SearchParams
+     *
+     * @param {string} name The entity name to remove.
+     */
+    delete(name) {
+        updateSearchPath(
+            this.url,
+            entriesToString(
+                this.entries().filter((entry) => entry[0] !== name)
+            )
+        );
+    }
+
+    /**
+     * Sort entities by keys names.
+     * @memberof Url.SearchParams
+     */
     sort() {
         let entries = this.entries();
         entries.sort((entry1, entry2) => {
@@ -260,13 +404,18 @@ class SearchParams {
     toString() {
         return this.url.search;
     }
-
-    values() {
-        return this.entries()
-            .map((entry) => entry[1]);
-    }
 }
 
+/**
+ * Url helper class.
+ * @class Url
+ * @memberof Url
+ * @property {string} href The full url string.
+ * @property {SearchParams} searchParams The url query string interface.
+ *
+ * @param {string} path The url to handle.
+ * @param {string} baseUrl? The optional base url. 
+ */
 export class Url {
     constructor(path, baseUrl) {
         if (baseUrl) {
@@ -289,22 +438,54 @@ export class Url {
         }
     }
 
+    /**
+     * Join current Url with paths.
+     * @memberof Url.Url
+     *
+     * @param {,,,string} paths A list of paths to join.
+     * @return {Url} A new url instance.
+     */
     join(...paths) {
         return new Url(join(this.href, ...paths));
     }
 
+    /**
+     * Resolve a path relative to the current Url.
+     * @memberof Url.Url
+     *
+     * @param {string} path The relative path.
+     * @return {Url} A new url instance.
+     */
     resolve(path) {
         return new Url(resolve(this.href, path));
     }
 
+    /**
+     * Check if current Url is absolute.
+     * @memberof Url.Url
+     *
+     * @return {Boolean}
+     */
     isAbsoluteUrl() {
         return isAbsoluteUrl(this.href);
     }
 
+    /**
+     * Check if current Url is a data url.
+     * @memberof Url.Url
+     *
+     * @return {Boolean}
+     */
     isDataUrl() {
         return isDataUrl(this.href);
     }
 
+    /**
+     * Check if current Url points to local file.
+     * @memberof Url.Url
+     *
+     * @return {Boolean}
+     */
     isLocalUrl() {
         return isLocalUrl(this.href);
     }
