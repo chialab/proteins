@@ -119,7 +119,7 @@ jobs:
         - cd pages
         - npm install
         - cd ..
-        - node ./pages/index.js .
+        - node ./pages/index.js . --extra.ga 'UA-149131-70'
       after_success:
         - for file in public/*.html; do mv -- "$file" "${file%%.html}"; done
         - for file in public/**/*.html; do mv -- "$file" "${file%%.html}"; done
