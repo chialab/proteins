@@ -5,7 +5,7 @@ import clone from './clone.js';
 import merge from './merge.js';
 import { isObject, isString } from './types.js';
 import { on, off, trigger } from './events.js';
-import { init, getContext, setContext } from './context.js';
+import { has } from './proto.js';
 
 /**
  * A set of classes with super powers.
@@ -15,6 +15,13 @@ import { init, getContext, setContext } from './context.js';
  */
 
 const FACTORY_SYM = new Symbolic('fsymbol');
+
+/**
+ * Symbol for Factory context.
+ * @memberof Factory
+ * @type {Symbolic}
+ */
+export const CONTEXT_SYM = new Symbolic('context');
 
 /**
  * Symbol for Factory configuration.
@@ -30,7 +37,18 @@ export const CONFIG_SYM = new Symbolic('config');
  */
 export const LISTENERS_SYM = new Symbolic('listeners');
 
+let context;
+
+/**
+ * Base Factory mixin.
+ * @memberof Factory
+ * @mixin FactoryMixin
+ */
 export const FactoryMixin = (SuperClass) => class extends SuperClass {
+    /**
+     * @property {Symbolic} A symbolic defintion for the Factory constructor.
+     * @memberof Factory.FactoryMixin
+     */
     static get SYM() {
         if (!this.hasOwnProperty(FACTORY_SYM.SYM)) {
             let sym = new Symbolic(this.name);
@@ -42,16 +60,31 @@ export const FactoryMixin = (SuperClass) => class extends SuperClass {
 
     constructor(...args) {
         super(...args);
-        setContext(this);
+        this[CONTEXT_SYM] = context || this;
     }
 
-    init(...args) {
-        return init(this, ...args);
+    /**
+     * Init a new Factory with the same context.
+     * @memberof Factory.FactoryMixin
+     *
+     * @param {Function} Factory The Factory constructor.
+     * @param {...*} args A list of arguments for the constructor.
+     * @return {Object} The new instance.
+     */
+    init(Factory, ...args) {
+        context = this[CONTEXT_SYM];
+        let res = new Factory(...args);
+        context = null;
+        return res;
     }
 
+    /**
+     * Clear the context.
+     * @memberof Factory.FactoryMixin
+     */
     destroy() {
-        setContext(this, null);
-        return SuperClass.prototype.destroy && super.destroy();
+        delete this[CONTEXT_SYM];
+        return has(SuperClass, 'destroy') && super.destroy();
     }
 };
 
@@ -224,7 +257,7 @@ export const InjectableMixin = (SuperClass) => class extends mix(SuperClass).wit
 
     constructor(...args) {
         super(...args);
-        let ctx = getContext(this);
+        let ctx = this[CONTEXT_SYM];
         this.inject.forEach((Injector) => {
             if (Injector instanceof Symbolic) {
                 Injector = Injector.Ctr;
