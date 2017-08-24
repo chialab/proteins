@@ -1,4 +1,4 @@
-let support = typeof Symbol !== 'function';
+let support = typeof Symbol === 'function';
 let count = 0;
 
 /**
