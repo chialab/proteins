@@ -213,16 +213,19 @@ export const ConfigurableMixin = (SuperClass) => class extends mix(SuperClass).w
  * @memberof Factory
  * @mixin InjectableMixin
  */
-export const InjectableMixin = (SuperClass) => class extends mix(SuperClass).with(ConfigurableMixin) {
+export const InjectableMixin = (SuperClass) => class extends mix(SuperClass).with(FactoryMixin) {
+    /**
+     * @property {Array} inject A default list of injections.
+     * @memberof Factory.InjectableMixin
+     */
     get inject() {
         return [];
     }
 
     constructor(...args) {
         super(...args);
-        let injectors = (this.config('inject') || []).concat(this.inject);
         let ctx = getContext(this);
-        injectors.forEach((Injector) => {
+        this.inject.forEach((Injector) => {
             if (Injector instanceof Symbolic) {
                 Injector = Injector.Ctr;
             }
@@ -236,6 +239,10 @@ export const InjectableMixin = (SuperClass) => class extends mix(SuperClass).wit
         });
     }
 
+    /**
+     * Clear injected methods.
+     * @memberof Factory.InjectableMixin
+     */
     destroy() {
         let injectors = (this.config('inject') || []).concat(this.inject);
         injectors.forEach((Injector) => {
@@ -249,6 +256,7 @@ export const InjectableMixin = (SuperClass) => class extends mix(SuperClass).wit
 /**
  * @class Observable
  * @memberof Factory
+ * @extends Object
  * @implements ObservableMixin
  */
 export class Observable extends mix().with(ObservableMixin) { }
@@ -265,7 +273,6 @@ export class Configurable extends mix(Observable).with(ConfigurableMixin) { }
  * @class Factory
  * @memberof Factory
  * @extends Configurable
- * @implements ContextualMixin
  * @implements InjectableMixin
  */
 export class Factory extends mix(Configurable).with(InjectableMixin) { }

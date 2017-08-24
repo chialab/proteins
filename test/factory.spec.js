@@ -163,9 +163,9 @@ class MainFactory extends Factory {
     }
 }
 
-class ChildFactory extends Factory {
+class ChildFactory extends MainFactory {
     get inject() {
-        return [InjectedFactory.SYM, Injected2Factory.SYM, Injected4Factory.SYM];
+        return [...super.inject, Injected2Factory.SYM, Injected4Factory.SYM];
     }
 
     get defaultConfig() {
