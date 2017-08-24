@@ -12,13 +12,12 @@ const PORT_REGEX = /\:\d*$/;
 
 /**
  * Parse and split an url in its components.
- * @private
  * @memberof Url
  *
  * @param {string} url The url to parse.
- * @return {Object} The url properties
+ * @return {Object} The url properties.
  */
-function parse(url = '') {
+export function parse(url = '') {
     let hashSplit = url.split('#');
     let hash = hashSplit.length > 1 ? hashSplit.pop() : undefined;
     url = hashSplit.join('#');
@@ -91,7 +90,7 @@ function chunk(key, val) {
  *
  * @param {Object} obj The object to convert.
  * @param {string} prefix The prefix to use in case of recursion.
- * @param {Function} chunkFn? The callback function to use for chunking a key/value pair.
+ * @param {Function} [chunkFn] The callback function to use for chunking a key/value pair.
  * @return {string} An object to serialize.
  */
 export function serialize(obj, prefix, chunkFn = chunk) {
@@ -166,14 +165,13 @@ export function join(...paths) {
 
 /**
  * Resolve relative url path.
- * @private
  * @memberof Url
  *
  * @param {string} base The base path.
  * @param {string} relative The relative path.
  * @return {string} The rsolved path.
  */
-function resolve(base, relative) {
+export function resolve(base, relative) {
     if (relative[0] === '/') {
         let baseInfo = parse(base);
         if (!baseInfo.origin) {
@@ -409,7 +407,7 @@ export class SearchParams {
  * @property {string} hash The url's hash.
  *
  * @param {string} path The url to handle.
- * @param {string} baseUrl? The optional base url. 
+ * @param {string} [baseUrl] The optional base url. 
  */
 export class Url {
     constructor(path, baseUrl) {

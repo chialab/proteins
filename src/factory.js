@@ -82,8 +82,8 @@ export const ObservableMixin = (SuperClass) => class extends mix(SuperClass).wit
      * Remove an event(s) listener(s).
      * @memberof Factory.ObservableMixin
      *
-     * @param {string} name? The event name.
-     * @param {Function} callback? The optional callback to remove.
+     * @param {string} [name] The event name.
+     * @param {Function} [callback] The optional callback to remove.
      */
     off(name, callback) {
         return off(this, name, callback);
@@ -120,9 +120,9 @@ export const ObservableMixin = (SuperClass) => class extends mix(SuperClass).wit
      * Unlisten event(s) from another object(s).
      * @memberof Factory.ObservableMixin
      *
-     * @param {Object} obj? The object to unlisten.
-     * @param {string} name? The event name.
-     * @param {Function} callback? The callback to exec for the event.
+     * @param {Object} [obj] The object to unlisten.
+     * @param {string} [name] The event name.
+     * @param {Function} [callback] The callback to exec for the event.
      * @return {Function} A listener destroyer.
      */
     unlisten(obj, name, callback) {
@@ -150,7 +150,7 @@ export const ObservableMixin = (SuperClass) => class extends mix(SuperClass).wit
  * @memberof Factory
  * @mixin ConfigurableMixin
  *
- * @param {Object} config? The instance configuration object.
+ * @param {Object} [config] The instance configuration object.
  */
 export const ConfigurableMixin = (SuperClass) => class extends mix(SuperClass).with(FactoryMixin) {
     /**
@@ -175,7 +175,7 @@ export const ConfigurableMixin = (SuperClass) => class extends mix(SuperClass).w
      * @memberof Factory.ConfigurableMixin
      *
      * @param {Object|string} config The configuration to update (or the path of the configuration property).
-     * @param {*} value? The value to update for the given config name.
+     * @param {*} [value] The value to update for the given config name.
      * @return {Object} Final configuration of the instance.
      */
     config(config, ...args) {
