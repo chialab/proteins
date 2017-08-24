@@ -30,7 +30,7 @@
   "bugs": {
     "url": "https://github.com/chialab/proteins/issues"
   },
-  "homepage": "https://github.com/chialab/proteins#readme",
+  "homepage": "https://proteins.chialab.io",
   "devDependencies": {
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-transform-inline-environment-variables": "0.0.2",
