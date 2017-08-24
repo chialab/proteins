@@ -60,7 +60,7 @@ export const FactoryMixin = (SuperClass) => class extends SuperClass {
  * @memberof Factory
  * @mixin ObservableMixin
  */
-export const ObservableMixin = (SuperClass) => class extends SuperClass {
+export const ObservableMixin = (SuperClass) => class extends mix(SuperClass).with(FactoryMixin) {
     constructor(...args) {
         super(...args);
         this[LISTENERS_SYM] = [];
@@ -152,7 +152,7 @@ export const ObservableMixin = (SuperClass) => class extends SuperClass {
  *
  * @param {Object} config? The instance configuration object.
  */
-export const ConfigurableMixin = (SuperClass) => class extends SuperClass {
+export const ConfigurableMixin = (SuperClass) => class extends mix(SuperClass).with(FactoryMixin) {
     /**
      * Default config object.
      * @type {Object}
@@ -213,7 +213,7 @@ export const ConfigurableMixin = (SuperClass) => class extends SuperClass {
  * @memberof Factory
  * @mixin InjectableMixin
  */
-export const InjectableMixin = (SuperClass) => class extends SuperClass {
+export const InjectableMixin = (SuperClass) => class extends mix(SuperClass).with(ConfigurableMixin) {
     get inject() {
         return [];
     }
@@ -251,7 +251,7 @@ export const InjectableMixin = (SuperClass) => class extends SuperClass {
  * @memberof Factory
  * @implements ObservableMixin
  */
-export class Observable extends mix().with(FactoryMixin, ObservableMixin) { }
+export class Observable extends mix().with(ObservableMixin) { }
 
 /**
  * @class Configurable
