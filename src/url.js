@@ -11,28 +11,14 @@ const URL_REGEX = /((?:^(?:[a-z]+:))|^)?(?:\/\/)?([^?\/$]*)([^?]*)?(\?.*)?/i;
 const PORT_REGEX = /\:\d*$/;
 
 /**
- * @typedef {Object} UrlProperties
- * @memberof Url
- * @property {string} protocol The url's protocol (if defined).
- * @property {string} username The username used (if defined).
- * @property {string} password The password used (if defined).
- * @property {string} host The url's host.
- * @property {string} hostname The url's hostname.
- * @property {string} port The url's port (if defined).
- * @property {string} search The url's query params.
- * @property {string} hash The url's hash.
- */
-// eslint-disable-next-line
-function UrlProperties() { }
-
-/**
  * Parse and split an url in its components.
+ * @private
  * @memberof Url
  *
  * @param {string} url The url to parse.
- * @return {UrlProperties} The url properties
+ * @return {Object} The url properties
  */
-export function parse(url = '') {
+function parse(url = '') {
     let hashSplit = url.split('#');
     let hash = hashSplit.length > 1 ? hashSplit.pop() : undefined;
     url = hashSplit.join('#');
@@ -180,13 +166,14 @@ export function join(...paths) {
 
 /**
  * Resolve relative url path.
+ * @private
  * @memberof Url
  *
  * @param {string} base The base path.
  * @param {string} relative The relative path.
  * @return {string} The rsolved path.
  */
-export function resolve(base, relative) {
+function resolve(base, relative) {
     if (relative[0] === '/') {
         let baseInfo = parse(base);
         if (!baseInfo.origin) {
@@ -410,8 +397,16 @@ export class SearchParams {
  * Url helper class.
  * @class Url
  * @memberof Url
- * @property {string} href The full url string.
  * @property {SearchParams} searchParams The url query string interface.
+ * @property {string} href The full url string.
+ * @property {string} protocol The url's protocol (if defined).
+ * @property {string} username The username used (if defined).
+ * @property {string} password The password used (if defined).
+ * @property {string} host The url's host.
+ * @property {string} hostname The url's hostname.
+ * @property {string} port The url's port (if defined).
+ * @property {string} search The url's query params.
+ * @property {string} hash The url's hash.
  *
  * @param {string} path The url to handle.
  * @param {string} baseUrl? The optional base url. 
