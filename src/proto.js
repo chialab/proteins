@@ -3,7 +3,13 @@ import { isFunction } from './types.js';
 const getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 
 /**
+ * @module Proto
+ */
+
+/**
  * Iterate all prototype chain of a class.
+ * @memberof Proto
+ *
  * @param {Function} Ctr The class to iterate.
  * @param {Function} [callback] A callback function for each prototype.
  * @return {Array<string>}
@@ -18,6 +24,8 @@ export function walk(Ctr, callback) {
 
 /**
  * Retrieve a list of properties and methods (with their descriptors) for the class.
+ * @memberof Proto
+ *
  * @param {Function} Ctr The class to analyze.
  * @param {Function} [filter] A filter function for the property.
  * @return {Object}
@@ -40,6 +48,8 @@ export function entries(Ctr, filter = () => true) {
 
 /**
  * Retrieve definitions of methods for the class.
+ * @memberof Proto
+ *
  * @param {Function} Ctr The class to analyze.
  * @return {Array<string>}
  */
@@ -49,6 +59,8 @@ export function methods(Ctr) {
 
 /**
  * Retrieve definitions of properties for the class.
+ * @memberof Proto
+ *
  * @param {Function} Ctr The class to analyze.
  */
 export function properties(Ctr) {
@@ -57,6 +69,8 @@ export function properties(Ctr) {
 
 /**
  * Get all definitions for a given property in the prototype chain.
+ * @memberof Proto
+ *
  * @param {Function} Ctr The class to analyze.
  * @param {string} property The property name to collect.
  * @return {Array<Object>}
@@ -74,6 +88,8 @@ export function reduce(Ctr, property) {
 
 /**
  * Check if a method or a property is in the prototype chain.
+ * @memberof Proto
+ *
  * @param {Function} Ctr The class to analyze.
  * @param {string} property The property name to verify.
  * @return {Boolean}
