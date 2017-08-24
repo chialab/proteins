@@ -11,16 +11,18 @@ export default class Symbolic {
         if (support) {
             this.SYM = Symbol(property);
         } else {
-            this.SYM = `__${property}_${count++}`;
-        }
-    }
-
-    define(obj) {
-        if (!support && !obj.hasOwnProperty(this.SYM)) {
-            Object.defineProperty(obj, this.SYM, {
+            let sym = this.SYM = `__${property}_${count++}`;
+            Object.defineProperty(Object.prototype, sym, {
                 configurable: true,
                 enumerable: false,
-                writable: true,
+                set(x) {
+                    Object.defineProperty(this, sym, {
+                        configurable: true,
+                        enumerable: false,
+                        writable: true,
+                        value: x,
+                    });
+                },
             });
         }
     }
@@ -28,14 +30,4 @@ export default class Symbolic {
     toString() {
         return this.SYM;
     }
-}
-
-try {
-    if (support) {
-        let check = new Symbolic('check');
-        let test = {};
-        test[check] = 2;
-    }
-} catch(ex) {
-    support = false;
 }

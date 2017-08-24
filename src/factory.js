@@ -35,7 +35,6 @@ export const FactoryMixin = (SuperClass) => class extends SuperClass {
         if (!this.hasOwnProperty(FACTORY_SYM.SYM)) {
             let sym = new Symbolic(this.name);
             sym.Ctr = this;
-            FACTORY_SYM.define(this);
             this[FACTORY_SYM] = sym;
         }
         return this[FACTORY_SYM];
@@ -64,7 +63,6 @@ export const FactoryMixin = (SuperClass) => class extends SuperClass {
 export const ObservableMixin = (SuperClass) => class extends SuperClass {
     constructor(...args) {
         super(...args);
-        LISTENERS_SYM.define(this);
         this[LISTENERS_SYM] = [];
     }
 
@@ -166,7 +164,6 @@ export const ConfigurableMixin = (SuperClass) => class extends SuperClass {
 
     constructor(config) {
         super(config);
-        CONFIG_SYM.define(this);
         this[CONFIG_SYM] = clone(this.defaultConfig || {});
         if (config) {
             this.config(config);

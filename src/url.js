@@ -281,7 +281,6 @@ function entriesToString(entries) {
  */
 export class SearchParams {
     constructor(ref) {
-        REF_SYM.define(this);
         this[REF_SYM] = ref;
     }
 
@@ -425,7 +424,6 @@ export class Url {
             this.href = path;
         }
         this.searchParams = new SearchParams(this);
-        REF_SYM.define(this);
     }
 
     get href() {

@@ -8,7 +8,7 @@ describe('Unit: Symbolic', () => {
             firstName: 'Alan',
             lastName: 'Turing',
         };
-        AGE.define(user);
+
         user[AGE] = 29;
 
         let enumKeys = [];
