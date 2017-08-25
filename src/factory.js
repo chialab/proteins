@@ -63,15 +63,22 @@ export const FactoryMixin = (SuperClass) => class extends SuperClass {
         return this[FACTORY_SYM];
     }
 
+    constructor(...args) {
+        super(...args);
+        this.initialize(...args);
+    }
+
     /**
      * @class BaseFactory
      * @memberof Factory
      *
-     * @param {...*} [args] Arguments for the constructor.
+     * @param {...*} [args] Arguments for super initialize.
      */
-    constructor(...args) {
-        super(...args);
-        this[CONTEXT_SYM] = context || this;
+    initialize(...args) {
+        if (!this[CONTEXT_SYM]) {
+            this[CONTEXT_SYM] = context || this;
+        }
+        return has(SuperClass, 'initialize') && super.initialize(...args);
     }
 
     /**
@@ -115,9 +122,11 @@ export const ObservableMixin = (SuperClass) => class extends mix(SuperClass).wit
      *
      * @param {...*} [args] Arguments for the constructor.
      */
-    constructor(...args) {
-        super(...args);
-        this[LISTENERS_SYM] = [];
+    initialize(...args) {
+        super.initialize(...args);
+        if (!this[LISTENERS_SYM]) {
+            this[LISTENERS_SYM] = [];
+        }
     }
 
     /**
@@ -218,11 +227,13 @@ export const ConfigurableMixin = (SuperClass) => class extends mix(SuperClass).w
      * @param {Object} [config] The instance configuration object.
      * @param {...*} [args] Other arguments for the super constructor.
      */
-    constructor(config, ...args) {
-        super(config, ...args);
-        this[CONFIG_SYM] = clone(this.defaultConfig || {});
-        if (config) {
-            this.config(config);
+    initialize(config, ...args) {
+        super.initialize(config, ...args);
+        if (!this[CONFIG_SYM]) {
+            this[CONFIG_SYM] = clone(this.defaultConfig || {});
+            if (config) {
+                this.config(config);
+            }
         }
     }
 
@@ -276,7 +287,7 @@ export const ConfigurableMixin = (SuperClass) => class extends mix(SuperClass).w
  * @param {Function} SuperClass The class to mix.
  * @return {Function} A Factory constructor.
  */
-export const InjectableMixin = (SuperClass) => class extends mix(SuperClass).with(FactoryMixin, ConfigurableMixin, ObservableMixin) {
+export const InjectableMixin = (SuperClass) => class extends mix(SuperClass).with(FactoryMixin) {
     /**
      * @class Factory
      * @memberof Factory
@@ -288,8 +299,8 @@ export const InjectableMixin = (SuperClass) => class extends mix(SuperClass).wit
      *
      * @param {...*} [args] Arguments for the constructor.
      */
-    constructor(...args) {
-        super(...args);
+    initialize(...args) {
+        super.initialize(...args);
         let ctx = this[CONTEXT_SYM];
         this.inject.forEach((Injector) => {
             if (Injector instanceof Symbolic) {
@@ -314,8 +325,7 @@ export const InjectableMixin = (SuperClass) => class extends mix(SuperClass).wit
      * @memberof Factory.Factory
      */
     destroy() {
-        let injectors = (this.config('inject') || []).concat(this.inject);
-        injectors.forEach((Injector) => {
+        this.inject.forEach((Injector) => {
             let SYM = (Injector instanceof Symbolic) ? Injector : Injector.SYM;
             delete this[SYM];
         });
@@ -329,4 +339,4 @@ export class Observable extends mix().with(ObservableMixin) { }
 
 export class Configurable extends mix().with(ConfigurableMixin) { }
 
-export class Factory extends mix().with(InjectableMixin) { }
+export class Factory extends mix().with(ObservableMixin, ConfigurableMixin, InjectableMixin) { }
