@@ -57,12 +57,12 @@ export function off(scope, name, callback) {
  */
 export function trigger(scope, name, ...args) {
     let callbacks = scope[SYM];
+    let promise = Promise.resolve();
     if (callbacks) {
         let evtCallbacks = callbacks[name] || [];
-        let promise = Promise.resolve();
         evtCallbacks.forEach((callback) => {
             promise = promise.then(() => callback.call(scope, ...args));
         });
-        return promise;
     }
+    return promise;
 }
