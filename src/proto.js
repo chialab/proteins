@@ -1,10 +1,10 @@
-import { isFunction } from './types.js';
-
-const getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
-
 /**
  * @module Proto
  */
+
+import { isFunction } from './types.js';
+
+const getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 
 /**
  * Iterate all prototype chain of a class.

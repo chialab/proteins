@@ -5,6 +5,7 @@ let count = 0;
  * Create a symbolic key for objects's properties.
  *
  * @class Symbolic
+ * @param {string} property The Symbol name
  */
 export default class Symbolic {
     constructor(property) {

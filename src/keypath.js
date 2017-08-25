@@ -1,3 +1,7 @@
+/**
+ * @module keypath
+ */
+
 import {
     isNumber,
     isString,
@@ -8,13 +12,8 @@ import {
 } from './types.js';
 
 /**
- * @module keypath
- */
-
-/**
  * Assert scope object is an array or an object
  * @private
- * @ignore
  *
  * @param {*} obj The object to check
  * @return {boolean} The object is valid or not
@@ -26,7 +25,6 @@ function assertObject(obj) {
 /**
  * Assert scope object and path are valid
  * @private
- * @ignore
  *
  * @param {*} obj The object to check
  * @param {*} path The property path
@@ -46,7 +44,6 @@ function assertArgs(obj, path) {
 /**
  * Normalize path argument in an array of paths
  * @private
- * @ignore
  *
  * @param {Array|string|number} path The argument to normalize
  * @return {Array} An array of paths
@@ -191,7 +188,7 @@ export function ensure(obj, path, value) {
  * 
  * @param {Object} obj The object scope
  * @param {String|Array} path The path of the property to retrieve
- * @param {*} The value to push
+ * @param {*} value The value to push
  * @param {number} [index] The index to replace (empty, push at the end)
  * @return {Array} The modified array
  * @throws {Error} throw error when object scope is invalid undefined
@@ -214,11 +211,11 @@ export function insert(obj, path, value, index) {
 
 /**
  * Reset the value at the given path.
- * Object => remove all keys from the object
- * Array => remove all values from the array
- * String => reset to empty string
- * Number => reset to 0
- * * => reset to null
+ * * Object → remove all keys from the object
+ * * Array → remove all values from the array
+ * * String → reset to empty string
+ * * Number → reset to 0
+ * * any → reset to null
  * @memberof keypath
  * 
  * @param {Object} obj The object scope

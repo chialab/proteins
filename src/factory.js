@@ -1,3 +1,10 @@
+/**
+ * A set of classes with super powers.
+ * For direct or extended use.
+ *
+ * @module Factory
+ */
+
 import mix from './mixin.js';
 import Symbolic from './symbolic.js';
 import * as keypath from './keypath.js';
@@ -6,13 +13,6 @@ import merge from './merge.js';
 import { isObject, isString } from './types.js';
 import { on, off, trigger } from './events.js';
 import { has } from './proto.js';
-
-/**
- * A set of classes with super powers.
- * For direct or extended use.
- *
- * @module Factory
- */
 
 const FACTORY_SYM = new Symbolic('fsymbol');
 
@@ -43,11 +43,16 @@ let context;
  * Base Factory mixin.
  * @memberof Factory
  * @mixin FactoryMixin
+ *
+ * @param {Function} SuperClass The class to mix.
+ * @return {Function} A base Factory constructor.
  */
 export const FactoryMixin = (SuperClass) => class extends SuperClass {
     /**
-     * @property {Symbolic} A symbolic defintion for the Factory constructor.
-     * @memberof Factory.FactoryMixin
+     * A symbolic defintion for the Factory constructor.
+     * @name BaseFactory.SYM
+     * @type {Symbolic}
+     * @memberof Factory.BaseFactory
      */
     static get SYM() {
         if (!this.hasOwnProperty(FACTORY_SYM.SYM)) {
@@ -58,6 +63,12 @@ export const FactoryMixin = (SuperClass) => class extends SuperClass {
         return this[FACTORY_SYM];
     }
 
+    /**
+     * @class BaseFactory
+     * @memberof Factory
+     *
+     * @param {...*} [args] Arguments for the constructor.
+     */
     constructor(...args) {
         super(...args);
         this[CONTEXT_SYM] = context || this;
@@ -65,7 +76,7 @@ export const FactoryMixin = (SuperClass) => class extends SuperClass {
 
     /**
      * Init a new Factory with the same context.
-     * @memberof Factory.FactoryMixin
+     * @memberof Factory.BaseFactory
      *
      * @param {Function} Factory The Factory constructor.
      * @param {...*} args A list of arguments for the constructor.
@@ -80,7 +91,7 @@ export const FactoryMixin = (SuperClass) => class extends SuperClass {
 
     /**
      * Clear the context.
-     * @memberof Factory.FactoryMixin
+     * @memberof Factory.BaseFactory
      */
     destroy() {
         delete this[CONTEXT_SYM];
@@ -92,8 +103,18 @@ export const FactoryMixin = (SuperClass) => class extends SuperClass {
  * Events emitter mixin.
  * @memberof Factory
  * @mixin ObservableMixin
+ *
+ * @param {Function} SuperClass The class to mix.
+ * @return {Function} A Observable constructor.
  */
 export const ObservableMixin = (SuperClass) => class extends mix(SuperClass).with(FactoryMixin) {
+    /**
+     * @class Observable
+     * @memberof Factory
+     * @implements FactoryMixin
+     *
+     * @param {...*} [args] Arguments for the constructor.
+     */
     constructor(...args) {
         super(...args);
         this[LISTENERS_SYM] = [];
@@ -101,7 +122,7 @@ export const ObservableMixin = (SuperClass) => class extends mix(SuperClass).wit
 
     /**
      * Add an event listener.
-     * @memberof Factory.ObservableMixin
+     * @memberof Factory.Observable
      *
      * @param {string} name The event name.
      * @param {Function} callback The callback to exec for the event.
@@ -113,7 +134,7 @@ export const ObservableMixin = (SuperClass) => class extends mix(SuperClass).wit
 
     /**
      * Remove an event(s) listener(s).
-     * @memberof Factory.ObservableMixin
+     * @memberof Factory.Observable
      *
      * @param {string} [name] The event name.
      * @param {Function} [callback] The optional callback to remove.
@@ -124,7 +145,7 @@ export const ObservableMixin = (SuperClass) => class extends mix(SuperClass).wit
 
     /**
      * Dispatch an event.
-     * @memberof Factory.ObservableMixin
+     * @memberof Factory.Observable
      *
      * @param {string} name The event name.
      * @param {...*} args A list of arguments to pass to listeners.
@@ -136,7 +157,7 @@ export const ObservableMixin = (SuperClass) => class extends mix(SuperClass).wit
 
     /**
      * Listen events from another object.
-     * @memberof Factory.ObservableMixin
+     * @memberof Factory.Observable
      *
      * @param {Object} obj The object to listen.
      * @param {string} name The event name.
@@ -151,7 +172,7 @@ export const ObservableMixin = (SuperClass) => class extends mix(SuperClass).wit
 
     /**
      * Unlisten event(s) from another object(s).
-     * @memberof Factory.ObservableMixin
+     * @memberof Factory.Observable
      *
      * @param {Object} [obj] The object to unlisten.
      * @param {string} [name] The event name.
@@ -169,7 +190,7 @@ export const ObservableMixin = (SuperClass) => class extends mix(SuperClass).wit
 
     /**
      * Clear all listeners.
-     * @memberof Factory.ObservableMixin
+     * @memberof Factory.Observable
      */
     destroy() {
         this.off();
@@ -183,29 +204,35 @@ export const ObservableMixin = (SuperClass) => class extends mix(SuperClass).wit
  * @memberof Factory
  * @mixin ConfigurableMixin
  *
- * @param {Object} [config] The instance configuration object.
+ * @param {Function} SuperClass The class to mix.
+ * @return {Function} A Configurable constructor.
  */
 export const ConfigurableMixin = (SuperClass) => class extends mix(SuperClass).with(FactoryMixin) {
     /**
-     * Default config object.
-     * @type {Object}
-     * @memberof Factory.ConfigurableMixin
+     * @class Configurable
+     * @memberof Factory
+     * @implements FactoryMixin
+     *
+     * @property {Object} defaultConfig Default config object.
+     *
+     * @param {Object} [config] The instance configuration object.
+     * @param {...*} [args] Other arguments for the super constructor.
      */
-    get defaultConfig() {
-        return {};
-    }
-
-    constructor(config) {
-        super(config);
+    constructor(config, ...args) {
+        super(config, ...args);
         this[CONFIG_SYM] = clone(this.defaultConfig || {});
         if (config) {
             this.config(config);
         }
     }
 
+    get defaultConfig() {
+        return {};
+    }
+
     /**
      * Update instance configuration.
-     * @memberof Factory.ConfigurableMixin
+     * @memberof Factory.Configurable
      *
      * @param {Object|string} config The configuration to update (or the path of the configuration property).
      * @param {*} [value] The value to update for the given config name.
@@ -233,7 +260,7 @@ export const ConfigurableMixin = (SuperClass) => class extends mix(SuperClass).w
 
     /**
      * Clear the configuration.
-     * @memberof Factory.ConfigurableMixin
+     * @memberof Factory.Configurable
      */
     destroy() {
         delete this[CONFIG_SYM];
@@ -245,16 +272,22 @@ export const ConfigurableMixin = (SuperClass) => class extends mix(SuperClass).w
  * Mixin for other multiple injections.
  * @memberof Factory
  * @mixin InjectableMixin
+ *
+ * @param {Function} SuperClass The class to mix.
+ * @return {Function} A Factory constructor.
  */
-export const InjectableMixin = (SuperClass) => class extends mix(SuperClass).with(FactoryMixin) {
+export const InjectableMixin = (SuperClass) => class extends mix(SuperClass).with(FactoryMixin, ConfigurableMixin, ObservableMixin) {
     /**
+     * @class Factory
+     * @memberof Factory
+     * @implements FactoryMixin
+     * @implements ConfigurableMixin
+     * @implements ObservableMixin
+     *
      * @property {Array} inject A default list of injections.
-     * @memberof Factory.InjectableMixin
+     *
+     * @param {...*} [args] Arguments for the constructor.
      */
-    get inject() {
-        return [];
-    }
-
     constructor(...args) {
         super(...args);
         let ctx = this[CONTEXT_SYM];
@@ -272,9 +305,13 @@ export const InjectableMixin = (SuperClass) => class extends mix(SuperClass).wit
         });
     }
 
+    get inject() {
+        return [];
+    }
+
     /**
      * Clear injected methods.
-     * @memberof Factory.InjectableMixin
+     * @memberof Factory.Factory
      */
     destroy() {
         let injectors = (this.config('inject') || []).concat(this.inject);
@@ -286,26 +323,10 @@ export const InjectableMixin = (SuperClass) => class extends mix(SuperClass).wit
     }
 };
 
-/**
- * @class Observable
- * @memberof Factory
- * @extends Object
- * @implements ObservableMixin
- */
+export class BaseFactory extends mix().with(FactoryMixin) { } 
+
 export class Observable extends mix().with(ObservableMixin) { }
 
-/**
- * @class Configurable
- * @memberof Factory
- * @extends Observable
- * @implements ConfigurableMixin
- */
-export class Configurable extends mix(Observable).with(ConfigurableMixin) { }
+export class Configurable extends mix().with(ConfigurableMixin) { }
 
-/**
- * @class Factory
- * @memberof Factory
- * @extends Configurable
- * @implements InjectableMixin
- */
-export class Factory extends mix(Configurable).with(InjectableMixin) { }
+export class Factory extends mix().with(InjectableMixin) { }
