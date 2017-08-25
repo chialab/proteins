@@ -1,8 +1,10 @@
 import clone from './clone.js';
-import { isObject, isArray, isFunction } from './types.js';
+import { isObject, isArray } from './types.js';
+
+let merge;
 
 function MergeConfigurator(options) {
-    if (isFunction(merge)) {
+    if (typeof merge === 'function') {
         options = merge(merge.options, options);
     }
 
@@ -46,7 +48,7 @@ function MergeConfigurator(options) {
  * @param {...Object|Array} objects The objects to merge.
  * @return {Object} The merged object.
  */
-const merge = MergeConfigurator({
+merge = MergeConfigurator({
     mergeObjects: true,
     joinArrays: false,
     strictMerge: false,
