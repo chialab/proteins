@@ -79,8 +79,8 @@ export function reduce(Ctr, property) {
     let res = [];
     walk(Ctr, (proto) => {
         let descriptor = getOwnPropertyDescriptor(proto, property);
-        if (descriptor && (descriptor.value || descriptor.get)) {
-            res.push(descriptor.value || descriptor.get);
+        if (descriptor) {
+            res.push(descriptor);
         }
     });
     return res;
