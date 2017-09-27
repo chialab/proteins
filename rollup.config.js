@@ -9,7 +9,6 @@ const babel = require('rollup-plugin-babel');
 const uglify = require('rollup-plugin-uglify');
 const istanbul = require('rollup-plugin-istanbul');
 const json = require('rollup-plugin-json');
-const multiEntry = require('rollup-plugin-multi-entry');
 const builtins = require('rollup-plugin-node-builtins');
 const inject = require('rollup-plugin-inject');
 
@@ -20,13 +19,12 @@ const NODE_TARGET = (env.TARGET === 'node');
 
 module.exports = {
     name: camelize(project.main),
-    input: TEST_ENV ? './test/**/*.spec.js' : project.module,
+    input: TEST_ENV ? './test/suite.js' : project.module,
     sourcemap: process.env.NODE_ENV !== 'production' ? 'inline' : false,
     format: 'umd',
     strict: false,
     plugins: [
         NODE_TARGET ? builtins() : {},
-        multiEntry(),
         json(),
         nodeResolve(),
         TEST_ENV ? istanbul({
