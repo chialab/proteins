@@ -105,7 +105,7 @@ jobs:
         - git push origin
     - stage: deploy
       os: linux
-      env: CI_BUILD_TYPE=website CNAME=proteins.chialab.io
+      env: CI_BUILD_TYPE=website CNAME=proteins.chialab.io S3_BUCKET=chialab-static-sites
       node_js: 7
       install:
         - pip install --user awscli
