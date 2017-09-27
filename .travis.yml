@@ -105,7 +105,7 @@ jobs:
         - git push origin
     - stage: deploy
       os: linux
-      env: CI_BUILD_TYPE=website CNAME=proteins.chialab.io
+      env: CI_BUILD_TYPE=website CNAME=proteins.chialab.io S3_BUCKET=chialab-static-sites
       node_js: 7
       install:
         - pip install --user awscli
@@ -124,9 +124,9 @@ jobs:
         - for file in public/*.html; do mv -- "$file" "${file%%.html}"; done
         - for file in public/**/*.html; do mv -- "$file" "${file%%.html}"; done
         - sed -i 's/\.html//g' public/service-worker.js
-        - aws s3 sync public s3://$CNAME/ --region eu-west-1 --size-only --exclude "*" --include "*.*" --delete
-        - aws s3 sync public s3://$CNAME/ --region eu-west-1 --size-only --content-type text/html --exclude "*.*" --delete
-        - aws cloudfront create-invalidation --paths '/*' --distribution-id $(aws cloudfront list-distributions | python -c 'import json, os, sys; print([d["Id"] for d in json.loads(sys.stdin.read()).get("DistributionList", {}).get("Items", []) if os.environ.get("CNAME") in d.get("Aliases", {}).get("Items", [])][0])')
+        - aws s3 sync public s3://$S3_BUCKET/$CNAME/ --region eu-west-1 --size-only --exclude "*" --include "*.*" --delete
+        - aws s3 sync public s3://$S3_BUCKET/$CNAME/ --region eu-west-1 --size-only --content-type text/html --exclude "*.*" --delete
+        - aws cloudfront create-invalidation --paths '/*' --distribution-id $(aws cloudfront list-distributions --query "DistributionList.Items[?contains(Aliases.Items, '${CNAME}')].Id" --output text)
 
   allow_failures:
     - env: CI_BUILD_TYPE=electron
