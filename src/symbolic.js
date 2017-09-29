@@ -1,5 +1,22 @@
-let support = typeof Symbol === 'function';
 let count = 0;
+let support = (() => {
+    try {
+        if (typeof Symbol === 'function') {
+            class Test {
+                toString() {
+                    return Symbol();
+                }
+            }
+            new Object({
+                [new Test()]: 0,
+            });
+            return true;
+        }
+    } catch (ex) {
+        //
+    }
+    return false;
+})();
 
 /**
  * Create a symbolic key for objects's properties.
@@ -31,14 +48,4 @@ export default class Symbolic {
     toString() {
         return this.SYM;
     }
-}
-
-try {
-    if (support) {
-        let check = new Symbolic('check');
-        let test = {};
-        test[check] = 2;
-    }
-} catch(ex) {
-    support = false;
 }

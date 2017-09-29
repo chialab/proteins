@@ -49,6 +49,7 @@ jobs:
         - npm run test-electron
     - stage: test
       os: osx
+      osx_image: xcode9
       env: CI_BUILD_TYPE=nativescript
       node_js: 7
       install:
