@@ -60,7 +60,7 @@ jobs:
         - tns error-reporting disable
         - npm install
       script:
-        - travis_wait 30 npm run test-nativescript-ios
+        - npm run test-nativescript-ios
     - stage: test
       os: linux
       env: CI_BUILD_TYPE=nativescript

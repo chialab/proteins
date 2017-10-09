@@ -132,13 +132,15 @@ module.exports = {
         browserName: 'Safari',
         platform: 'iOS',
         version: '8.4',
-        device: 'iPhone 5',
+        appiumVersion: '1.7.1',
+        device: 'iPhone 6',
     },
     SL_iOS_9: {
         base: 'SauceLabs',
         browserName: 'Safari',
         platform: 'iOS',
         version: '9.3',
+        appiumVersion: '1.7.1',
         device: 'iPhone 6',
     },
     SL_iOS_10: {
@@ -146,13 +148,15 @@ module.exports = {
         browserName: 'Safari',
         platform: 'iOS',
         version: '10.3',
+        appiumVersion: '1.7.1',
         device: 'iPhone 7',
     },
     SL_iOS_11: {
         base: 'SauceLabs',
         browserName: 'Safari',
         platform: 'iOS',
-        version: '11',
+        version: '11.0',
+        appiumVersion: '1.7.1',
         device: 'iPhone 8',
     },
     SL_Android_4: {
