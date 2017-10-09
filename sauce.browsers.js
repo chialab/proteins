@@ -153,7 +153,7 @@ module.exports = {
         browserName: 'Safari',
         platform: 'iOS',
         version: '11',
-        device: 'iPhone X',
+        device: 'iPhone 8',
     },
     SL_Android_4: {
         base: 'SauceLabs',
