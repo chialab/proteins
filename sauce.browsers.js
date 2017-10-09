@@ -132,7 +132,7 @@ module.exports = {
         browserName: 'Safari',
         platform: 'iOS',
         version: '8.4',
-        appiumVersion: '1.7.1',
+        appiumVersion: '1.6.4',
         device: 'iPhone 6',
     },
     SL_iOS_9: {
