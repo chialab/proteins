@@ -45,7 +45,7 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
  * @param {ChangeSet} changeset The changes descriptor.
  */
 function triggerChanges(scope, changeset) {
-    return EMITTER_PROTO.trigger.call(scope, 'change', changeset);
+    return scope.trigger('change', changeset);
 }
 
 /**
@@ -184,7 +184,7 @@ export default class Observable {
 
         let proxy;
 
-        Object.setPrototypeOf(data, Object.create(data.constructor.prototype, {
+        data.__proto__ = (data, Object.create(data.__proto__, {
             on: { value: Emitter.prototype.on },
             off: { value: Emitter.prototype.off },
             trigger: { value: Emitter.prototype.trigger },
