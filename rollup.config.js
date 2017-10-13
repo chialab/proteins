@@ -29,7 +29,10 @@ module.exports = {
         json(),
         nodeResolve(),
         common({
-            include: ['node_modules/promise-polyfill/**'],
+            include: [
+                'node_modules/promise-polyfill/**',
+                'test/polyfills.js',
+            ],
         }),
         TEST_ENV ? istanbul({
             include: [

@@ -1,8 +1,4 @@
-import 'proxy-polyfill';
-import Promise from 'promise-polyfill';
-if (typeof window !== 'undefined') {
-    window.Promise = window.Promise || Promise;
-}
+import './polyfills.js';
 
 import './clone.spec.js';
 import './events.spec.js';

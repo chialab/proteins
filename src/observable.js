@@ -116,7 +116,7 @@ const ARRAY_PROTO_WRAP = {
  * @return {Observable} The Observable instance for the sub object.
  */
 function subobserve(target, name, value) {
-    if (isObject(value) || isArray(value) || value instanceof Observable) {
+    if (isObject(value) || isArray(value)) {
         value = new Observable(value);
         value.on('change', (changeset) => {
             name = isArray(target) ? target.indexOf(value) : name;
@@ -177,10 +177,6 @@ const handler = {
  */
 export default class Observable {
     constructor(data) {
-        if (data instanceof Observable) {
-            return data;
-        }
-
         if (data[SYM]) {
             return data[SYM];
         }
@@ -195,7 +191,7 @@ export default class Observable {
             data[key] = subobserve(proxy, key, data[key]);
         });
 
-        data[SYM] = proxy;
+        proxy[SYM] = data[SYM] = proxy;
 
         return proxy;
     }
