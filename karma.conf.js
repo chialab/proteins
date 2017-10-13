@@ -183,7 +183,7 @@ module.exports = function(config) {
                         flags: ['--no-sandbox'],
                     },
                 },
-                browsers: ['Chrome_CI'],
+                browsers: ['Chrome_CI', 'Firefox'],
             });
             break;
     }
