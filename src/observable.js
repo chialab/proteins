@@ -152,9 +152,6 @@ const handler = {
         return target[name];
     },
     set: (target, name, value) => {
-        if (name in Emitter.prototype) {
-            return;
-        }
         let oldValue = target[name];
         if (target[name] !== value) {
             value = subobserve(target, name, value);
@@ -178,20 +175,27 @@ const handler = {
 export default class Observable {
     constructor(data) {
         if (data[SYM]) {
-            return data[SYM];
+            return data[SYM]();
         }
 
         if (!isObject(data) && !isArray(data)) {
             throw new Error('Cannot observe this value.');
         }
 
-        let proxy = new Proxy(data, handler);
+        let proxy;
+
+        Object.setPrototypeOf(data, Object.create(data.constructor.prototype, {
+            on: { value: Emitter.prototype.on },
+            off: { value: Emitter.prototype.off },
+            trigger: { value: Emitter.prototype.trigger },
+        }));
+        data[SYM] = () => proxy;
+
+        proxy = new Proxy(data, handler);
 
         Object.keys(data).forEach((key) => {
             data[key] = subobserve(proxy, key, data[key]);
         });
-
-        proxy[SYM] = data[SYM] = proxy;
 
         return proxy;
     }
