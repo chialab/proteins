@@ -1,4 +1,4 @@
-[![Logo](http://logos.chialab.io.s3-website-eu-west-1.amazonaws.com/@chialab/proteins.svg)](https://proteins.chialab.io)
+[![Logo](https://logos.chialab.io/@chialab/proteins.svg)](https://proteins.chialab.io)
 
 A primer for JavaScript libraries and frameworks development.
 
