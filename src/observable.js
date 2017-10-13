@@ -2,6 +2,41 @@ import { Emitter } from './factory.js';
 import { isArray, isObject } from './types.js';
 import Symbolic from './symbolic.js';
 
+let ProxyHelper = typeof Proxy !== 'undefined' ? Proxy : class Proxy {
+    constructor(data, handler) {
+        let res = isArray(data) ? [] : {};
+        Object.keys(data).forEach((key) => {
+            this.define(res, data, key, handler);
+        });
+        res.__proto__ = data.__proto__;
+        if (isArray(data)) {
+            let lastLength = data.length;
+            res.on('change', () => {
+                if (data.length !== lastLength) {
+                    Object.keys(data).forEach((key) => {
+                        this.define(res, data, key, handler);
+                    });
+                    lastLength = data.length;
+                }
+            });
+        }
+        return res;
+    }
+
+    define(res, data, property, handler) {
+        let desc = {
+            configurable: true,
+        };
+        if (handler.get) {
+            desc.get = () => handler.get(data, property);
+        }
+        if (handler.set) {
+            desc.set = (val) => handler.set(data, property, val);
+        }
+        Object.defineProperty(res, property, desc);
+    }
+};
+
 /**
  * @typedef ChangeSet
  * @property {String} property The path to the changed property.
@@ -16,7 +51,8 @@ import Symbolic from './symbolic.js';
  * @type {Symbolic}
  * @private
  */
-const SYM = new Symbolic('observable');
+const OBSERVABLE_SYM = new Symbolic('observable');
+const EMITTER_SYM = new Symbolic('emitter');
 
 /**
  * Array prototype shortcut.
@@ -24,13 +60,6 @@ const SYM = new Symbolic('observable');
  * @private
  */
 const ARRAY_PROTO = Array.prototype;
-
-/**
- * Emitter prototype shortcut.
- * @type {Object}
- * @private
- */
-const EMITTER_PROTO = Emitter.prototype;
 
 /**
  * Object.prototype.hasOwnProperty shortcut.
@@ -45,7 +74,7 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
  * @param {ChangeSet} changeset The changes descriptor.
  */
 function triggerChanges(scope, changeset) {
-    return scope.trigger('change', changeset);
+    return scope[OBSERVABLE_SYM].trigger('change', changeset);
 }
 
 /**
@@ -142,15 +171,7 @@ function subobserve(target, name, value) {
  * @private
  */
 const handler = {
-    get: (target, name) => {
-        if (isArray(target) && name in ARRAY_PROTO_WRAP) {
-            return ARRAY_PROTO_WRAP[name].bind(target);
-        }
-        if (name in EMITTER_PROTO) {
-            return EMITTER_PROTO[name].bind(target);
-        }
-        return target[name];
-    },
+    get: (target, name) => target[name],
     set: (target, name, value) => {
         let oldValue = target[name];
         if (target[name] !== value) {
@@ -174,8 +195,8 @@ const handler = {
  */
 export default class Observable {
     constructor(data) {
-        if (data[SYM]) {
-            return data[SYM]();
+        if (data[OBSERVABLE_SYM]) {
+            return data[OBSERVABLE_SYM];
         }
 
         if (!isObject(data) && !isArray(data)) {
@@ -184,17 +205,31 @@ export default class Observable {
 
         let proxy;
 
-        data.__proto__ = (data, Object.create(data.__proto__, {
-            on: { value: Emitter.prototype.on },
-            off: { value: Emitter.prototype.off },
-            trigger: { value: Emitter.prototype.trigger },
-        }));
-        data[SYM] = () => proxy;
+        let emitter = new Emitter();
 
-        proxy = new Proxy(data, handler);
+        let proto = {
+            [OBSERVABLE_SYM]: { get: () => proxy },
+            on: { value: emitter.on.bind(emitter) },
+            off: { value: emitter.off.bind(emitter) },
+            trigger: { value: emitter.trigger.bind(emitter) },
+        };
+
+        if (isArray(data)) {
+            proto.push = { get: () => ARRAY_PROTO_WRAP.push.bind(data) };
+            proto.unshift = { get: () => ARRAY_PROTO_WRAP.unshift.bind(data) };
+            proto.pop = { get: () => ARRAY_PROTO_WRAP.pop.bind(data) };
+            proto.shift = { get: () => ARRAY_PROTO_WRAP.shift.bind(data) };
+            proto.splice = { get: () => ARRAY_PROTO_WRAP.splice.bind(data) };
+        }
+
+        data.__proto__ = Object.create(data.__proto__, proto);
+
+        proxy = new ProxyHelper(data, handler);
 
         Object.keys(data).forEach((key) => {
-            data[key] = subobserve(proxy, key, data[key]);
+            if (key !== EMITTER_SYM) {
+                data[key] = subobserve(data, key, data[key]);
+            }
         });
 
         return proxy;

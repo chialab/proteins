@@ -47,6 +47,19 @@ export function off(scope, name, callback) {
         scope[SYM] = {};
     }
 }
+
+function flush(callbacks, index, lastRes, scope, ...args) {
+    if (index === callbacks.length) {
+        if (lastRes instanceof Promise) {
+            return lastRes;
+        }
+        return Promise.resolve(lastRes);
+    }
+    let fn = callbacks[index].bind(scope, ...args);
+    let res = lastRes ? lastRes.then(() => fn()) : fn();
+    return flush(callbacks, index + 1, res, scope, ...args);
+}
+
 /**
  * Trigger a callback.
  *
@@ -56,13 +69,7 @@ export function off(scope, name, callback) {
  * @return {Promise} The final Promise of the callbacks chain
  */
 export function trigger(scope, name, ...args) {
-    let callbacks = scope[SYM];
-    let promise = Promise.resolve();
-    if (callbacks) {
-        let evtCallbacks = callbacks[name] || [];
-        evtCallbacks.forEach((callback) => {
-            promise = promise.then(() => callback.call(scope, ...args));
-        });
-    }
-    return promise;
+    let callbacks = scope[SYM] || {};
+    let evtCallbacks = callbacks[name] || [];
+    return flush(evtCallbacks, 0, null, scope, ...args);
 }

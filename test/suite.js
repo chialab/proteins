@@ -1,5 +1,3 @@
-import './polyfills.js';
-
 import './clone.spec.js';
 import './events.spec.js';
 import './factory.spec.js';
