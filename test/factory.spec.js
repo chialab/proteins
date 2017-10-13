@@ -1,9 +1,9 @@
 /* eslint-env mocha */
 import { trigger } from '../src/events.js';
-import { Factory, Observable, CONTEXT_SYM } from '../src/factory.js';
+import { Factory, Emitter, CONTEXT_SYM } from '../src/factory.js';
 
-describe('Unit: Observable', () => {
-    let obj = new Observable();
+describe('Unit: Emitter', () => {
+    let obj = new Emitter();
     let check = {};
 
     function prepareFn(number) {

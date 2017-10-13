@@ -18,6 +18,7 @@ import * as Url from './src/url.js';
 
 export * from './src/types.js';
 export * from './src/events.js';
+export * from './src/observable.js';
 export { Symbolic };
 export { clone };
 export { merge };

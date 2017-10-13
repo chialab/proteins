@@ -109,14 +109,14 @@ export const FactoryMixin = (SuperClass) => class extends SuperClass {
 /**
  * Events emitter mixin.
  * @memberof Factory
- * @mixin ObservableMixin
+ * @mixin EmitterMixin
  *
  * @param {Function} SuperClass The class to mix.
- * @return {Function} A Observable constructor.
+ * @return {Function} A Emitter constructor.
  */
-export const ObservableMixin = (SuperClass) => class extends mix(SuperClass).with(FactoryMixin) {
+export const EmitterMixin = (SuperClass) => class extends mix(SuperClass).with(FactoryMixin) {
     /**
-     * @class Observable
+     * @class Emitter
      * @memberof Factory
      * @implements FactoryMixin
      *
@@ -131,7 +131,7 @@ export const ObservableMixin = (SuperClass) => class extends mix(SuperClass).wit
 
     /**
      * Add an event listener.
-     * @memberof Factory.Observable
+     * @memberof Factory.Emitter
      *
      * @param {string} name The event name.
      * @param {Function} callback The callback to exec for the event.
@@ -143,7 +143,7 @@ export const ObservableMixin = (SuperClass) => class extends mix(SuperClass).wit
 
     /**
      * Remove an event(s) listener(s).
-     * @memberof Factory.Observable
+     * @memberof Factory.Emitter
      *
      * @param {string} [name] The event name.
      * @param {Function} [callback] The optional callback to remove.
@@ -154,7 +154,7 @@ export const ObservableMixin = (SuperClass) => class extends mix(SuperClass).wit
 
     /**
      * Dispatch an event.
-     * @memberof Factory.Observable
+     * @memberof Factory.Emitter
      *
      * @param {string} name The event name.
      * @param {...*} args A list of arguments to pass to listeners.
@@ -166,7 +166,7 @@ export const ObservableMixin = (SuperClass) => class extends mix(SuperClass).wit
 
     /**
      * Listen events from another object.
-     * @memberof Factory.Observable
+     * @memberof Factory.Emitter
      *
      * @param {Object} obj The object to listen.
      * @param {string} name The event name.
@@ -181,7 +181,7 @@ export const ObservableMixin = (SuperClass) => class extends mix(SuperClass).wit
 
     /**
      * Unlisten event(s) from another object(s).
-     * @memberof Factory.Observable
+     * @memberof Factory.Emitter
      *
      * @param {Object} [obj] The object to unlisten.
      * @param {string} [name] The event name.
@@ -199,7 +199,7 @@ export const ObservableMixin = (SuperClass) => class extends mix(SuperClass).wit
 
     /**
      * Clear all listeners.
-     * @memberof Factory.Observable
+     * @memberof Factory.Emitter
      */
     destroy() {
         this.off();
@@ -293,7 +293,7 @@ export const InjectableMixin = (SuperClass) => class extends mix(SuperClass).wit
      * @memberof Factory
      * @implements FactoryMixin
      * @implements ConfigurableMixin
-     * @implements ObservableMixin
+     * @implements EmitterMixin
      *
      * @property {Array} inject A default list of injections.
      *
@@ -335,8 +335,8 @@ export const InjectableMixin = (SuperClass) => class extends mix(SuperClass).wit
 
 export class BaseFactory extends mix().with(FactoryMixin) { } 
 
-export class Observable extends mix().with(ObservableMixin) { }
+export class Emitter extends mix().with(EmitterMixin) { }
 
 export class Configurable extends mix().with(ConfigurableMixin) { }
 
-export class Factory extends mix().with(ObservableMixin, ConfigurableMixin, InjectableMixin) { }
+export class Factory extends mix().with(EmitterMixin, ConfigurableMixin, InjectableMixin) { }

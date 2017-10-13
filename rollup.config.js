@@ -6,6 +6,7 @@ const project = require('./package.json');
 
 const nodeResolve = require('rollup-plugin-node-resolve');
 const babel = require('rollup-plugin-babel');
+const common = require('rollup-plugin-commonjs');
 const uglify = require('rollup-plugin-uglify');
 const istanbul = require('rollup-plugin-istanbul');
 const json = require('rollup-plugin-json');
@@ -27,6 +28,9 @@ module.exports = {
         NODE_TARGET ? builtins() : {},
         json(),
         nodeResolve(),
+        common({
+            include: ['node_modules/promise-polyfill/**'],
+        }),
         TEST_ENV ? istanbul({
             include: [
                 'src/**/*.js',
