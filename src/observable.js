@@ -2,7 +2,41 @@ import { Emitter } from './factory.js';
 import { isArray, isObject } from './types.js';
 import Symbolic from './symbolic.js';
 
-let ProxyHelper = typeof Proxy !== 'undefined' ? Proxy : class Proxy {
+/**
+ * @typedef ChangeSet
+ * @property {String} property The path to the changed property.
+ * @property {*} oldValue The old value for the property.
+ * @property {*} newValue The new value for the property.
+ * @property {Array} added A list of added items to an array.
+ * @property {Array} remove A list of remove items from an array.
+ */
+
+/**
+ * Observable Symbol.
+ * @type {Symbolic}
+ * @private
+ */
+const OBSERVABLE_SYM = new Symbolic('observable');
+
+/**
+ * Array prototype shortcut.
+ * @type {Object}
+ * @private
+ */
+const ARRAY_PROTO = Array.prototype;
+
+/**
+ * Object.prototype.hasOwnProperty shortcut.
+ * @type {Function}
+ * @private
+ */
+const hasOwnProperty = Object.prototype.hasOwnProperty;
+
+/**
+ * Micro Proxy polyfill.
+ * @private
+ */
+const ProxyHelper = typeof Proxy !== 'undefined' ? Proxy : class Proxy {
     constructor(data, handler) {
         let res = isArray(data) ? [] : {};
         Object.keys(data).forEach((key) => {
@@ -14,7 +48,9 @@ let ProxyHelper = typeof Proxy !== 'undefined' ? Proxy : class Proxy {
             res.on('change', () => {
                 if (data.length !== lastLength) {
                     Object.keys(data).forEach((key) => {
-                        this.define(res, data, key, handler);
+                        if (key !== OBSERVABLE_SYM) {
+                            this.define(res, data, key, handler);
+                        }
                     });
                     lastLength = data.length;
                 }
@@ -38,43 +74,12 @@ let ProxyHelper = typeof Proxy !== 'undefined' ? Proxy : class Proxy {
 };
 
 /**
- * @typedef ChangeSet
- * @property {String} property The path to the changed property.
- * @property {*} oldValue The old value for the property.
- * @property {*} newValue The new value for the property.
- * @property {Array} added A list of added items to an array.
- * @property {Array} remove A list of remove items from an array.
- */
-
-/**
- * Observable Symbol.
- * @type {Symbolic}
- * @private
- */
-const OBSERVABLE_SYM = new Symbolic('observable');
-const EMITTER_SYM = new Symbolic('emitter');
-
-/**
- * Array prototype shortcut.
- * @type {Object}
- * @private
- */
-const ARRAY_PROTO = Array.prototype;
-
-/**
- * Object.prototype.hasOwnProperty shortcut.
- * @type {Function}
- * @private
- */
-const hasOwnProperty = Object.prototype.hasOwnProperty;
-
-/**
  * Trigger object changes.
  * @param {Object|Array} scope The updated object.
  * @param {ChangeSet} changeset The changes descriptor.
  */
 function triggerChanges(scope, changeset) {
-    return scope[OBSERVABLE_SYM].trigger('change', changeset);
+    return scope[OBSERVABLE_SYM]().trigger('change', changeset);
 }
 
 /**
@@ -196,7 +201,7 @@ const handler = {
 export default class Observable {
     constructor(data) {
         if (data[OBSERVABLE_SYM]) {
-            return data[OBSERVABLE_SYM];
+            return data[OBSERVABLE_SYM]();
         }
 
         if (!isObject(data) && !isArray(data)) {
@@ -208,7 +213,6 @@ export default class Observable {
         let emitter = new Emitter();
 
         let proto = {
-            [OBSERVABLE_SYM]: { get: () => proxy },
             on: { value: emitter.on.bind(emitter) },
             off: { value: emitter.off.bind(emitter) },
             trigger: { value: emitter.trigger.bind(emitter) },
@@ -222,12 +226,13 @@ export default class Observable {
             proto.splice = { get: () => ARRAY_PROTO_WRAP.splice.bind(data) };
         }
 
+        data[OBSERVABLE_SYM] = () => proxy;
         data.__proto__ = Object.create(data.__proto__, proto);
 
         proxy = new ProxyHelper(data, handler);
 
         Object.keys(data).forEach((key) => {
-            if (key !== EMITTER_SYM) {
+            if (key !== OBSERVABLE_SYM) {
                 data[key] = subobserve(data, key, data[key]);
             }
         });
