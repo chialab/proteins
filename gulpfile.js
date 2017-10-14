@@ -115,7 +115,7 @@ function execAndLog(cmd) {
         console.log(data.toString());
     });
     childProcess.stderr.on('data', (data) => {
-        console.error(data.toString());
+        console.log('ERROR:', data.toString());
     });
     return promise;
 }
@@ -128,7 +128,6 @@ function unitNativescipt(platform, done) {
             execAndLog('tns create Test --path .tmp')
                 .then(() => execAndLog('tns test init --path .tmp/Test --framework mocha'))
                 .then(() => execAndLog('cp .tmp/specs.js .tmp/Test/app/tests'))
-                .then(() => execAndLog('ls .tmp/Test/app/tests'))
                 .then(() => execAndLog(`tns test ${platform} --emulator --justlaunch --path .tmp/Test`))
                 .then(() => done())
                 .catch(() => {
