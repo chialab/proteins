@@ -129,11 +129,14 @@ const ARRAY_PROTO_WRAP = {
         });
         return res;
     },
-    splice(index, count) {
-        let res = ARRAY_PROTO.splice.call(this, index, count);
+    splice(index, count, ...items) {
+        items = items.map((item, index) =>
+            subobserve(this, length + index, item)
+        );
+        let res = ARRAY_PROTO.splice.call(this, index, count, ...items);
         triggerChanges(this, {
             property: index,
-            added: [],
+            added: items,
             removed: [res],
         });
         return res;
