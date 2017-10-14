@@ -17,9 +17,16 @@ jobs:
       script:
         - npm run test-default
     - stage: test
+      env: CI_BUILD_TYPE=default
+      node_js: 8
+      install:
+        - npm install
+      script:
+        - npm run test-default
+    - stage: test
       os: linux
       env: CI_BUILD_TYPE=saucelabs
-      node_js: 7
+      node_js: 8
       install:
         - npm install
         - npm install karma-sauce-launcher
@@ -28,7 +35,7 @@ jobs:
     - stage: test
       os: linux
       env: CI_BUILD_TYPE=electron
-      node_js: 7
+      node_js: 8
       install:
         - export DISPLAY=':99.0'
         - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
@@ -39,7 +46,7 @@ jobs:
     - stage: test
       os: osx
       env: CI_BUILD_TYPE=electron
-      node_js: 7
+      node_js: 8
       install:
         - export DISPLAY=':99.0'
         - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
@@ -51,7 +58,7 @@ jobs:
       os: osx
       osx_image: xcode9
       env: CI_BUILD_TYPE=nativescript
-      node_js: 7
+      node_js: 8
       install:
         - export DISPLAY=':99.0'
         - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
@@ -66,7 +73,7 @@ jobs:
       env: CI_BUILD_TYPE=nativescript
       language: android
       jdk: oraclejdk8
-      node_js: 7
+      node_js: 8
       android:
         components:
           - platform-tools
@@ -91,7 +98,7 @@ jobs:
     - stage: deploy
       os: linux
       env: CI_BUILD_TYPE=docs
-      node_js: 7
+      node_js: 8
       install:
         - npm install documentation
         - npm install
@@ -107,7 +114,7 @@ jobs:
     - stage: deploy
       os: linux
       env: CI_BUILD_TYPE=website CNAME=proteins.chialab.io S3_BUCKET=chialab-static-sites
-      node_js: 7
+      node_js: 8
       install:
         - pip install --user awscli
         - aws configure set preview.cloudfront true
