@@ -27,7 +27,7 @@ module.exports = {
         NODE_TARGET ? builtins() : {},
         json(),
         nodeResolve(),
-        TEST_ENV ? istanbul({
+        TEST_ENV && NODE_TARGET ? istanbul({
             include: [
                 'src/**/*.js',
             ],

@@ -36,7 +36,7 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
  * Micro Proxy polyfill.
  * @private
  */
-const ProxyHelper = typeof Proxy !== 'undefined' ? Proxy : class Proxy {
+const ProxyHelper = typeof Proxy !== 'undefined' ? Proxy : class {
     constructor(data, handler) {
         let res = isArray(data) ? [] : {};
         Object.keys(data).forEach((key) => {

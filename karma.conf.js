@@ -138,7 +138,7 @@ module.exports = function(config) {
         case 'saucelabs': {
             const saucelabsBrowsers = require('./sauce.browsers.js');
             config.set({
-                concurrency: 1,
+                concurrency: 5,
                 retryLimit: 3,
                 browserDisconnectTimeout: 10000,
                 browserDisconnectTolerance: 1,
