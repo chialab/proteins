@@ -11,6 +11,7 @@ import clone from './src/clone.js';
 import merge from './src/merge.js';
 import mix from './src/mixin.js';
 import Symbolic from './src/symbolic.js';
+import Observable from './src/observable.js';
 import * as keypath from './src/keypath.js';
 import * as Factory from './src/factory.js';
 import * as Proto from './src/proto.js';
@@ -18,8 +19,8 @@ import * as Url from './src/url.js';
 
 export * from './src/types.js';
 export * from './src/events.js';
-export * from './src/observable.js';
 export { Symbolic };
+export { Observable };
 export { clone };
 export { merge };
 export { mix };

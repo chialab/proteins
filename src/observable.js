@@ -192,6 +192,7 @@ const handler = {
                 value,
             });
         }
+        return true;
     },
 };
 
@@ -203,12 +204,10 @@ const handler = {
  */
 export default class Observable {
     constructor(data) {
-        if (data[OBSERVABLE_SYM]) {
-            return data[OBSERVABLE_SYM]();
-        }
-
         if (!isObject(data) && !isArray(data)) {
             throw new Error('Cannot observe this value.');
+        } else if (data[OBSERVABLE_SYM]) {
+            return data[OBSERVABLE_SYM]();
         }
 
         let proxy;
