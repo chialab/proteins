@@ -99,14 +99,15 @@ jobs:
       os: linux
       env: CI_BUILD_TYPE=docs
       node_js: 8
+      before_install:
+        - npm install -g documentation
       install:
-        - npm install documentation
         - npm install
       script:
         - git config --global user.email "travis@travis-ci.org"
         - git config --global user.name "travis-ci"
         - git clone https://${GH_TOKEN}@github.com/Chialab/proteins.wiki.git wiki
-        - ./node_modules/.bin/documentation build src/**/*.js -f md > ./wiki/API.md
+        - documentation build src/**/*.js -f md > ./wiki/API.md
         - cd wiki
         - git add .
         - git diff-index --quiet HEAD || git commit -m "Lastest api reference on successful travis build ${TRAVIS_BUILD_NUMBER} auto-pushed to wiki"
