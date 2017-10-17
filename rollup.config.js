@@ -14,20 +14,19 @@ const inject = require('rollup-plugin-inject');
 
 const TEST_ENV = (env.NODE_ENV === 'test');
 const PRODUCTION_ENV = (env.NODE_ENV === 'production');
-const BROWSER_TARGET = (env.TARGET === 'browser');
 const NODE_TARGET = (env.TARGET === 'node');
 
 module.exports = {
     name: camelize(project.main),
     input: TEST_ENV ? './test/suite.js' : project.module,
-    sourcemap: process.env.NODE_ENV !== 'production' ? 'inline' : false,
+    sourcemap: env.NODE_ENV !== 'production' ? 'inline' : false,
     format: 'umd',
     strict: false,
     plugins: [
         NODE_TARGET ? builtins() : {},
         json(),
         nodeResolve(),
-        TEST_ENV && NODE_TARGET ? istanbul({
+        TEST_ENV && !env.BROWSER_PROVIDER ? istanbul({
             include: [
                 'src/**/*.js',
             ],
