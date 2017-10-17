@@ -1,5 +1,6 @@
 import { Emitter } from './factory.js';
 import { isArray, isObject } from './types.js';
+import { get, reconstruct } from './proto.js';
 import Symbolic from './symbolic.js';
 
 /**
@@ -38,11 +39,10 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
  */
 const ProxyHelper = typeof Proxy !== 'undefined' ? Proxy : class {
     constructor(data, handler) {
-        let res = isArray(data) ? [] : {};
+        let res = reconstruct(get(data));
         Object.keys(data).forEach((key) => {
             this.define(res, data, key, handler);
         });
-        res.__proto__ = data.__proto__;
         if (isArray(data)) {
             let lastLength = data.length;
             res.on('change', () => {

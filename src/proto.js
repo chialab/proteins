@@ -5,6 +5,7 @@
 import { isFunction, isObject } from './types.js';
 
 const getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+const create = Object.create;
 
 /**
  * Iterate all prototype chain of a class.
@@ -106,11 +107,43 @@ export function has(Ctr, property) {
  * @return {Object} The prototype.
  */
 export function get(Ctr) {
-    if (Object.hasOwnProperty('getPrototypeOf')) {
+    if (Object.getPrototypeOf) {
         return Object.getPrototypeOf(Ctr);
     }
     if (isObject(Ctr.__proto__)) {
         return Ctr.__proto__;
     }
     return Ctr.constructor.prototype;
+}
+
+/**
+ * Set prototype to an object.
+ * @memberof Proto
+ *
+ * @param {Object} Ctr The object to update.
+ * @param {Object|Function} proto The prototype or the class to use.
+ */
+export function set(obj, proto) {
+    if (!isFunction(obj) && isFunction(proto)) {
+        proto = proto.prototype;
+    }
+    Object.setPrototypeOf ?
+        Object.setPrototypeOf(obj, proto) :
+        obj.__proto__ = proto;
+}
+
+/**
+ * Create a new instance of an object without constructor.
+ * @memberof Proto
+ *
+ * @param {Function|Object} Ctr The class or the prototype to reconstruct.
+ * @return {Object} The new instance.
+ */
+export function reconstruct(Ctr) {
+    if (isFunction(Ctr)) {
+        return create(Ctr.prototype);
+    } else if (Ctr === Array.prototype) {
+        return [];
+    }
+    return create(Ctr);
 }
