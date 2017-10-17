@@ -71,4 +71,29 @@ describe('Unit: Clone', () => {
         assert.equal(cloned[1], 4);
         assert.equal(cloned[2], 3);
     });
+
+    it('should clone a class', () => {
+        class A {
+            constructor() {
+                this.test3 = 3;
+            }
+        }
+        class B extends A {
+            constructor() {
+                super();
+                this.test = 11;
+                this.test2 = new A();
+            }
+        }
+        let b = new B();
+        let cloned = clone(b);
+        assert(cloned instanceof B);
+        assert(cloned instanceof A);
+        assert(cloned !== b);
+        assert(cloned.test === 11);
+        assert(cloned.test3 === 3);
+        assert(cloned.test2 instanceof A);
+        assert(cloned.test2 !== b.test2);
+        assert(cloned.test2.test3 === 3);
+    });
 });

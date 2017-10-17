@@ -2,7 +2,7 @@
  * @module Proto
  */
 
-import { isFunction } from './types.js';
+import { isFunction, isObject } from './types.js';
 
 const getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 
@@ -96,4 +96,21 @@ export function reduce(Ctr, property) {
  */
 export function has(Ctr, property) {
     return !!reduce(Ctr, property).length;
+}
+
+/**
+ * Retrieve prototype of an object.
+ * @memberof Proto
+ *
+ * @param {Object} Ctr The object to analyze.
+ * @return {Object} The prototype.
+ */
+export function get(Ctr) {
+    if (Object.hasOwnProperty('getPrototypeOf')) {
+        return Object.getPrototypeOf(Ctr);
+    }
+    if (isObject(Ctr.__proto__)) {
+        return Ctr.__proto__;
+    }
+    return Ctr.constructor.prototype;
 }

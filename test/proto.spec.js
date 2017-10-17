@@ -1,5 +1,5 @@
 /* eslint-env mocha */
-import { entries, methods, properties, has, reduce } from '../src/proto.js';
+import { entries, methods, properties, has, reduce, get } from '../src/proto.js';
 
 describe('Unit: Proto', () => {
     class A {
@@ -70,5 +70,12 @@ describe('Unit: Proto', () => {
         assert(!has(B, 'prop3'));
         assert(!has(B, 'test3'));
         assert(has(B, 'constructor'));
+    });
+
+    it('should retrieve prototype', () => {
+        let a = new A();
+        assert(typeof get(a).test === 'function');
+        assert(get(a).prop === undefined);
+        assert(A.prototype === get(a));
     });
 });

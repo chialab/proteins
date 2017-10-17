@@ -1,4 +1,5 @@
 import { isObject, isDate, isArray } from './types.js';
+import { get } from './proto.js';
 
 function noop(scope, key, prop) { return prop; }
 
@@ -17,7 +18,7 @@ export default function clone(obj, callback = noop) {
             return clone(entry, callback);
         });
     } else if (isObject(obj)) {
-        let res = {};
+        let res = Object.create(get(obj));
         Object.keys(obj).forEach((k) => {
             let val = callback(obj, k, obj[k]);
             res[k] = clone(val, callback);
