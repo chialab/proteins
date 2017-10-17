@@ -1,6 +1,6 @@
 import { Emitter } from './factory.js';
 import { isArray, isObject } from './types.js';
-import { get, reconstruct } from './proto.js';
+import { get, set, extend, reconstruct } from './proto.js';
 import Symbolic from './symbolic.js';
 
 /**
@@ -230,7 +230,7 @@ export default class Observable {
         }
 
         data[OBSERVABLE_SYM] = () => proxy;
-        data.__proto__ = Object.create(data.__proto__, proto);
+        set(data, extend(get(data), proto));
 
         proxy = new ProxyHelper(data, handler);
 

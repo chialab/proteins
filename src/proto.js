@@ -133,6 +133,24 @@ export function set(obj, proto) {
 }
 
 /**
+ * Extend a prototype.
+ * @memberof Proto
+ *
+ * @param {Object} proto1 The prototype to extend.
+ * @param {Object} proto2 The prototype to use.
+ * @return {Object} The new prototype.
+ */
+export function extend(proto1, proto2) {
+    if (isFunction(proto1)) {
+        proto1 = proto1.prototype;
+    }
+    if (isFunction(proto2)) {
+        proto2 = proto2.prototype;
+    }
+    return create(proto1, proto2);
+}
+
+/**
  * Create a new instance of an object without constructor.
  * @memberof Proto
  *
