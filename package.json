@@ -1,6 +1,6 @@
 {
   "name": "@chialab/proteins",
-  "version": "3.0.0-rc.3",
+  "version": "3.0.0-rc.4",
   "description": "A primer for JavaScript libraries and frameworks development.",
   "main": "dist/proteins.js",
   "module": "index.js",
@@ -11,8 +11,8 @@
     "test-browsers": "gulp unit-browsers",
     "test-saucelabs": "BROWSER_PROVIDER=\"saucelabs\" gulp unit-browsers",
     "test-electron": "BROWSER_PROVIDER=\"electron\" gulp unit-browsers",
-    "test-nativescript-ios": "gulp unit-nativescript-ios",
-    "test-nativescript-android": "gulp unit-nativescript-android",
+    "test-nativescript-ios": "BROWSER_PROVIDER=\"nativescript\" gulp unit-nativescript-ios",
+    "test-nativescript-android": "BROWSER_PROVIDER=\"nativescript\" gulp unit-nativescript-android",
     "lint": "gulp lint"
   },
   "repository": {
