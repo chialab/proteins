@@ -18,6 +18,8 @@ let support = (() => {
     return false;
 })();
 
+const registry = [];
+
 /**
  * Create a symbolic key for objects's properties.
  *
@@ -25,11 +27,23 @@ let support = (() => {
  * @param {string} property The Symbol name
  */
 export default class Symbolic {
+    static isSymbolic(sym) {
+        if (sym instanceof Symbolic) {
+            return true;
+        }
+        return sym && (
+            support ?
+                (sym.constructor === Symbol) :
+                (registry.indexOf(sym) !== -1)
+        );
+    }
+
     constructor(property) {
         if (support) {
             this.SYM = Symbol(property);
         } else {
             let sym = this.SYM = `__${property}_${count++}`;
+            registry.push(sym);
             Object.defineProperty(Object.prototype, sym, {
                 configurable: true,
                 enumerable: false,
