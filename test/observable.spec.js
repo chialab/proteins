@@ -1,5 +1,6 @@
 /* eslint-env mocha */
 import Observable from '../src/observable.js';
+import Symbolic from '../src/symbolic.js';
 
 describe('Unit: Observable', () => {
     describe('simple object', () => {
@@ -126,6 +127,25 @@ describe('Unit: Observable', () => {
                 'prop4.1.prop4_2.0',
                 'prop4.1.prop4_2.0.prop6',
             ]);
+        });
+    });
+
+    describe('symbolic keys', () => {
+        let changes = [];
+        let sym = new Symbolic('tags');
+        let observable = new Observable({
+            name: 'Alan',
+            [sym]: ['math'],
+        });
+
+        observable.on('change', (changset) => {
+            changes.push(changset);
+        });
+
+        it('should be ignored', () => {
+            observable[sym] = [];
+            observable.name = 'Steve';
+            assert.equal(changes.length, 1);
         });
     });
 });

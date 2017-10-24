@@ -181,6 +181,9 @@ function subobserve(target, name, value) {
 const handler = {
     get: (target, name) => target[name],
     set: (target, name, value) => {
+        if (Symbolic.isSymbolic(name)) {
+            return target[name] = value;
+        }
         let oldValue = target[name];
         if (target[name] !== value) {
             value = subobserve(target, name, value);
