@@ -6,8 +6,8 @@ import * as keypath from './keypath.js';
 import Symbolic from './symbolic.js';
 
 const REF_SYM = new Symbolic('ref');
-const URL_REGEX = /((?:^(?:[a-z]+:))|^)?(?:\/\/)?([^?\/$]*)([^?]*)?(\?.*)?/i;
-const PORT_REGEX = /\:\d*$/;
+const URL_REGEX = /((?:^(?:[a-z]+:))|^)?(?:\/\/)?([^?/$]*)([^?]*)?(\?.*)?/i;
+const PORT_REGEX = /:\d*$/;
 
 /**
  * Parse and split an url in its components.
@@ -105,8 +105,8 @@ export function serialize(obj, prefix, chunkFn = chunk) {
                 }
                 str.push(
                     (v !== null && typeof v === 'object') ?
-                    serialize(v, k) :
-                    chunkFn(k, `${v}`)
+                        serialize(v, k) :
+                        chunkFn(k, `${v}`)
                 );
             }
         }
@@ -283,7 +283,7 @@ export class SearchParams {
             .map((entry) => entry[0]);
     }
 
-     /**
+    /**
      * List all entry values.
      * @memberof Url.SearchParams
      *
