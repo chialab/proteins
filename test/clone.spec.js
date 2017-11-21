@@ -96,4 +96,21 @@ describe('Unit: Clone', () => {
         assert(cloned.test2 !== b.test2);
         assert(cloned.test2.test3 === 3);
     });
+
+    it('should clone circular dependencies', () => {
+        const a = {
+            test: 2,
+        };
+        const b = {
+            test: 11,
+            value: a,
+        };
+        a.value = b;
+        let cloned = clone(b);
+        assert.equal(cloned.test, 11);
+        assert(cloned.value !== a);
+        assert.equal(cloned.value.test, 2);
+        assert(cloned.value.value !== b);
+        assert.equal(cloned.value.value, cloned);
+    });
 });
