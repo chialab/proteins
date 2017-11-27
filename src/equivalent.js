@@ -1,19 +1,20 @@
 import { isObject, isDate, isArray, isFunction } from './types.js';
 
 /**
- * Recursive objects equivalence check.
+ * Internal objects equivalence check.
+ * @private
  * @param {*} obj1 The original object.
  * @param {*} obj2 The object to compare
  * @param {Array} [processing] A list of already processed comparisons.
  * @return {Boolean}
  */
-export default function equivalent(obj1, obj2, processing = []) {
+function internalEquivalent(obj1, obj2, processing = []) {
     if (typeof obj1 === typeof obj2) {
         if (isArray(obj1)) {
             if (obj1.length === obj2.length) {
                 // Arrays have the same length
                 for (let i = 0, len = obj1.length; i < len; i++) {
-                    if (!equivalent(obj1[i], obj2[i], processing)) {
+                    if (!internalEquivalent(obj1[i], obj2[i], processing)) {
                         // Deep check failed.
                         return false;
                     }
@@ -36,11 +37,11 @@ export default function equivalent(obj1, obj2, processing = []) {
             processing.push(obj1, obj2);
             let sourceKeys = Object.keys(obj1).sort();
             let targetKeys = Object.keys(obj2).sort();
-            if (equivalent(sourceKeys, targetKeys)) {
+            if (internalEquivalent(sourceKeys, targetKeys)) {
                 // objects keys are equivalent.
                 for (let i = 0, len = sourceKeys.length; i < len; i++) {
                     let key = sourceKeys[i];
-                    if (!equivalent(obj1[key], obj2[key], processing)) {
+                    if (!internalEquivalent(obj1[key], obj2[key], processing)) {
                         // deep check failed.
                         return false;
                     }
@@ -60,4 +61,14 @@ export default function equivalent(obj1, obj2, processing = []) {
     }
     // Comparison failed because object types mismatch.
     return false;
+}
+
+/**
+ * Recursive objects equivalence check.
+ * @param {*} obj1 The original object.
+ * @param {*} obj2 The object to compare
+ * @return {Boolean}
+ */
+export default function equivalent(obj1, obj2) {
+    return internalEquivalent(obj1, obj2);
 }
