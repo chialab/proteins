@@ -113,4 +113,10 @@ describe('Unit: Clone', () => {
         assert(cloned.value.value !== b);
         assert.equal(cloned.value.value, cloned);
     });
+
+    it('should not clone functions', () => {
+        const TEST_FUN = () => { };
+        assert.equal(clone(TEST_FUN), TEST_FUN);
+        assert(clone(TEST_FUN) !== TEST_FUN.bind(null));
+    });
 });
