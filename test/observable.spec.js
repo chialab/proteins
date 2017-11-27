@@ -148,4 +148,14 @@ describe('Unit: Observable', () => {
             assert.equal(changes.length, 1);
         });
     });
+
+    describe('not Observable objects', () => {
+        it('should throw an exception', () => {
+            assert.throws(() => new Observable(null));
+            assert.throws(() => new Observable(2));
+            assert.throws(() => new Observable('hello'));
+            assert.throws(() => new Observable(undefined));
+            assert.throws(() => new Observable(NaN));
+        });
+    });
 });
