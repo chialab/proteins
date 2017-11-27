@@ -9,6 +9,7 @@
 
 import clone from './src/clone.js';
 import merge from './src/merge.js';
+import equivalent from './src/equivalent.js';
 import mix from './src/mixin.js';
 import Symbolic from './src/symbolic.js';
 import Observable from './src/observable.js';
@@ -23,6 +24,7 @@ export { Symbolic };
 export { Observable };
 export { clone };
 export { merge };
+export { equivalent };    
 export { mix };
 export { keypath };
 export { Url };

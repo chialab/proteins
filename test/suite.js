@@ -1,4 +1,5 @@
 import './clone.spec.js';
+import './equivalent.spec.js';
 import './events.spec.js';
 import './factory.spec.js';
 import './keypath.spec.js';
