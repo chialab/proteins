@@ -7,6 +7,7 @@ describe('Unit: Equivalent', () => {
 
     const CIRCULAR_REFERENCE = {
         answer: 42,
+        correct: true,
     };
     CIRCULAR_REFERENCE.question = {
         text: 'The Ultimate Question of Life, the Universe and Everything',
@@ -14,6 +15,7 @@ describe('Unit: Equivalent', () => {
     };
     const ANOTHER_CIRCULAR_REFERENCE = {
         answer: 42,
+        correct: true,
     };
     ANOTHER_CIRCULAR_REFERENCE.question = {
         text: 'The Ultimate Question of Life, the Universe and Everything',
@@ -31,6 +33,8 @@ describe('Unit: Equivalent', () => {
         assert(equivalent(TEST_FUN, TEST_FUN));
         assert(equivalent(TEST_DATE, new Date(TEST_DATE.getTime())));
         assert(equivalent(new Number(42), new Number(42)));
+        assert(equivalent(new String('Synapse'), new String('Synapse')));
+        assert(equivalent(new Array(['DNA', 'Synapse', 'Proteins']), new Array(['DNA', 'Synapse', 'Proteins'])));
         assert(!equivalent('1', 1));
         assert(!equivalent(-10, '-10'));
         assert(!equivalent('true', true));
@@ -112,6 +116,11 @@ describe('Unit: Equivalent', () => {
             }
         ));
         assert(equivalent(ANOTHER_CIRCULAR_REFERENCE, CIRCULAR_REFERENCE));
+        ANOTHER_CIRCULAR_REFERENCE.question.attempts.push({
+            answer: 99,
+            correct: false,
+        });
+        assert(!equivalent(ANOTHER_CIRCULAR_REFERENCE, CIRCULAR_REFERENCE));
         assert(!equivalent(
             {
                 a: true,
