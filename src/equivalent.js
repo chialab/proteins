@@ -1,4 +1,4 @@
-import { isObject, isDate, isArray } from './types.js';
+import { isObject, isDate, isArray, isFunction } from './types.js';
 
 /**
  * Recursive objects equivalence check.
@@ -51,6 +51,9 @@ export default function equivalent(obj1, obj2, processing = []) {
         } else if (isDate(obj1) && isDate(obj2)) {
             // We cannot compare two dates just using `===`, so we use their timestamps.
             return obj1.getTime() === obj2.getTime();
+        } else if (isFunction(obj1.valueOf) && isFunction(obj2.valueOf)) {
+            // Use `valueOf` method if available.
+            return obj1.valueOf() === obj2.valueOf();
         }
         // Generic check.
         return obj1 === obj2;

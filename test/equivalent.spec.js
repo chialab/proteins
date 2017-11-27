@@ -30,6 +30,7 @@ describe('Unit: Equivalent', () => {
         assert(equivalent(false, false));
         assert(equivalent(TEST_FUN, TEST_FUN));
         assert(equivalent(TEST_DATE, new Date(TEST_DATE.getTime())));
+        assert(equivalent(new Number(42), new Number(42)));
         assert(!equivalent('1', 1));
         assert(!equivalent(-10, '-10'));
         assert(!equivalent('true', true));
