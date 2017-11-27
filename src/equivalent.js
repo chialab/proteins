@@ -25,14 +25,15 @@ export default function equivalent(obj1, obj2, processing = []) {
             // handle multiple object instance check.
             let processSourceIndex = processing.indexOf(obj1);
             while (processSourceIndex !== -1) {
-                // `processing` array contains pairs of compared object, so left objects have always odd index
-                if (processSourceIndex % 2 === 1 && processing[processSourceIndex + 1] === obj2) {
+                // `processing` array contains pairs of compared object, so left objects have always even index
+                if (processSourceIndex % 2 === 0 && processing[processSourceIndex + 1] === obj2) {
                     // The comparison between the two objects has been already handled before.
                     return true;
                 }
                 // The same object could be compared more than once, so we have to check for all references.
-                processSourceIndex = processing.indexOf(obj1);
+                processSourceIndex = processing.indexOf(obj1, processSourceIndex);
             }
+            processing.push(obj1, obj2);
             let sourceKeys = Object.keys(obj1).sort();
             let targetKeys = Object.keys(obj2).sort();
             if (equivalent(sourceKeys, targetKeys)) {

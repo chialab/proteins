@@ -5,6 +5,21 @@ describe('Unit: Equivalent', () => {
     const TEST_FUN = () => { };
     const TEST_DATE = new Date();
 
+    const CIRCULAR_REFERENCE = {
+        answer: 42,
+    };
+    CIRCULAR_REFERENCE.question = {
+        text: 'The Ultimate Question of Life, the Universe and Everything',
+        attempts: [CIRCULAR_REFERENCE],
+    };
+    const ANOTHER_CIRCULAR_REFERENCE = {
+        answer: 42,
+    };
+    ANOTHER_CIRCULAR_REFERENCE.question = {
+        text: 'The Ultimate Question of Life, the Universe and Everything',
+        attempts: [ANOTHER_CIRCULAR_REFERENCE],
+    };
+
     it('should check simple equivalences', () => {
         assert(equivalent('A', 'A'));
         assert(equivalent('Abc', 'Abc'));
@@ -95,6 +110,7 @@ describe('Unit: Equivalent', () => {
                 a: true,
             }
         ));
+        assert(equivalent(ANOTHER_CIRCULAR_REFERENCE, CIRCULAR_REFERENCE));
         assert(!equivalent(
             {
                 a: true,
