@@ -1,21 +1,4 @@
-let support = (() => {
-    try {
-        if (typeof Symbol === 'function') {
-            class Test {
-                toString() {
-                    return Symbol();
-                }
-            }
-            new Object({
-                [new Test()]: 0,
-            });
-            return true;
-        }
-    } catch (ex) {
-        //
-    }
-    return false;
-})();
+const support = (typeof Symbol === 'function');
 
 /**
  * Polyfill registry for symbols.
