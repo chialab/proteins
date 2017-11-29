@@ -14,30 +14,32 @@ import { isObject, isString } from './types.js';
 import { on, off, trigger } from './events.js';
 import { has } from './proto.js';
 
-const FACTORY_SYM = new Symbolic('fsymbol');
+const FACTORY_SYM = Symbolic('fsymbol');
 
 /**
  * Symbol for Factory context.
  * @memberof Factory
  * @type {Symbolic}
  */
-export const CONTEXT_SYM = new Symbolic('context');
+export const CONTEXT_SYM = Symbolic('context');
 
 /**
  * Symbol for Factory configuration.
  * @memberof Factory
  * @type {Symbolic}
  */
-export const CONFIG_SYM = new Symbolic('config');
+export const CONFIG_SYM = Symbolic('config');
 
 /**
  * Symbol for Factory listeners.
  * @memberof Factory
  * @type {Symbolic}
  */
-export const LISTENERS_SYM = new Symbolic('listeners');
+export const LISTENERS_SYM = Symbolic('listeners');
 
 let context;
+
+const FACTORY_SYMBOLS = {};
 
 /**
  * Base Factory mixin.
@@ -55,9 +57,9 @@ export const FactoryMixin = (SuperClass) => class extends SuperClass {
      * @memberof Factory.BaseFactory
      */
     static get SYM() {
-        if (!this.hasOwnProperty(FACTORY_SYM.SYM)) {
-            let sym = new Symbolic(this.name);
-            sym.Ctr = this;
+        if (!this.hasOwnProperty(FACTORY_SYM)) {
+            let sym = Symbolic(this.name);
+            FACTORY_SYMBOLS[sym] = this;
             this[FACTORY_SYM] = sym;
         }
         return this[FACTORY_SYM];
@@ -303,8 +305,8 @@ export const InjectableMixin = (SuperClass) => class extends mix(SuperClass).wit
         super.initialize(...args);
         let ctx = this[CONTEXT_SYM];
         this.inject.forEach((Injector) => {
-            if (Injector instanceof Symbolic) {
-                Injector = Injector.Ctr;
+            if (Symbolic.isSymbolic(Injector)) {
+                Injector = FACTORY_SYMBOLS[Injector];
             }
             if (!this[Injector.SYM]) {
                 if (ctx) {
@@ -326,7 +328,7 @@ export const InjectableMixin = (SuperClass) => class extends mix(SuperClass).wit
      */
     destroy() {
         this.inject.forEach((Injector) => {
-            let SYM = (Injector instanceof Symbolic) ? Injector : Injector.SYM;
+            let SYM = (Symbolic.isSymbolic(Injector)) ? Injector : Injector.SYM;
             delete this[SYM];
         });
         return super.destroy();

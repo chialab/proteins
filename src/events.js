@@ -1,7 +1,7 @@
 import Symbolic from './symbolic.js';
 import { isFunction } from './types.js';
 
-const SYM = new Symbolic('listeners');
+const SYM = Symbolic('listeners');
 
 /**
  * Add a callback for the specified trigger.

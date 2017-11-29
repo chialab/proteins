@@ -17,7 +17,7 @@ import Symbolic from './symbolic.js';
  * @type {Symbolic}
  * @private
  */
-const OBSERVABLE_SYM = new Symbolic('observable');
+const OBSERVABLE_SYM = Symbolic('observable');
 
 /**
  * Array prototype shortcut.
@@ -79,7 +79,7 @@ const ProxyHelper = typeof Proxy !== 'undefined' ? Proxy : class {
  * @param {ChangeSet} changeset The changes descriptor.
  */
 function triggerChanges(scope, changeset) {
-    return scope[OBSERVABLE_SYM]().trigger('change', changeset);
+    return scope[OBSERVABLE_SYM].trigger('change', changeset);
 }
 
 /**
@@ -209,13 +209,12 @@ export default class Observable {
     constructor(data) {
         if (!isObject(data) && !isArray(data)) {
             throw new Error('Cannot observe this value.');
-        } else if (data[OBSERVABLE_SYM]) {
-            return data[OBSERVABLE_SYM]();
         }
 
-        let proxy;
-
-        let emitter = new Emitter();
+        let emitter = data[OBSERVABLE_SYM] || new Emitter();
+        if (emitter.proxy) {
+            return emitter.proxy;
+        }
 
         let proto = {
             on: { value: emitter.on.bind(emitter) },
@@ -231,10 +230,10 @@ export default class Observable {
             proto.splice = { get: () => ARRAY_PROTO_WRAP.splice.bind(data) };
         }
 
-        data[OBSERVABLE_SYM] = () => proxy;
+        data[OBSERVABLE_SYM] = emitter;
         set(data, extend(get(data), proto));
 
-        proxy = new ProxyHelper(data, handler);
+        emitter.proxy = new ProxyHelper(data, handler);
 
         Object.keys(data).forEach((key) => {
             if (key !== OBSERVABLE_SYM) {
@@ -242,6 +241,6 @@ export default class Observable {
             }
         });
 
-        return proxy;
+        return emitter.proxy;
     }
 }
