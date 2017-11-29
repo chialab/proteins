@@ -46,7 +46,7 @@ export default function SymbolicFactory(property) {
         // native Symbol support.
         return Symbol(property);
     }
-    return Symbolic(property);
+    return new Symbolic(property);
 }
 
 /**
