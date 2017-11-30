@@ -5,7 +5,7 @@
 import * as keypath from './keypath.js';
 import Symbolic from './symbolic.js';
 
-const REF_SYM = new Symbolic('ref');
+const REF_SYM = Symbolic('ref');
 const URL_REGEX = /((?:^(?:[a-z]+:))|^)?(?:\/\/)?([^?/$]*)([^?]*)?(\?.*)?/i;
 const PORT_REGEX = /:\d*$/;
 

@@ -84,7 +84,8 @@ describe('Unit: Observable', () => {
     });
 
     describe('complex objects', () => {
-        let changes = [];
+        let changes1 = [];
+        let changes2 = [];
         let observable = new Observable({
             prop1: 1,
             prop2: ['a', 'b'],
@@ -97,9 +98,14 @@ describe('Unit: Observable', () => {
                 { prop4_2: [] },
             ],
         });
+        let observable2 = new Observable(observable);
 
         observable.on('change', (changset) => {
-            changes.push(changset);
+            changes1.push(changset);
+        });
+
+        observable2.on('change', (changset) => {
+            changes2.push(changset);
         });
 
         it('should trigger changes', () => {
@@ -113,11 +119,12 @@ describe('Unit: Observable', () => {
             });
             observable.prop4[1].prop4_2[0].prop6 = 10;
 
-            assert.equal(changes.length, 7);
+            assert.equal(changes1.length, 7);
+            assert.deepEqual(changes1, changes2);
         });
 
         it('should compute property name', () => {
-            let paths = changes.map((change) => change.property);
+            let paths = changes1.map((change) => change.property);
             assert.deepEqual(paths, [
                 'prop1',
                 'prop2.2',
@@ -132,7 +139,7 @@ describe('Unit: Observable', () => {
 
     describe('symbolic keys', () => {
         let changes = [];
-        let sym = new Symbolic('tags');
+        let sym = Symbolic('tags');
         let observable = new Observable({
             name: 'Alan',
             [sym]: ['math'],
@@ -156,6 +163,18 @@ describe('Unit: Observable', () => {
             assert.throws(() => new Observable('hello'));
             assert.throws(() => new Observable(undefined));
             assert.throws(() => new Observable(NaN));
+        });
+    });
+
+    describe('Observable object with thousands of instances', () => {
+        it('should not crash in Firefox', () => {
+            assert.doesNotThrow(() => {
+                let obj = [[], [], [], [], [], [], [], [], []];
+                let obs = new Observable(obj);
+                for (let i = 0; i < 3000; i++) {
+                    obs = new Observable(obs);
+                }
+            });
         });
     });
 });

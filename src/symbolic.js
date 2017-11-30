@@ -1,65 +1,64 @@
-let count = 0;
-let support = (() => {
-    try {
-        if (typeof Symbol === 'function') {
-            class Test {
-                toString() {
-                    return Symbol();
-                }
-            }
-            new Object({
-                [new Test()]: 0,
-            });
-            return true;
-        }
-    } catch (ex) {
-        //
-    }
-    return false;
-})();
+const support = (typeof Symbol === 'function');
 
+/**
+ * Polyfill registry for symbols.
+ * @type {Array}
+ */
 const registry = [];
 
 /**
- * Create a symbolic key for objects's properties.
+ * Polyfill for Symbol.
  *
- * @class Symbolic
- * @param {string} property The Symbol name
+ * @class SymbolPolyfill
+ * @param {string} property The Symbol name.
  */
-export default class Symbolic {
-    static isSymbolic(sym) {
-        if (sym instanceof Symbolic) {
-            return true;
-        }
-        return sym && (
-            support ?
-                (sym.constructor === Symbol) :
-                (registry.indexOf(sym) !== -1)
-        );
-    }
-
+class SymbolPolyfill {
     constructor(property) {
-        if (support) {
-            this.SYM = Symbol(property);
-        } else {
-            let sym = this.SYM = `__${property}_${count++}`;
-            registry.push(sym);
-            Object.defineProperty(Object.prototype, sym, {
-                configurable: true,
-                enumerable: false,
-                set(x) {
-                    Object.defineProperty(this, sym, {
-                        configurable: true,
-                        enumerable: false,
-                        writable: true,
-                        value: x,
-                    });
-                },
-            });
-        }
+        let sym = this.SYM = `__${property}_${registry.length}`;
+        registry.push(sym);
+        Object.defineProperty(Object.prototype, sym, {
+            configurable: true,
+            enumerable: false,
+            set(x) {
+                Object.defineProperty(this, sym, {
+                    configurable: true,
+                    enumerable: false,
+                    writable: true,
+                    value: x,
+                });
+            },
+        });
     }
 
     toString() {
         return this.SYM;
     }
 }
+
+/**
+ * Create a symbolic key for objects's properties.
+ *
+ * @param {string} property The Symbol name.
+ * @return {Symbol|Symbolic}
+ */
+export default function Symbolic(property) {
+    if (support) {
+        // native Symbol support.
+        let sym = Symbol(property);
+        registry.push(sym);
+        return sym;
+    }
+    return new SymbolPolyfill(property);
+}
+
+/**
+ * Check if an instance is a Symbol.
+ * @param {Symbol|Symbolic} sym The symbol to check.
+ * @return {Boolean}
+ */
+Symbolic.isSymbolic = function(sym) {
+    if (sym instanceof SymbolPolyfill) {
+        return true;
+    }
+    return sym && (support && registry.indexOf(sym) !== -1);
+};

@@ -1,6 +1,6 @@
 import Symbolic from './symbolic.js';
 
-const MIXINS_SYM = new Symbolic('mixins');
+const MIXINS_SYM = Symbolic('mixins');
 
 /**
  * Mix a class with a mixin.

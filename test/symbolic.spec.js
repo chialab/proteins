@@ -3,7 +3,7 @@ import Symbolic from '../src/symbolic.js';
 
 describe('Unit: Symbolic', () => {
     it('should set a symbolic property', () => {
-        const AGE = new Symbolic('age');
+        const AGE = Symbolic('age');
         let user = {
             firstName: 'Alan',
             lastName: 'Turing',
