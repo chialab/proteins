@@ -56,6 +56,7 @@ const ProxyHelper = typeof Proxy !== 'undefined' ? Proxy : class {
                 }
             });
         }
+        res[OBSERVABLE_SYM] = data[OBSERVABLE_SYM];
         return res;
     }
 

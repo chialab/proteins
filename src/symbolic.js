@@ -9,10 +9,10 @@ const registry = [];
 /**
  * Polyfill for Symbol.
  *
- * @class Symbolic
+ * @class SymbolPolyfill
  * @param {string} property The Symbol name.
  */
-class Symbolic {
+class SymbolPolyfill {
     constructor(property) {
         let sym = this.SYM = `__${property}_${registry.length}`;
         registry.push(sym);
@@ -41,12 +41,14 @@ class Symbolic {
  * @param {string} property The Symbol name.
  * @return {Symbol|Symbolic}
  */
-export default function SymbolicFactory(property) {
+export default function Symbolic(property) {
     if (support) {
         // native Symbol support.
-        return Symbol(property);
+        let sym = Symbol(property);
+        registry.push(sym);
+        return sym;
     }
-    return new Symbolic(property);
+    return new SymbolPolyfill(property);
 }
 
 /**
@@ -54,13 +56,9 @@ export default function SymbolicFactory(property) {
  * @param {Symbol|Symbolic} sym The symbol to check.
  * @return {Boolean}
  */
-SymbolicFactory.isSymbolic = function(sym) {
-    if (sym instanceof Symbolic) {
+Symbolic.isSymbolic = function(sym) {
+    if (sym instanceof SymbolPolyfill) {
         return true;
     }
-    return sym && (
-        support ?
-            (sym.constructor === Symbol) :
-            (registry.indexOf(sym) !== -1)
-    );
+    return sym && (support && registry.indexOf(sym) !== -1);
 };
