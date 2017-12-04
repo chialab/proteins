@@ -12,14 +12,14 @@ import {
 } from './types.js';
 
 /**
- * Assert scope object is an array or an object
+ * Assert scope object is a valid object.
  * @private
  *
  * @param {*} obj The object to check
  * @return {boolean} The object is valid or not
  */
 function assertObject(obj) {
-    return isArray(obj) || isObject(obj);
+    return !isFalsy(obj) && typeof obj === 'object';
 }
 
 /**
