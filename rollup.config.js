@@ -52,5 +52,5 @@ module.exports = {
 };
 
 function camelize(str) {
-    return str.split('/').pop().replace(/(^[a-z0-9]|[-_]([a-z0-9]))/g, (g) => (g[1] || g[0]).toUpperCase());
+    return str.split('/').pop().split('.')[0].replace(/(^[a-z0-9]|[-_]([a-z0-9]))/g, (g) => (g[1] || g[0]).toUpperCase());
 }
