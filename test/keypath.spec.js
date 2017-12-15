@@ -363,6 +363,12 @@ describe('Unit: Keypath', () => {
             assert(!keypath.has(obj, 'b.4'));
         });
 
+        it('should work with properties manually added to an array', () => {
+            let arr = [];
+            arr['property'] = 'new property';
+            assert(keypath.has(arr, 'property'));
+        });
+
         it('should test the value under array deep', () => {
             let obj = getTestObj();
             assert(keypath.has(obj, 'b.e.1.f'));
