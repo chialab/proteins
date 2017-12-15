@@ -28,7 +28,7 @@ function assertObject(obj) {
  *
  * @param {*} obj The object to check
  * @param {*} path The property path
- * @return {boolean} Arguments valid or not
+ * @return {void}
  * @throws {Error} throw error when object scope is invalid undefined
  * @throws {Error} throw error when paths is invalid or undefined
  */
@@ -73,16 +73,15 @@ function pathToArray(path) {
  */
 export function get(obj, path) {
     assertArgs(obj, path);
-    path = pathToArray(path);
-    let current = path.shift();
-    let currentObj = obj[current];
-    if (path.length === 0) {
-        return currentObj;
-    }
-    if (!assertObject(currentObj)) {
+    if (!has(obj, path)) {
         return undefined;
     }
-    return get(currentObj, path);
+    let value = obj;
+    path = pathToArray(path);
+    path.forEach(prop => {
+        value = value[prop];
+    });
+    return value;
 }
 
 /**
