@@ -142,6 +142,15 @@ export function has(obj, path) {
     assertArgs(obj, path);
     path = pathToArray(path);
     let current = path.shift();
+    if (isArray(obj) && !isNaN(current)) {
+        current = parseInt(current);
+        if (obj.length > current) {
+            if (path.length === 0) {
+                return true;
+            }
+            return has(obj[current], path);
+        }
+    }
     if (current in obj) {
         if (path.length === 0) {
             return true;
