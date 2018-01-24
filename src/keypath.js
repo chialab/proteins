@@ -150,7 +150,7 @@ export function has(obj, path) {
             return has(obj[current], path);
         }
     }
-    if (current in obj) {
+    if (current in obj || obj.hasOwnProperty(current)) {
         if (path.length === 0) {
             return true;
         }
