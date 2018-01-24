@@ -50,6 +50,7 @@ describe('Unit: Observable', () => {
             observable[0] = 'Luke';
 
             assert.equal(changes.length, 0);
+            assert.equal(observable.length, 3);
         });
         
         it('should trigger changes if object has been updated', () => {
@@ -76,6 +77,7 @@ describe('Unit: Observable', () => {
             assert.equal(changes[3].added.length, 2);
             assert.equal(changes[3].removed.length, 0);
             assert.deepEqual(changes[3].added, ['Leia', 'Han Solo']);
+            assert.equal(observable.length, 4);
         });
 
         it('should trigger changes', () => {

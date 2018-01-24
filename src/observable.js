@@ -55,6 +55,11 @@ const ProxyHelper = typeof Proxy !== 'undefined' ? Proxy : class {
                     lastLength = data.length;
                 }
             });
+            this.define(res, data, 'length', {
+                get() {
+                    return lastLength;
+                },
+            });
         }
         res[OBSERVABLE_SYM] = data[OBSERVABLE_SYM];
         return res;
