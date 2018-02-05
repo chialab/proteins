@@ -249,4 +249,49 @@ export default class Observable {
 
         return emitter.proxy;
     }
+
+    /**
+     * Re-observe an array or an object after adding a property.
+     * 
+     * You should invoke this static method only after adding a new property
+     * to an object, and only if you wish to support browsers that do not have
+     * native Proxy object. This is required because it is impossible to
+     * intercept new properties added to an existing object from the polyfill.
+     * 
+     * ## Example
+     * 
+     * ```js
+     * const myObservable = new Observable({ foo: 'foo' });
+     * 
+     * // This is not enough to trigger changes in older browsers!
+     * myObservable.bar = 'bar';
+     * 
+     * // So, you should invoke this immediately after:
+     * Observable.reobserve(myObservable);
+     * ```
+     * 
+     * @param {Object|Array} data Data to be re-observed.
+     * @return {void}
+     */
+    static reobserve(data) {
+        if (typeof Proxy !== 'undefined') {
+            // Native proxy support. We're good.
+            return;
+        }
+
+        // Ensure `data` is an observable.
+        new Observable(data);
+
+        Object.keys(data).forEach(key => {
+            if (key !== OBSERVABLE_SYM && !data[key][OBSERVABLE_SYM]) {
+                // Key has been added and is not yet observed. Big Brother is on its way.
+                data[key] = subobserve(data, key, data[key]);
+                triggerChanges(data, {
+                    property: key,
+                    oldValue: undefined,
+                    value: data[key],
+                });
+            }
+        });
+    }
 }
