@@ -189,6 +189,7 @@ describe('Unit: Observable', () => {
         it('should trigger changes', () => {
             observable.bar = 'bar';
             observable.baz = 'baz';
+            Observable.reobserve(observable);
 
             assert.deepEqual(changes, [
                 {
