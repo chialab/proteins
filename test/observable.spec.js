@@ -179,4 +179,30 @@ describe('Unit: Observable', () => {
             });
         });
     });
+
+    describe('Reobserve object when adding properties', () => {
+        const observable = new Observable({ foo: 'foo' });
+        const changes = [];
+        observable.on('change', changeset => {
+            changes.push(changeset);
+        });
+        it('should trigger changes', () => {
+            observable.bar = 'bar';
+            observable.baz = 'baz';
+            Observable.reobserve(observable);
+
+            assert.deepEqual(changes, [
+                {
+                    property: 'bar',
+                    oldValue: undefined,
+                    value: 'bar',
+                },
+                {
+                    property: 'baz',
+                    oldValue: undefined,
+                    value: 'baz',
+                },
+            ]);
+        });
+    });
 });

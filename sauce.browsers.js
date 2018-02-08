@@ -1,4 +1,5 @@
 module.exports = {
+    /** CHROME */
     SL_Chrome_dev: {
         base: 'SauceLabs',
         browserName: 'chrome',
@@ -29,6 +30,16 @@ module.exports = {
         platform: 'Windows 10',
         version: 'latest-2',
     },
+
+    /** CHROMIUM */
+    SL_Chromium_45: {
+        base: 'SauceLabs',
+        browserName: 'chrome',
+        platform: 'Linux',
+        version: '45',
+    },
+
+    /** FIREFOX */
     SL_Firefox_dev: {
         base: 'SauceLabs',
         browserName: 'firefox',
@@ -59,6 +70,8 @@ module.exports = {
         platform: 'Windows 10',
         version: 'latest-2',
     },
+
+    /** SAFARI */
     SL_Safari_8: {
         base: 'SauceLabs',
         browserName: 'safari',
@@ -77,6 +90,8 @@ module.exports = {
         platform: 'macOS 10.12',
         version: '10.1',
     },
+
+    /** IE/EDGE */
     SL_IE_11: {
         base: 'SauceLabs',
         browserName: 'internet explorer',
@@ -101,6 +116,8 @@ module.exports = {
         platform: 'Windows 10',
         version: '15.15063',
     },
+
+    /** iOS */
     SL_iOS_8: {
         base: 'SauceLabs',
         browserName: 'Safari',
@@ -133,6 +150,8 @@ module.exports = {
         appiumVersion: '1.7.1',
         device: 'iPhone 8',
     },
+
+    /** ANDROID */
     SL_Android_4: {
         base: 'SauceLabs',
         browserName: 'android',
