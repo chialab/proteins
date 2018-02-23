@@ -49,7 +49,7 @@ export function off(scope, name, callback) {
 }
 
 function flush(callbacks, index, lastRes, scope, ...args) {
-    if (index === callbacks.length) {
+    if (index >= callbacks.length) {
         if (lastRes instanceof Promise) {
             return lastRes;
         }
