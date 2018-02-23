@@ -15,23 +15,15 @@ describe('Unit: Observable', () => {
             changes.push(changset);
         });
 
-        before((done) => setTimeout(done, 100));
-
-        it('should not trigger changes if object is not changed', () => {
+        before((done) => {
             observable.firstName = 'Alan';
-
-            assert.equal(changes.length, 0);
+            observable.lastName = 'Skywalker';
+            setTimeout(done, 100);
         });
 
         it('should trigger changes if object has been updated', () => {
-            observable.lastName = 'Skywalker';
-
-            let change = changes[0];
-            assert.equal(change.value, 'Skywalker');
-            assert.equal(change.oldValue, 'Turing');
-        });
-
-        it('should trigger changes', () => {
+            assert.equal(changes[0].value, 'Skywalker');
+            assert.equal(changes[0].oldValue, 'Turing');
             assert.equal(changes.length, 1);
         });
     });
@@ -48,28 +40,18 @@ describe('Unit: Observable', () => {
             changes.push(changset);
         });
 
-        before((done) => setTimeout(done, 100));
-
-        it('should not trigger changes if object is not changed', () => {
+        before((done) => {
             observable[0] = 'Luke';
-
-            assert.equal(changes.length, 0);
-            assert.equal(observable.length, 3);
-        });
-        
-        it('should trigger changes if object has been updated', () => {
             observable[1] = 'Darth Vader';
-
-            let change = changes[0];
-            assert.equal(change.value, 'Darth Vader');
-            assert.equal(change.oldValue, 'Anakin');
-        });
-
-        it('should trigger changes for array functions', () => {
             observable[2] = 'Leia';
             observable.pop();
             observable.push('Leia', 'Han Solo');
+            setTimeout(done, 100);
+        });
 
+        it('should trigger changes if object has been updated', () => {
+            assert.equal(changes[0].value, 'Darth Vader');
+            assert.equal(changes[0].oldValue, 'Anakin');
             assert.equal(changes[1].property, '2');
             assert.equal(changes[1].oldValue, 'Padme');
             assert.equal(changes[1].value, 'Leia');
@@ -82,9 +64,6 @@ describe('Unit: Observable', () => {
             assert.equal(changes[3].removed.length, 0);
             assert.deepEqual(changes[3].added, ['Leia', 'Han Solo']);
             assert.equal(observable.length, 4);
-        });
-
-        it('should trigger changes', () => {
             assert.equal(changes.length, 4);
         });
     });
@@ -158,11 +137,13 @@ describe('Unit: Observable', () => {
             changes.push(changset);
         });
 
-        before((done) => setTimeout(done, 100));
-
-        it('should be ignored', () => {
+        before((done) => {
             observable[sym] = [];
             observable.name = 'Steve';
+            setTimeout(done, 100);
+        });
+
+        it('should be ignored', () => {
             assert.equal(changes.length, 1);
         });
     });
@@ -197,13 +178,14 @@ describe('Unit: Observable', () => {
             changes.push(changeset);
         });
 
-        before((done) => setTimeout(done, 100));
-
-        it('should trigger changes', () => {
+        before((done) => {
             observable.bar = 'bar';
             observable.baz = 'baz';
             Observable.reobserve(observable);
+            setTimeout(done, 100);
+        });
 
+        it('should trigger changes', () => {
             assert.deepEqual(changes, [
                 {
                     property: 'bar',
