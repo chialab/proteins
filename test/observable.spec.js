@@ -14,7 +14,9 @@ describe('Unit: Observable', () => {
         observable.on('change', (changset) => {
             changes.push(changset);
         });
-        
+
+        before((done) => setTimeout(done, 100));
+
         it('should not trigger changes if object is not changed', () => {
             observable.firstName = 'Alan';
 
@@ -45,7 +47,9 @@ describe('Unit: Observable', () => {
         observable.on('change', (changset) => {
             changes.push(changset);
         });
-        
+
+        before((done) => setTimeout(done, 100));
+
         it('should not trigger changes if object is not changed', () => {
             observable[0] = 'Luke';
 
@@ -120,7 +124,7 @@ describe('Unit: Observable', () => {
                 prop6: 5,
             });
             observable.prop4[1].prop4_2[0].prop6 = 10;
-            setTimeout(() => done(), 100);
+            setTimeout(done, 100);
         });
 
         it('should trigger changes', () => {
@@ -154,6 +158,8 @@ describe('Unit: Observable', () => {
             changes.push(changset);
         });
 
+        before((done) => setTimeout(done, 100));
+
         it('should be ignored', () => {
             observable[sym] = [];
             observable.name = 'Steve';
@@ -186,9 +192,13 @@ describe('Unit: Observable', () => {
     describe('Reobserve object when adding properties', () => {
         const observable = new Observable({ foo: 'foo' });
         const changes = [];
+
         observable.on('change', changeset => {
             changes.push(changeset);
         });
+
+        before((done) => setTimeout(done, 100));
+
         it('should trigger changes', () => {
             observable.bar = 'bar';
             observable.baz = 'baz';
