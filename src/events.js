@@ -56,10 +56,12 @@ function flush(registered, callbacks, index, res, scope, ...args) {
     if (registered.indexOf(callback) !== -1) {
         res = callback.call(scope, ...args);
     }
-    res = (res instanceof Promise) ? res : Promise.resolve(res);
-    return res.then(() =>
-        flush(registered, callbacks, index + 1, res, scope, ...args)
-    );
+    if (res instanceof Promise) {
+        return res.then(() =>
+            flush(registered, callbacks, index + 1, res, scope, ...args)
+        );
+    }
+    return flush(registered, callbacks, index + 1, res, scope, ...args);
 }
 
 /**
