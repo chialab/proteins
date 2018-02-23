@@ -117,4 +117,32 @@ describe('Unit: Events', () => {
             assert.throws(() => on(obj, 'event', 4), TypeError);
         });
     });
+
+    describe('remove a callback during a trigger', () => {
+        let scope = {};
+        on(scope, 'change', callback1);
+        on(scope, 'change', function(...args) {
+            off(scope, 'change', callback3);
+            return callback2.call(this, ...args);
+        });
+        on(scope, 'change', callback3);
+        on(scope, 'change', callback4);
+
+        before((done) => {
+            reset().then(() => {
+                Promise.all([
+                    trigger(scope, 'change', 2),
+                ]).then(() => {
+                    done();
+                });
+            });
+        });
+
+        it('should skip that callback', () => {
+            assert.equal(check['1'], 2);
+            assert.equal(check['2'], 2);
+            assert.equal(check['3'], false);
+            assert.equal(check['4'], 2);
+        });
+    });
 });

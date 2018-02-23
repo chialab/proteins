@@ -110,7 +110,7 @@ describe('Unit: Observable', () => {
             changes2.push(changset);
         });
 
-        it('should trigger changes', () => {
+        before((done) => {
             observable.prop1 = 2;
             observable.prop2.push('c');
             observable.prop3.prop3_1 = 2;
@@ -120,7 +120,10 @@ describe('Unit: Observable', () => {
                 prop6: 5,
             });
             observable.prop4[1].prop4_2[0].prop6 = 10;
+            setTimeout(() => done(), 100);
+        });
 
+        it('should trigger changes', () => {
             assert.equal(changes1.length, 7);
             assert.deepEqual(changes1, changes2);
         });

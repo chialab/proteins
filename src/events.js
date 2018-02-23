@@ -48,16 +48,18 @@ export function off(scope, name, callback) {
     }
 }
 
-function flush(callbacks, index, lastRes, scope, ...args) {
-    if (index >= callbacks.length) {
-        if (lastRes instanceof Promise) {
-            return lastRes;
-        }
-        return Promise.resolve(lastRes);
+function flush(registered, callbacks, index, res, scope, ...args) {
+    if (index === callbacks.length) {
+        return (res instanceof Promise) ? res : Promise.resolve(res);
     }
-    let fn = callbacks[index].bind(scope, ...args);
-    let res = lastRes ? lastRes.then(() => fn()) : fn();
-    return flush(callbacks, index + 1, res, scope, ...args);
+    let callback = callbacks[index];
+    if (registered.indexOf(callback) !== -1) {
+        res = callback.call(scope, ...args);
+    }
+    res = (res instanceof Promise) ? res : Promise.resolve(res);
+    return res.then(() =>
+        flush(registered, callbacks, index + 1, res, scope, ...args)
+    );
 }
 
 /**
@@ -71,5 +73,5 @@ function flush(callbacks, index, lastRes, scope, ...args) {
 export function trigger(scope, name, ...args) {
     let callbacks = scope[SYM] || {};
     let evtCallbacks = callbacks[name] || [];
-    return flush(evtCallbacks, 0, null, scope, ...args);
+    return flush(evtCallbacks, evtCallbacks.slice(0), 0, null, scope, ...args);
 }
