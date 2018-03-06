@@ -90,7 +90,6 @@ module.exports = {
         platform: 'macOS 10.12',
         version: '10.1',
     },
-
     /** IE/EDGE */
     SL_IE_11: {
         base: 'SauceLabs',
@@ -141,6 +140,14 @@ module.exports = {
         version: '10.3',
         appiumVersion: '1.7.1',
         device: 'iPhone 7',
+    },
+    SL_iOS_10_2: {
+        base: 'SauceLabs',
+        browserName: 'Safari',
+        platform: 'iOS',
+        version: '10.2',
+        appiumVersion: '1.7.1',
+        device: 'iPhone 5',
     },
     SL_iOS_11: {
         base: 'SauceLabs',
