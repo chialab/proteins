@@ -45,6 +45,8 @@ describe('Unit: Url', () => {
         assert.equal(url.origin, 'http://www.chialab.it:80');
 
         assert(new Url('http://www.chialab.it:80').isAbsoluteUrl());
+        assert(new Url('mailto:test@test.com').isAbsoluteUrl());
+        assert(new Url('tel:5555').isAbsoluteUrl());
         assert(!new Url('http://www.chialab.it:80').isDataUrl());
         assert(!new Url('http://www.chialab.it:80').isLocalUrl());
         assert(!new Url('/posts').isAbsoluteUrl());
