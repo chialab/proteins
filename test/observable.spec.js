@@ -168,6 +168,12 @@ describe('Unit: Observable', () => {
         });
     });
 
+    describe('Observable of observable objects', () => {
+        it('should handle observable of observable', () => {
+            assert.doesNotThrow(() => new Observable(new Observable({})));
+        });
+    });
+
     describe('Observable object with thousands of instances', () => {
         it('should not crash in Firefox', () => {
             assert.doesNotThrow(() => {
