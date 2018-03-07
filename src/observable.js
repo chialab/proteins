@@ -213,7 +213,7 @@ const handler = {
  */
 export default class Observable {
     constructor(data) {
-        if (!isObject(data) && !isArray(data)) {
+        if (typeof data !== 'object') {
             throw new Error('Cannot observe this value.');
         }
 
