@@ -73,7 +73,7 @@ function flush(registered, callbacks, index, res, scope, ...args) {
  * @return {Promise} The final Promise of the callbacks chain
  */
 export function trigger(scope, name, ...args) {
-    let callbacks = scope[SYM] || {};
-    let evtCallbacks = callbacks[name] || [];
-    return flush(evtCallbacks, evtCallbacks.slice(0), 0, null, scope, ...args);
+    if (scope.hasOwnProperty(SYM) && scope[SYM].hasOwnProperty(name)) {
+        return flush(scope[SYM][name], scope[SYM][name].slice(0), 0, null, scope, ...args);
+    }
 }
