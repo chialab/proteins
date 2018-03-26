@@ -26,9 +26,8 @@ class MixinScope {
      * @private
      * @param {Function} superClass The class to extend.
      */
-    constructor(superclass) {
-        superclass = superclass || class { };
-        this.superclass = superclass;
+    constructor(superClass) {
+        this.superClass = superClass || class { };
     }
     /**
      * Mix the super class with a list of mixins.
@@ -38,7 +37,7 @@ class MixinScope {
      * @return {Function} The extended class.
      */
     with(...mixins) {
-        let Class = this.superclass;
+        let Class = this.superClass;
         mixins.forEach((mixin) => {
             if (!this.has(mixin)) {
                 Class = mixin(Class);
