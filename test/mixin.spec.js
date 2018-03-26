@@ -46,4 +46,13 @@ describe('Unit: Mixin', () => {
             assert.equal(person.isPerson(), true);
         });
     });
+
+    describe('is mixed', () => {
+        const PersonClass = mix(SuperClass).with(mixin);
+
+        it('should extend a class', () => {
+            assert(mix(PersonClass).has(mixin));
+            assert(!mix(PersonClass).has(() => {}));
+        });
+    });
 });
