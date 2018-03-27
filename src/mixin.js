@@ -43,7 +43,7 @@ class MixinScope {
                 Class = mixin(Class);
             }
         });
-        Class[MIXINS_SYM] = Class[MIXINS_SYM] || [];
+        Class[MIXINS_SYM] = Class.hasOwnProperty(MIXINS_SYM) ? Class[MIXINS_SYM] : [];
         Class[MIXINS_SYM].push(...mixins);
         return Class;
     }
