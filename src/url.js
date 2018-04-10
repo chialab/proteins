@@ -176,7 +176,7 @@ export function resolve(base, relative) {
         if (!baseInfo.origin) {
             throw new Error('base url is not an absolute url');
         }
-        base = baseInfo.origin;
+        base = `${baseInfo.origin}/`;
     }
     let stack = base.split('/');
     let parts = relative.split('/').filter((part) => part !== '');
