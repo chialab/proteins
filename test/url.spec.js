@@ -1,6 +1,7 @@
 /* eslint-env mocha */
 import {
     Url,
+    resolve,
     serialize,
     unserialize,
 } from '../src/url.js';
@@ -107,6 +108,12 @@ describe('Unit: Url', () => {
 
         let url4 = url3.resolve('./edit');
         assert.equal(url4.href, 'chialab.it/posts/3/edit');
+
+        let url5 = resolve('https://example.com/index.html', '/callback.html');
+        assert.equal(url5, 'https://example.com/callback.html');
+
+        let url6 = resolve('https://example.com/index.html', 'callback.html');
+        assert.equal(url6, 'https://example.com/callback.html');
 
         assert.throws(() => new Url('/posts').resolve('/article'), Error);
     });
