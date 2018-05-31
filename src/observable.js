@@ -108,7 +108,7 @@ const ARRAY_PROTO_WRAP = {
         return res;
     },
     unshift(item) {
-        let res = ARRAY_PROTO.push.unshift(this, item);
+        let res = ARRAY_PROTO.unshift.call(this, item);
         subobserve(this, 0, item);
         triggerChanges(this, {
             property: 0,
