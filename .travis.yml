@@ -6,32 +6,32 @@ jobs:
       env: CI_BUILD_TYPE=default
       node_js: 6
       install:
-        - npm install
+        - yarn install
       script:
-        - npm run test-default
+        - yarn run test-default
     - stage: test
       env: CI_BUILD_TYPE=default
       node_js: 7
       install:
-        - npm install
+        - yarn install
       script:
-        - npm run test-default
+        - yarn run test-default
     - stage: test
       env: CI_BUILD_TYPE=default
       node_js: 8
       install:
-        - npm install
+        - yarn install
       script:
-        - npm run test-default
+        - yarn run test-default
     - stage: test
       os: linux
       env: CI_BUILD_TYPE=saucelabs
       node_js: 8
       install:
-        - npm install
-        - npm install github:edoardocavazza/karma-sauce-launcher
+        - yarn install
+        - yarn install github:edoardocavazza/karma-sauce-launcher
       script:
-        - npm run test-saucelabs
+        - yarn run test-saucelabs
     - stage: test
       os: linux
       env: CI_BUILD_TYPE=electron
@@ -39,10 +39,10 @@ jobs:
       install:
         - export DISPLAY=':99.0'
         - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-        - npm install
-        - npm install electron karma-electron-launcher
+        - yarn install
+        - yarn install electron karma-electron-launcher
       script:
-        - npm run test-electron
+        - yarn run test-electron
     - stage: test
       os: osx
       env: CI_BUILD_TYPE=electron
@@ -50,10 +50,10 @@ jobs:
       install:
         - export DISPLAY=':99.0'
         - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-        - npm install
-        - npm install electron karma-electron-launcher
+        - yarn install
+        - yarn install electron karma-electron-launcher
       script:
-        - npm run test-electron
+        - yarn run test-electron
     - stage: test
       os: osx
       osx_image: xcode8.3
@@ -65,9 +65,9 @@ jobs:
         - npm install -g nativescript
         - tns usage-reporting disable
         - tns error-reporting disable
-        - npm install
+        - yarn install
       script:
-        - npm run test-nativescript-ios
+        - yarn run test-nativescript-ios
     - stage: test
       os: linux
       env: CI_BUILD_TYPE=nativescript
@@ -88,13 +88,13 @@ jobs:
         - npm install -g nativescript
         - tns usage-reporting disable
         - tns error-reporting disable
-        - npm install
+        - yarn install
       before_script:
         - echo no | android create avd --force -n test -t android-19 -b armeabi-v7a
         - emulator -avd test -no-audio -no-window &
         - android-wait-for-emulator
       script:
-        - npm run test-nativescript-android
+        - yarn run test-nativescript-android
     - stage: deploy
       os: linux
       env: CI_BUILD_TYPE=docs
@@ -102,7 +102,7 @@ jobs:
       before_install:
         - npm install -g documentation
       install:
-        - npm install
+        - yarn install
       script:
         - git config --global user.email "travis@travis-ci.org"
         - git config --global user.name "travis-ci"
