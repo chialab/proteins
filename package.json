@@ -13,7 +13,8 @@
     "test-electron": "BROWSER_PROVIDER=\"electron\" gulp unit-browsers",
     "test-nativescript-ios": "BROWSER_PROVIDER=\"nativescript\" gulp unit-nativescript-ios",
     "test-nativescript-android": "BROWSER_PROVIDER=\"nativescript\" gulp unit-nativescript-android",
-    "lint": "gulp lint"
+    "lint": "gulp lint",
+    "prepublishOnly": "gulp dist"
   },
   "repository": {
     "type": "git",
@@ -25,7 +26,7 @@
     "javascript",
     "utils"
   ],
-  "author": "Chialab <dev@chialab.io> (http://chialab.io)",
+  "author": "Chialab <dev@chialab.io> (https://www.chialab.it)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/chialab/proteins/issues"
