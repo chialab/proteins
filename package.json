@@ -1,11 +1,11 @@
 {
   "name": "@chialab/proteins",
-  "version": "3.0.0-rc.14",
+  "version": "3.0.0-rc.15",
   "description": "A primer for JavaScript libraries and frameworks development.",
   "main": "dist/proteins.js",
   "module": "index.js",
   "scripts": {
-    "build": "rna build",
+    "build": "rna build --production",
     "test": "rna unit 'test/*.js' --node + unit 'test/*.js' --browser",
     "test-default": "rna unit 'test/*.js' --node",
     "test-browsers": "rna unit 'test/*.js' --browser",
@@ -14,7 +14,7 @@
     "test-nativescript-ios": "rna unit 'test/*.js' --nativescript ios",
     "test-nativescript-android": "rna unit 'test/*.js' --nativescript android",
     "lint": "rna lint 'src/**/*.js'",
-    "prepublishOnly": "rna build"
+    "prepublishOnly": "rna build --production"
   },
   "repository": {
     "type": "git",
