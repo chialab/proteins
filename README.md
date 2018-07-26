@@ -68,9 +68,3 @@ $ rna build --production
 $ rna install
 $ rna build --watch
 ```
-
----
-
-## Saucelabs status
-
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/chialab-sl-014.svg)](https://saucelabs.com/u/chialab-sl-014)
