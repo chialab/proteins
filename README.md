@@ -24,6 +24,9 @@
     <a href="https://github.com/Chialab/proteins/wiki">
         <img alt="Documentation" src="https://img.shields.io/badge/documentation-wiki-ff69b4.svg?style=flat-square">
     </a>
+    <a href="https://saucelabs.com/u/chialab-sl-014">
+        <img alt="Documentation" src="https://badges.herokuapp.com/sauce/chialab-sl-014?labels=none&style=flat-square">
+    </a>
 </p>
 
 ---
