@@ -4,67 +4,65 @@ jobs:
   include:
     - stage: test
       env: CI_BUILD_TYPE=default
-      node_js: 6
+      node_js: 9
       install:
+        - yarn global add @chialab/rna-cli
         - yarn install
       script:
         - yarn run test-default
     - stage: test
       env: CI_BUILD_TYPE=default
-      node_js: 7
+      node_js: 10
       install:
-        - yarn install
-      script:
-        - yarn run test-default
-    - stage: test
-      env: CI_BUILD_TYPE=default
-      node_js: 8
-      install:
+        - yarn global add @chialab/rna-cli
         - yarn install
       script:
         - yarn run test-default
     - stage: test
       os: linux
       env: CI_BUILD_TYPE=saucelabs
-      node_js: 8
+      node_js: 10
       install:
+        - yarn global add @chialab/rna-cli
         - yarn install
-        - yarn install github:edoardocavazza/karma-sauce-launcher
       script:
         - yarn run test-saucelabs
     - stage: test
       os: linux
       env: CI_BUILD_TYPE=electron
-      node_js: 8
+      node_js: 10
       install:
         - export DISPLAY=':99.0'
         - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        - yarn global add @chialab/rna-cli
         - yarn install
-        - yarn install electron karma-electron-launcher
+        - yarn install electron
       script:
         - yarn run test-electron
     - stage: test
       os: osx
       env: CI_BUILD_TYPE=electron
-      node_js: 8
+      node_js: 10
       install:
         - export DISPLAY=':99.0'
         - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        - yarn global add @chialab/rna-cli
         - yarn install
-        - yarn install electron karma-electron-launcher
+        - yarn install electron
       script:
         - yarn run test-electron
     - stage: test
       os: osx
       osx_image: xcode8.3
       env: CI_BUILD_TYPE=nativescript
-      node_js: 8
+      node_js: 10
       install:
         - export DISPLAY=':99.0'
         - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
         - npm install -g nativescript
         - tns usage-reporting disable
         - tns error-reporting disable
+        - yarn global add @chialab/rna-cli
         - yarn install
       script:
         - yarn run test-nativescript-ios
@@ -73,7 +71,7 @@ jobs:
       env: CI_BUILD_TYPE=nativescript
       language: android
       jdk: oraclejdk8
-      node_js: 8
+      node_js: 10
       android:
         components:
           - platform-tools
@@ -88,6 +86,7 @@ jobs:
         - npm install -g nativescript
         - tns usage-reporting disable
         - tns error-reporting disable
+        - yarn global add @chialab/rna-cli
         - yarn install
       before_script:
         - echo no | android create avd --force -n test -t android-19 -b armeabi-v7a
@@ -98,16 +97,15 @@ jobs:
     - stage: deploy
       os: linux
       env: CI_BUILD_TYPE=docs
-      node_js: 8
-      before_install:
-        - npm install -g documentation
+      node_js: 10
       install:
+        - yarn global add @chialab/rna-cli
         - yarn install
       script:
         - git config --global user.email "travis@travis-ci.org"
         - git config --global user.name "travis-ci"
         - git clone https://${GH_TOKEN}@github.com/Chialab/proteins.wiki.git wiki
-        - documentation build src/**/*.js -f md > ./wiki/API.md
+        - rna documentation 'src/**/*.js' --output ./wiki/API.md
         - cd wiki
         - git add .
         - git diff-index --quiet HEAD || git commit -m "Lastest api reference on successful travis build ${TRAVIS_BUILD_NUMBER} auto-pushed to wiki"
@@ -115,7 +113,7 @@ jobs:
     - stage: deploy
       os: linux
       env: CI_BUILD_TYPE=website CNAME=proteins.chialab.io S3_BUCKET=chialab-static-sites
-      node_js: 8
+      node_js: 10
       install:
         - pip install --user awscli
         - aws configure set preview.cloudfront true
