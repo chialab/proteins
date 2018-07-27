@@ -5,67 +5,82 @@ jobs:
     - stage: test
       env: CI_BUILD_TYPE=default
       node_js: 9
-      install:
+      before_install:
         - yarn global add @chialab/rna-cli
-        - yarn install
+      install:
+        - rna install
       script:
         - rna unit 'test/*.js' --node
+
     - stage: test
       env: CI_BUILD_TYPE=default
       node_js: 10
-      install:
+      before_install:
         - yarn global add @chialab/rna-cli
-        - yarn install
+      install:
+        - rna install
       script:
         - rna unit 'test/*.js' --node
+
     - stage: test
       os: linux
       env: CI_BUILD_TYPE=saucelabs
       node_js: 10
-      install:
+      before_install:
         - yarn global add @chialab/rna-cli
-        - yarn install
+      install:
+        - rna install
       script:
         - rna unit 'test/*.js' --saucelabs
+
     - stage: test
       os: linux
       env: CI_BUILD_TYPE=electron
       node_js: 10
+      before_install:
+        - yarn global add @chialab/rna-cli
       install:
+        - rna install
+        - rna add electron
+      before_script:
         - export DISPLAY=':99.0'
         - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-        - yarn global add @chialab/rna-cli
-        - yarn install
-        - yarn add electron
       script:
         - rna unit 'test/*.js' --electron
+
     - stage: test
       os: osx
       env: CI_BUILD_TYPE=electron
       node_js: 10
+      before_install:
+        - yarn global add @chialab/rna-cli
       install:
+        - rna install
+        - rna add electron
+      before_script:
         - export DISPLAY=':99.0'
         - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-        - yarn global add @chialab/rna-cli
-        - yarn install
-        - yarn add electron
       script:
         - rna unit 'test/*.js' --electron
+
     - stage: test
       os: osx
       osx_image: xcode8.3
       env: CI_BUILD_TYPE=nativescript
       node_js: 10
+      before_install:
+        - npm install -g nativescript
+        - yarn global add @chialab/rna-cli
       install:
+        - rna install
+      before_script:
         - export DISPLAY=':99.0'
         - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-        - npm install -g nativescript
         - tns usage-reporting disable
         - tns error-reporting disable
-        - yarn global add @chialab/rna-cli
-        - yarn install
       script:
         - rna unit 'test/*.js' --nativescript ios
+
     - stage: test
       os: linux
       env: CI_BUILD_TYPE=nativescript
@@ -79,49 +94,54 @@ jobs:
           - android-19
           - extra-android-m2repository
           - sys-img-armeabi-v7a-android-19
+      before_install:
+        - npm install -g nativescript
+        - yarn global add @chialab/rna-cli
       install:
+        - nvm install 7
+        - rna install
+      before_script:
         - export DISPLAY=':99.0'
         - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-        - nvm install 7
-        - npm install -g nativescript
         - tns usage-reporting disable
         - tns error-reporting disable
-        - yarn global add @chialab/rna-cli
-        - yarn install
-      before_script:
         - echo no | android create avd --force -n test -t android-19 -b armeabi-v7a
         - emulator -avd test -no-audio -no-window &
         - android-wait-for-emulator
       script:
         - rna unit 'test/*.js' --nativescript android
+
     - stage: deploy
       os: linux
       env: CI_BUILD_TYPE=docs
       node_js: 10
-      install:
+      before_install:
         - yarn global add @chialab/rna-cli
-        - yarn install
-      script:
+      install:
+        - rna install
+      before_script:
         - git config --global user.email "travis@travis-ci.org"
         - git config --global user.name "travis-ci"
+      script:
         - git clone https://${GH_TOKEN}@github.com/Chialab/proteins.wiki.git wiki
         - rna documentation 'src/**/*.js' --output ./wiki/API.md
         - cd wiki
         - git add .
         - git diff-index --quiet HEAD || git commit -m "Lastest api reference on successful travis build ${TRAVIS_BUILD_NUMBER} auto-pushed to wiki"
         - git push origin
+
     - stage: deploy
       os: linux
       env: CI_BUILD_TYPE=website CNAME=proteins.chialab.io S3_BUCKET=chialab-static-sites
       node_js: 10
       install:
         - pip install --user awscli
-        - aws configure set preview.cloudfront true
       before_script:
-        - mkdir -p public
-      script:
+        - aws configure set preview.cloudfront true
         - git config --global user.email "travis@travis-ci.org"
         - git config --global user.name "travis-ci"
+        - mkdir -p public
+      script:
         - git clone https://gitlab.com/chialab/project-pages.git pages
         - cd pages
         - npm install
