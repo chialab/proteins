@@ -93,7 +93,7 @@ jobs:
       android:
         components:
           - platform-tools
-          - build-tools-23.0.1
+          - build-tools-27.0.3
           - android-19
           - extra-android-m2repository
           - sys-img-armeabi-v7a-android-19
