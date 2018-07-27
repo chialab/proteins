@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    </head>
+    <body>
+        <!-- Automatically download polyfills at runtime only if needed, using: https://polyfill.io/v2/docs/
+            In this script we add features we want to polyfill if specific browser doesn't support them. -->
+        <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=Promise" charset="utf-8"></script>
+        <script src="context.js"></script>
+        <script type="text/javascript">
+            // Configure our Karma and set up bindings
+            %CLIENT_CONFIG%
+            window.__karma__.setupContext(window);
+            // All served files with the latest timestamps
+            %MAPPINGS%
+        </script>
+        <!-- Dynamically replaced with <script> tags -->
+        %SCRIPTS%
+        <script type="text/javascript">
+            window.__karma__.loaded();
+        </script>
+    </body>
+</html>
