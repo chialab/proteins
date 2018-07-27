@@ -32,7 +32,7 @@ jobs:
         - rna install
         - rna add codecov
       script:
-        - rna unit 'test/*.js' --saucelabs --coverage --context unit/context.html
+        - rna unit 'test/*.js' --saucelabs --coverage --context test/context.html
       after_success:
         - cat coverage/report-lcov/*/lcov.info | ./node_modules/.bin/codecov
 
@@ -98,6 +98,7 @@ jobs:
           - extra-android-m2repository
           - sys-img-armeabi-v7a-android-19
       before_install:
+        - nvm install 10
         - npm install -g nativescript
         - yarn global add @chialab/rna-cli
       install:
