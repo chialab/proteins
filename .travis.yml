@@ -9,7 +9,7 @@ jobs:
         - yarn global add @chialab/rna-cli
         - yarn install
       script:
-        - yarn run test-default
+        - rna unit 'test/*.js' --node
     - stage: test
       env: CI_BUILD_TYPE=default
       node_js: 10
@@ -17,7 +17,7 @@ jobs:
         - yarn global add @chialab/rna-cli
         - yarn install
       script:
-        - yarn run test-default
+        - rna unit 'test/*.js' --node
     - stage: test
       os: linux
       env: CI_BUILD_TYPE=saucelabs
@@ -26,7 +26,7 @@ jobs:
         - yarn global add @chialab/rna-cli
         - yarn install
       script:
-        - yarn run test-saucelabs
+        - rna unit 'test/*.js' --saucelabs
     - stage: test
       os: linux
       env: CI_BUILD_TYPE=electron
@@ -36,9 +36,9 @@ jobs:
         - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
         - yarn global add @chialab/rna-cli
         - yarn install
-        - yarn install electron
+        - yarn add electron
       script:
-        - yarn run test-electron
+        - rna unit 'test/*.js' --electron
     - stage: test
       os: osx
       env: CI_BUILD_TYPE=electron
@@ -48,9 +48,9 @@ jobs:
         - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
         - yarn global add @chialab/rna-cli
         - yarn install
-        - yarn install electron
+        - yarn add electron
       script:
-        - yarn run test-electron
+        - rna unit 'test/*.js' --electron
     - stage: test
       os: osx
       osx_image: xcode8.3
@@ -65,7 +65,7 @@ jobs:
         - yarn global add @chialab/rna-cli
         - yarn install
       script:
-        - yarn run test-nativescript-ios
+        - rna unit 'test/*.js' --nativescript ios
     - stage: test
       os: linux
       env: CI_BUILD_TYPE=nativescript
@@ -93,7 +93,7 @@ jobs:
         - emulator -avd test -no-audio -no-window &
         - android-wait-for-emulator
       script:
-        - yarn run test-nativescript-android
+        - rna unit 'test/*.js' --nativescript android
     - stage: deploy
       os: linux
       env: CI_BUILD_TYPE=docs

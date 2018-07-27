@@ -7,12 +7,6 @@
   "scripts": {
     "build": "rna build --production",
     "test": "rna unit 'test/*.js' --node + unit 'test/*.js' --browser",
-    "test-default": "rna unit 'test/*.js' --node",
-    "test-browsers": "rna unit 'test/*.js' --browser",
-    "test-saucelabs": "rna unit 'test/*.js' --saucelabs",
-    "test-electron": "rna unit 'test/*.js' --electron",
-    "test-nativescript-ios": "rna unit 'test/*.js' --nativescript ios",
-    "test-nativescript-android": "rna unit 'test/*.js' --nativescript android",
     "lint": "rna lint 'src/**/*.js'",
     "prepublishOnly": "rna build --production"
   },
