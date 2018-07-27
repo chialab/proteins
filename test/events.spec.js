@@ -1,5 +1,8 @@
 /* eslint-env mocha */
 import { on, off, trigger } from '../src/events.js';
+import chai from 'chai';
+
+const { assert } = chai;
 
 describe('Unit: Events', () => {
     let obj = {};

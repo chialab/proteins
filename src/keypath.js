@@ -180,7 +180,7 @@ export function ensure(obj, path, value) {
 }
 
 /**
- * Push or replace a value in array.
+ * Push or insert a value in array.
  * @memberof keypath
  * 
  * @param {Object} obj The object scope

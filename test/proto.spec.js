@@ -1,9 +1,14 @@
 /* eslint-env mocha */
 import { entries, methods, properties, has, reduce, get } from '../src/proto.js';
+import chai from 'chai';
+
+const { assert } = chai;
 
 describe('Unit: Proto', () => {
     class A {
-        get prop() {}
+        get prop() {
+            return null;
+        }
 
         test() {}
     }
@@ -20,9 +25,13 @@ describe('Unit: Proto', () => {
             this.id = 1;
         }
 
-        get prop() { }
+        get prop() {
+            return null;
+        }
         
-        get prop2() { }
+        get prop2() {
+            return null;
+        }
     }
 
     class D extends C {
@@ -30,11 +39,17 @@ describe('Unit: Proto', () => {
 
         test4() { }
 
-        get prop() { }
+        get prop() {
+            return null;
+        }
 
-        get prop3() { }
+        get prop3() {
+            return null;
+        }
 
-        get prop4() { }
+        get prop4() {
+            return null;
+        }
     }
 
     it('should recognize prototype keys', () => {
@@ -75,7 +90,7 @@ describe('Unit: Proto', () => {
     it('should retrieve prototype', () => {
         let a = new A();
         assert(typeof get(a).test === 'function');
-        assert(get(a).prop === undefined);
+        assert(get(a).prop === null);
         assert(A.prototype === get(a));
     });
 });

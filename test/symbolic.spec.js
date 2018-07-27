@@ -1,5 +1,8 @@
 /* eslint-env mocha */
 import Symbolic from '../src/symbolic.js';
+import chai from 'chai';
+
+const { assert } = chai;
 
 describe('Unit: Symbolic', () => {
     it('should set a symbolic property', () => {

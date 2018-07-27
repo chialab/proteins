@@ -1,5 +1,8 @@
 /* eslint-env mocha */
 import mix from '../src/mixin.js';
+import chai from 'chai';
+
+const { assert } = chai;
 
 class SuperClass {
     constructor(name) {

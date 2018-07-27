@@ -1,5 +1,8 @@
 /* eslint-env mocha */
 import equivalent from '../src/equivalent.js';
+import chai from 'chai';
+
+const { assert } = chai;
 
 describe('Unit: Equivalent', () => {
     const TEST_FUN = () => { };

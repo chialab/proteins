@@ -1,5 +1,8 @@
 /* eslint-env mocha */
 import { isObject, isDate, isNumber, isString, isBoolean, isFunction, isUndefined, isFalsy } from '../src/types.js';
+import chai from 'chai';
+
+const { assert } = chai;
 
 describe('Unit: Types', () => {
     it('should recognize Object instances', () => {

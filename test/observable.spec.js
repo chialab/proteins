@@ -1,6 +1,9 @@
 /* eslint-env mocha */
 import Observable from '../src/observable.js';
 import Symbolic from '../src/symbolic.js';
+import chai from 'chai';
+
+const { assert } = chai;
 
 describe('Unit: Observable', () => {
     describe('simple object', () => {

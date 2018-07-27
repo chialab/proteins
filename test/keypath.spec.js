@@ -12,6 +12,9 @@ import {
     isObject,
     isArray,
 } from '../src/types.js';
+import chai from 'chai';
+
+const { assert } = chai;
 
 function getTestObj() {
     return {
@@ -462,7 +465,7 @@ describe('Unit: Keypath', () => {
 
             keypath.insert(obj, 'b.d', 'asdf', 3);
             // eslint-disable-next-line
-            assert.deepEqual(obj.b.d, ['a', 'b', , 'asdf']);
+            assert.deepEqual(obj.b.d, ['a', 'b', undefined, 'asdf', undefined]);
         });
     });
 

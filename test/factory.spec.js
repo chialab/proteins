@@ -1,6 +1,9 @@
 /* eslint-env mocha */
 import { trigger } from '../src/events.js';
 import { Factory, Emitter, CONTEXT_SYM } from '../src/factory.js';
+import chai from 'chai';
+
+const { assert } = chai;
 
 describe('Unit: Emitter', () => {
     let obj = new Emitter();

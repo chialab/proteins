@@ -5,6 +5,9 @@ import {
     serialize,
     unserialize,
 } from '../src/url.js';
+import chai from 'chai';
+
+const { assert } = chai;
 
 describe('Unit: Url', () => {
     it('should check url validity', () => {
