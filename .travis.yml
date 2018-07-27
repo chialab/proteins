@@ -30,8 +30,11 @@ jobs:
         - yarn global add @chialab/rna-cli
       install:
         - rna install
+        - rna add codecov
       script:
-        - rna unit 'test/*.js' --saucelabs
+        - rna unit 'test/*.js' --saucelabs --coverage
+      after_success:
+        - cat coverage/report-lcov/*/lcov.info | ./node_modules/.bin/codecov
 
     - stage: test
       os: linux
@@ -95,10 +98,10 @@ jobs:
           - extra-android-m2repository
           - sys-img-armeabi-v7a-android-19
       before_install:
+        - nvm install 7
         - npm install -g nativescript
         - yarn global add @chialab/rna-cli
       install:
-        - nvm install 7
         - rna install
       before_script:
         - export DISPLAY=':99.0'
@@ -166,6 +169,3 @@ addons:
   apt:
     packages:
       - xvfb
-
-after_success:
-  - cat coverage/report-lcov/*/lcov.info | ./node_modules/.bin/codecov
