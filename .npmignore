@@ -1,12 +1,5 @@
-npm-debug.log
-package-lock.json
 /node_modules
-/bower_components
-/coverage
 /test
+/reports
 /.tmp
 .*
-gulpfile.js
-rollup.config.js
-sauce.browsers.js
-karma.conf.js

@@ -1,8 +1,6 @@
 /.tmp
 /.history
 /node_modules
-/bower_components
-/coverage
 /dist
 /public
 /wiki
