@@ -32,9 +32,9 @@ jobs:
         - rna install
         - rna add codecov
       script:
-        - rna unit 'test/*.js' --saucelabs --coverage --context test/context.html
+        - rna unit 'test/*.js' --saucelabs --coverage --context test/context.html --concurrency 1
       after_success:
-        - cat coverage/report-lcov/*/lcov.info | ./node_modules/.bin/codecov
+        - cat reports/unit/coverage/report-lcov/*/lcov.info | ./node_modules/.bin/codecov
 
     - stage: test
       os: linux

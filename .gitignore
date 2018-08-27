@@ -6,5 +6,6 @@
 /dist
 /public
 /wiki
+/reports
 npm-debug.log
 .eslintcache
