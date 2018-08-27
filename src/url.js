@@ -434,7 +434,7 @@ export class Url {
      * Join current Url with paths.
      * @memberof Url.Url
      *
-     * @param {,,,string} paths A list of paths to join.
+     * @param {...string} paths A list of paths to join.
      * @return {Url} A new url instance.
      */
     join(...paths) {

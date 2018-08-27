@@ -2,20 +2,22 @@ const support = (typeof Symbol === 'function');
 
 /**
  * Polyfill registry for symbols.
+ * @private
  * @type {Array}
  */
 const registry = [];
 
 /**
  * Polyfill for Symbol.
- *
  * @class SymbolPolyfill
+ * @private
+ *
  * @param {string} property The Symbol name.
  */
 class SymbolPolyfill {
     constructor(property) {
         let sym = this.SYM = `__${property}_${registry.length}`;
-        registry.push(sym);
+        registry.push(sym); 
         Object.defineProperty(Object.prototype, sym, {
             configurable: true,
             enumerable: false,

@@ -1,6 +1,14 @@
 import { isObject, isDate, isArray, isFunction } from './types.js';
 import { get, reconstruct } from './proto.js';
 
+/**
+ * Useless callback function.
+ * @private
+ *
+ * @param {*} scope The current object.
+ * @param {string} key The current key.
+ * @param {*} prop The current value.
+ */
 function noop(scope, key, prop) { return prop; }
 
 /**

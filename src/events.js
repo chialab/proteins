@@ -48,20 +48,31 @@ export function off(scope, name, callback) {
     }
 }
 
-function flush(registered, callbacks, index, res, scope, ...args) {
+/**
+ * Queue event callbacks.
+ * @private
+ *
+ * @param {Array<Function>} registered A list of registered callbacks.
+ * @param {Array<Function>} callbacks A list of callbacks to exec.
+ * @param {integer} index The callbacks iterator.
+ * @param {*} res The previous callback response.
+ * @param {*} context The callback context.
+ * @param {*} args A list of arguments for the callback.
+ */
+function flush(registered, callbacks, index, res, context, ...args) {
     if (index === callbacks.length) {
         return (res instanceof Promise) ? res : Promise.resolve(res);
     }
     let callback = callbacks[index];
     if (registered.indexOf(callback) !== -1) {
-        res = callback.call(scope, ...args);
+        res = callback.call(context, ...args);
     }
     if (res instanceof Promise) {
         return res.then(() =>
-            flush(registered, callbacks, index + 1, res, scope, ...args)
+            flush(registered, callbacks, index + 1, res, context, ...args)
         );
     }
-    return flush(registered, callbacks, index + 1, res, scope, ...args);
+    return flush(registered, callbacks, index + 1, res, context, ...args);
 }
 
 /**

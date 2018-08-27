@@ -81,6 +81,8 @@ const ProxyHelper = typeof Proxy !== 'undefined' ? Proxy : class {
 
 /**
  * Trigger object changes.
+ * @private
+ *
  * @param {Object|Array} scope The updated object.
  * @param {ChangeSet} changeset The changes descriptor.
  */

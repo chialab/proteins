@@ -63,6 +63,7 @@ function pathToArray(path) {
 
 /**
  * Get a deep property of an object using paths
+ * @function get
  * @memberof keypath
  * 
  * @param {Object} obj The object scope
@@ -162,11 +163,12 @@ export function has(obj, path) {
 /**
  * Ensure the existance of a value for the given path.
  * If the value already exists, do nothing.
+ * @function ensure
  * @memberof keypath
  * 
  * @param {Object} obj The object scope
  * @param {String|Array} path The path of the property to retrieve
- * @param {*} The default value to set
+ * @param {*} value The default value to set
  * @return {*} The actual value for the given property
  * @throws {Error} throw error when object scope is invalid undefined
  * @throws {Error} throw error when paths is invalid or undefined
