@@ -1,7 +1,7 @@
 /* eslint-env mocha */
 import Observable from '../src/observable.js';
 import Symbolic from '../src/symbolic.js';
-import chai from 'chai';
+import chai from 'chai/chai';
 
 const { assert } = chai;
 

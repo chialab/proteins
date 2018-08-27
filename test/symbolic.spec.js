@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 import Symbolic from '../src/symbolic.js';
-import chai from 'chai';
+import chai from 'chai/chai';
 
 const { assert } = chai;
 

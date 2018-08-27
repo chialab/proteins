@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 import { on, off, trigger } from '../src/events.js';
-import chai from 'chai';
+import chai from 'chai/chai';
 
 const { assert } = chai;
 

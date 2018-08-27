@@ -1,7 +1,7 @@
 /* eslint-env mocha */
 import merge from '../src/merge.js';
 import { isUndefined, isDate } from '../src/types.js';
-import chai from 'chai';
+import chai from 'chai/chai';
 
 const { assert } = chai;
 

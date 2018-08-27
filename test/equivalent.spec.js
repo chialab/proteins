@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 import equivalent from '../src/equivalent.js';
-import chai from 'chai';
+import chai from 'chai/chai';
 
 const { assert } = chai;
 

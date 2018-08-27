@@ -27,7 +27,6 @@
   },
   "homepage": "https://proteins.chialab.io",
   "devDependencies": {
-    "@chialab/rna-cli": "^1.0.0-rc.17",
     "chai": "^4.1.2",
     "eslint": "^5.2.0"
   }

@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 import { isObject, isDate, isNumber, isString, isBoolean, isFunction, isUndefined, isFalsy } from '../src/types.js';
-import chai from 'chai';
+import chai from 'chai/chai';
 
 const { assert } = chai;
 

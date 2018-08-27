@@ -1,7 +1,7 @@
 /* eslint-env mocha */
 import clone from '../src/clone.js';
 import { isDate, isNumber, isString, isObject, isArray, isUndefined } from '../src/types.js';
-import chai from 'chai';
+import chai from 'chai/chai';
 
 const { assert } = chai;
 

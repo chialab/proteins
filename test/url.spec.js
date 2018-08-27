@@ -5,7 +5,7 @@ import {
     serialize,
     unserialize,
 } from '../src/url.js';
-import chai from 'chai';
+import chai from 'chai/chai';
 
 const { assert } = chai;
 

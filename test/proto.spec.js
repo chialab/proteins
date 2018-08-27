@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 import { entries, methods, properties, has, reduce, get } from '../src/proto.js';
-import chai from 'chai';
+import chai from 'chai/chai';
 
 const { assert } = chai;
 

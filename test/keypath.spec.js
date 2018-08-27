@@ -12,7 +12,7 @@ import {
     isObject,
     isArray,
 } from '../src/types.js';
-import chai from 'chai';
+import chai from 'chai/chai';
 
 const { assert } = chai;
 
