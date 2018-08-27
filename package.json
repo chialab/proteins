@@ -4,6 +4,7 @@
   "description": "A primer for JavaScript libraries and frameworks development.",
   "main": "dist/proteins.js",
   "module": "index.js",
+  "types": "proteins.d.ts",
   "scripts": {
     "build": "rna build --production",
     "test": "rna unit 'test/*.js' --node + unit 'test/*.js' --browser",

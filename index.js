@@ -24,7 +24,7 @@ export { Symbolic };
 export { Observable };
 export { clone };
 export { merge };
-export { equivalent };    
+export { equivalent };
 export { mix };
 export { keypath };
 export { Url };
