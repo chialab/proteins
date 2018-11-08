@@ -68,12 +68,17 @@ jobs:
 
     - stage: test
       os: osx
-      osx_image: xcode8.3
-      env: CI_BUILD_TYPE=nativescript
+      env:
+        - BuildiOS="12"
+        - Xcode="10.0"
+        - CI_BUILD_TYPE=nativescript
+      osx_image: xcode10
       node_js: 10
+      jdk: oraclejdk8
       before_install:
         - npm install -g nativescript
-        - yarn global add github:chialab/rna-cli#fix/nativescript
+        - pip install --ignore-installed six
+        - yarn global add @chialab/rna-cli
       install:
         - yarn install
       before_script:
@@ -93,14 +98,17 @@ jobs:
       android:
         components:
           - platform-tools
-          - build-tools-27.0.3
-          - android-19
+          - build-tools-28.0.2
+          - android-28
           - extra-android-m2repository
-          - sys-img-armeabi-v7a-android-19
+          - sys-img-armeabi-v7a-android-28
       before_install:
+        - mkdir -p "$ANDROID_HOME/licenses"
+        - yes | sdkmanager tools
+        - yes | sdkmanager "system-images;android-28;default;x86"
         - nvm install 10
         - npm install -g nativescript
-        - yarn global add github:chialab/rna-cli#fix/nativescript
+        - yarn global add @chialab/rna-cli
       install:
         - yarn install
       before_script:
@@ -108,11 +116,11 @@ jobs:
         - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
         - tns usage-reporting disable
         - tns error-reporting disable
-        - echo no | android create avd --force -n test -t android-19 -b armeabi-v7a
-        - emulator -avd test -no-audio -no-window &
+        - echo no | avdmanager create avd --force -n test -k "system-images;android-28;default;x86"
+        - $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window &
         - android-wait-for-emulator
       script:
-        - rna unit 'test/*.js' --nativescript android
+        - travis_wait travis_retry rna unit 'test/*.js' --nativescript android
 
     - stage: deploy
       os: linux

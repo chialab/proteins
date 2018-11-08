@@ -7,7 +7,7 @@
   "types": "proteins.d.ts",
   "scripts": {
     "build": "rna build --production",
-    "test": "rna unit 'test/*.js' --node + unit 'test/*.js' --browser",
+    "test": "rna unit 'test/*.js' --node + unit 'test/*.js' --browser --context 'test/context.html'",
     "lint": "rna lint 'src/**/*.js'",
     "prepublishOnly": "rna build --production"
   },
