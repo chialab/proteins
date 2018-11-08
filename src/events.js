@@ -58,23 +58,25 @@ export function off(scope, name, callback) {
  * @return {Promise} The final Promise of the callbacks chain
  */
 export function trigger(scope, name, ...args) {
-    let callbacksList = (scope.hasOwnProperty(SYM) && scope[SYM].hasOwnProperty(name) && scope[SYM][name]) || [];
-    let finalRes = callbacksList
+    const callbacksList = (scope.hasOwnProperty(SYM) && scope[SYM].hasOwnProperty(name) && scope[SYM][name]) || [];
+    let finalResults = callbacksList
         .slice(0)
-        .reduce((result, callback) => {
+        .reduce((results, callback) => {
             if (callbacksList.indexOf(callback) === -1) {
                 // the callback has been removed from the callback list.
-                return result;
+                return results;
             }
-            if (result instanceof Promise) {
+            let lastResult = results[results.length - 1];
+            let result;
+            if (lastResult instanceof Promise) {
                 // wait for the previous result.
-                return result.then(() => callback.call(scope, ...args));
+                result = lastResult.then(() => callback.call(scope, ...args));
+            } else {
+                result = callback.call(scope, ...args);
             }
-            return callback.call(scope, ...args);
-        }, null);
+            results.push(result);
+            return results;
+        }, []);
 
-    if (finalRes instanceof Promise) {
-        return finalRes;
-    }
-    return Promise.resolve(finalRes);
+    return Promise.all(finalResults);
 }

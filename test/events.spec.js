@@ -90,6 +90,14 @@ describe('Unit: Events', () => {
             assert(res instanceof Promise);
         });
 
+        it('should resolve all callbacks results', async () => {
+            on(context, 'test', (num) => num ** 2);
+            on(context, 'test', (num) => Promise.resolve(num ** 3));
+            on(context, 'test', (num) => Promise.resolve(num ** 4));
+            let result = await trigger(context, 'test', 2);
+            assert.deepEqual(result, [4, 8, 16]);
+        });
+
         it('remove a callback during a trigger should skip that callback', async () => {
             on(context, 'change', callback1);
             on(context, 'change', function(...args) {
