@@ -21,6 +21,7 @@ export function on(scope, name, callback) {
     evtCallbacks.push(callback);
     return off.bind(null, scope, name, callback);
 }
+
 /**
  * Remove one or multiple listeners.
  *
@@ -49,33 +50,6 @@ export function off(scope, name, callback) {
 }
 
 /**
- * Queue event callbacks.
- * @private
- *
- * @param {Array<Function>} registered A list of registered callbacks.
- * @param {Array<Function>} callbacks A list of callbacks to exec.
- * @param {integer} index The callbacks iterator.
- * @param {*} res The previous callback response.
- * @param {*} context The callback context.
- * @param {*} args A list of arguments for the callback.
- */
-function flush(registered, callbacks, index, res, context, ...args) {
-    if (index === callbacks.length) {
-        return (res instanceof Promise) ? res : Promise.resolve(res);
-    }
-    let callback = callbacks[index];
-    if (registered.indexOf(callback) !== -1) {
-        res = callback.call(context, ...args);
-    }
-    if (res instanceof Promise) {
-        return res.then(() =>
-            flush(registered, callbacks, index + 1, res, context, ...args)
-        );
-    }
-    return flush(registered, callbacks, index + 1, res, context, ...args);
-}
-
-/**
  * Trigger a callback.
  *
  * @param {Object} scope The event scope
@@ -84,7 +58,23 @@ function flush(registered, callbacks, index, res, context, ...args) {
  * @return {Promise} The final Promise of the callbacks chain
  */
 export function trigger(scope, name, ...args) {
-    if (scope.hasOwnProperty(SYM) && scope[SYM].hasOwnProperty(name)) {
-        return flush(scope[SYM][name], scope[SYM][name].slice(0), 0, null, scope, ...args);
+    let callbacksList = (scope.hasOwnProperty(SYM) && scope[SYM].hasOwnProperty(name) && scope[SYM][name]) || [];
+    let finalRes = callbacksList
+        .slice(0)
+        .reduce((result, callback) => {
+            if (callbacksList.indexOf(callback) === -1) {
+                // the callback has been removed from the callback list.
+                return result;
+            }
+            if (result instanceof Promise) {
+                // wait for the previous result.
+                return result.then(() => callback.call(scope, ...args));
+            }
+            return callback.call(scope, ...args);
+        }, null);
+
+    if (finalRes instanceof Promise) {
+        return finalRes;
     }
+    return Promise.resolve(finalRes);
 }
