@@ -17,7 +17,7 @@ const registry = [];
 class SymbolPolyfill {
     constructor(property) {
         let sym = this.SYM = `__${property}_${registry.length}`;
-        registry.push(sym); 
+        registry.push(sym);
         Object.defineProperty(Object.prototype, sym, {
             configurable: true,
             enumerable: false,
@@ -59,8 +59,11 @@ export default function Symbolic(property) {
  * @return {Boolean}
  */
 Symbolic.isSymbolic = function(sym) {
-    if (sym instanceof SymbolPolyfill) {
-        return true;
+    if (!sym) {
+        return false;
     }
-    return sym && (support && registry.indexOf(sym) !== -1);
+    if (sym instanceof SymbolPolyfill) {
+        sym = sym.toString();
+    }
+    return registry.indexOf(sym) !== -1;
 };
