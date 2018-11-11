@@ -9,19 +9,19 @@
 </p>
 
 <p align="center">
-    <a href="https://travis-ci.org/Chialab/proteins">
-        <img alt="Travis status" src="https://img.shields.io/travis/Chialab/proteins.svg?style=flat-square">
+    <a href="https://travis-ci.org/chialab/proteins">
+        <img alt="Travis status" src="https://img.shields.io/travis/chialab/proteins.svg?style=flat-square">
     </a>
-    <a href="https://codecov.io/gh/Chialab/proteins">
+    <a href="https://codecov.io/gh/chialab/proteins">
         <img alt="Code coverage" src="https://img.shields.io/codecov/c/github/chialab/proteins.svg?style=flat-square">
     </a>
     <a href="https://www.npmjs.com/package/@chialab/proteins">
         <img alt="NPM" src="https://img.shields.io/npm/v/@chialab/proteins.svg?style=flat-square">
     </a>
-    <a href="https://github.com/Chialab/proteins/blob/master/LICENSE">
+    <a href="https://github.com/chialab/proteins/blob/master/LICENSE">
         <img alt="License" src="https://img.shields.io/npm/l/@chialab/proteins.svg?style=flat-square">
     </a>
-    <a href="https://github.com/Chialab/proteins/wiki">
+    <a href="https://github.com/chialab/proteins/wiki">
         <img alt="Documentation" src="https://img.shields.io/badge/documentation-wiki-ff69b4.svg?style=flat-square">
     </a>
     <a href="https://saucelabs.com/u/chialab-sl-014">
