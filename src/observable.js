@@ -2,7 +2,6 @@ import { Emitter } from './factory.js';
 import { isArray, isObject } from './types.js';
 import { get, set, extend, reconstruct } from './proto.js';
 import Symbolic from './symbolic.js';
-
 /**
  * @typedef ChangeSet
  * @property {String} property The path to the changed property.
@@ -11,28 +10,24 @@ import Symbolic from './symbolic.js';
  * @property {Array} added A list of added items to an array.
  * @property {Array} remove A list of remove items from an array.
  */
-
 /**
  * Observable Symbol.
  * @type {Symbolic}
  * @private
  */
 const OBSERVABLE_SYM = Symbolic('observable');
-
 /**
  * Array prototype shortcut.
  * @type {Object}
  * @private
  */
 const ARRAY_PROTO = Array.prototype;
-
 /**
  * Object.prototype.hasOwnProperty shortcut.
  * @type {Function}
  * @private
  */
 const hasOwnProperty = Object.prototype.hasOwnProperty;
-
 /**
  * Micro Proxy polyfill.
  * @private
@@ -64,10 +59,10 @@ const ProxyHelper = typeof Proxy !== 'undefined' ? Proxy : class {
         res[OBSERVABLE_SYM] = data[OBSERVABLE_SYM];
         return res;
     }
-
     define(res, data, property, handler) {
         let desc = {
             configurable: true,
+            enumerable: !Symbolic.isSymbolic(property),
         };
         if (handler.get) {
             desc.get = () => handler.get(data, property);
@@ -78,7 +73,6 @@ const ProxyHelper = typeof Proxy !== 'undefined' ? Proxy : class {
         Object.defineProperty(res, property, desc);
     }
 };
-
 /**
  * Trigger object changes.
  * @private
@@ -89,7 +83,6 @@ const ProxyHelper = typeof Proxy !== 'undefined' ? Proxy : class {
 function triggerChanges(scope, changeset) {
     return scope[OBSERVABLE_SYM].trigger('change', changeset);
 }
-
 /**
  * Wrap Array prototype methods for changes triggering.
  * @type {Object}
@@ -150,7 +143,6 @@ const ARRAY_PROTO_WRAP = {
         return res;
     },
 };
-
 /**
  * Subobserve objects.
  * @private
@@ -180,7 +172,6 @@ function subobserve(target, name, value) {
     }
     return value;
 }
-
 /**
  * ES6 Proxy handler.
  * @type {Object}
@@ -196,7 +187,6 @@ const handler = {
         if (target[name] !== value) {
             value = subobserve(target, name, value);
             target[name] = value;
-
             triggerChanges(target, {
                 property: name,
                 oldValue,
@@ -206,7 +196,6 @@ const handler = {
         return true;
     },
 };
-
 /**
  * Create an Observable object for a set of data or an array.
  *
@@ -218,18 +207,15 @@ export default class Observable {
         if (typeof data !== 'object') {
             throw new Error('Cannot observe this value.');
         }
-
         let emitter = data[OBSERVABLE_SYM] || new Emitter();
         if (emitter.proxy) {
             return emitter.proxy;
         }
-
         let proto = {
             on: { value: emitter.on.bind(emitter) },
             off: { value: emitter.off.bind(emitter) },
             trigger: { value: emitter.trigger.bind(emitter) },
         };
-
         if (isArray(data)) {
             proto.push = { get: () => ARRAY_PROTO_WRAP.push.bind(data) };
             proto.unshift = { get: () => ARRAY_PROTO_WRAP.unshift.bind(data) };
@@ -237,21 +223,16 @@ export default class Observable {
             proto.shift = { get: () => ARRAY_PROTO_WRAP.shift.bind(data) };
             proto.splice = { get: () => ARRAY_PROTO_WRAP.splice.bind(data) };
         }
-
         data[OBSERVABLE_SYM] = emitter;
         set(data, extend(get(data), proto));
-
         emitter.proxy = new ProxyHelper(data, handler);
-
         Object.keys(data).forEach((key) => {
             if (key !== OBSERVABLE_SYM) {
                 data[key] = subobserve(data, key, data[key]);
             }
         });
-
         return emitter.proxy;
     }
-
     /**
      * Re-observe an array or an object after adding a property.
      *
@@ -280,12 +261,10 @@ export default class Observable {
             // Native proxy support. We're good.
             return;
         }
-
         // Ensure `data` is an observable.
         new Observable(data);
-
         Object.keys(data).forEach(key => {
-            if (key !== OBSERVABLE_SYM && !data[key][OBSERVABLE_SYM]) {
+            if (key !== OBSERVABLE_SYM && data[key] && !data[key][OBSERVABLE_SYM]) {
                 // Key has been added and is not yet observed. Big Brother is on its way.
                 data[key] = subobserve(data, key, data[key]);
                 triggerChanges(data, {
