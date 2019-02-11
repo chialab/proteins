@@ -50,7 +50,7 @@ describe('Unit: Observable', () => {
                 }
             };
             let observableDreamTheater = new Observable(dreamTheater);
-            assert.deepEqual(JSON.stringify(dreamTheater, observableDreamTheater));
+            assert.deepEqual(JSON.stringify(dreamTheater), JSON.stringify(observableDreamTheater));
         });
     });
 
