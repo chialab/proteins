@@ -51,6 +51,7 @@ const ProxyHelper = typeof Proxy !== 'undefined' ? Proxy : class {
                 }
             });
             this.define(res, data, 'length', {
+                enumerable: false,
                 get() {
                     return lastLength;
                 },
@@ -62,7 +63,7 @@ const ProxyHelper = typeof Proxy !== 'undefined' ? Proxy : class {
     define(res, data, property, handler) {
         let desc = {
             configurable: true,
-            enumerable: !Symbolic.isSymbolic(property),
+            enumerable: ('enumerable' in handler) ? handler.enumerable : !Symbolic.isSymbolic(property),
         };
         if (handler.get) {
             desc.get = () => handler.get(data, property);
@@ -208,6 +209,7 @@ export default class Observable {
             throw new Error('Cannot observe this value.');
         }
         let emitter = data[OBSERVABLE_SYM] || new Emitter();
+
         if (emitter.proxy) {
             return emitter.proxy;
         }
