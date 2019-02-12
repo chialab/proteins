@@ -54,7 +54,7 @@ describe('Unit: Observable', () => {
             assert.deepEqual(JSON.stringify(dreamTheater), JSON.stringify(observableDreamTheater));
         });
 
-        it.only('should correctly proxy an object with an array property', () => {
+        it('should correctly proxy an object with an array property', () => {
             let bucciaratiCrew = {
                 members: [
                     'Bruno Bucciarati',
