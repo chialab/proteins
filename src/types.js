@@ -68,7 +68,7 @@ export function isUndefined(obj) {
  * @return {Boolean}
  */
 export function isArray(obj) {
-    return Array.isArray(obj);
+    return Array.isArray(obj) || obj instanceof Array;
 }
 /**
  * Check if falsy value.
