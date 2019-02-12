@@ -2,6 +2,7 @@
 import Observable from '../src/observable.js';
 import Symbolic from '../src/symbolic.js';
 import chai from 'chai/chai';
+import { isArray } from '../src/types.js';
 
 const { assert } = chai;
 
@@ -46,11 +47,36 @@ describe('Unit: Observable', () => {
                     bass: 'John Myung',
                     drum: 'Mike Mangini',
                     keyboard: 'Jordan Rudess',
-                    vocals: 'James LaBrie'
-                }
+                    vocals: 'James LaBrie',
+                },
             };
             let observableDreamTheater = new Observable(dreamTheater);
             assert.deepEqual(JSON.stringify(dreamTheater), JSON.stringify(observableDreamTheater));
+        });
+
+        it.only('should correctly proxy an object with an array property', () => {
+            let bucciaratiCrew = {
+                members: [
+                    'Bruno Bucciarati',
+                    'Giorno Giovanna',
+                    'Guido Mista',
+                    'Narancia Ghirga',
+                    'Leone Abbacchio',
+                    'Pannacotta Fugo',
+                ],
+                stands: [
+                    'Sticky Fingers',
+                    'Gold Experience',
+                    'Sex Pistols',
+                    'Aerosmith',
+                    'Moody Blues',
+                    'Purple Haze',
+                ],
+            };
+
+            let observable = new Observable(bucciaratiCrew);
+            assert(isArray(observable.members));
+            assert(isArray(observable.stands));
         });
     });
 
