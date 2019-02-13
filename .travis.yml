@@ -34,7 +34,7 @@ jobs:
       install:
         - yarn install
       script:
-        - rna unit 'test/*.js' --saucelabs --context test/context.html --concurrency 1
+        - rna unit 'test/*.js' --saucelabs --context 'test/context.html' --concurrency 1
 
     - stage: test
       os: linux

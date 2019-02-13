@@ -2,6 +2,7 @@
 import Observable from '../src/observable.js';
 import Symbolic from '../src/symbolic.js';
 import chai from 'chai/chai';
+import { isArray } from '../src/types.js';
 
 const { assert } = chai;
 
@@ -17,7 +18,7 @@ describe('Unit: Observable', () => {
         observable.on('change', (changset) => {
             changes.push(changset);
         });
-        
+
         it('should not trigger changes if object is not changed', () => {
             observable.firstName = 'Alan';
 
@@ -35,6 +36,48 @@ describe('Unit: Observable', () => {
         it('should trigger changes', () => {
             assert.equal(changes.length, 1);
         });
+
+        // Regression test for a bug on IE:
+        // without defining a value for `enumerable` while using `Object.defineProperty`
+        // in `ProxyHelper`, IE can't recognize object properties and is not be able to JSON.stringify the object.
+        it('should correctly proxy an object', () => {
+            let dreamTheater = {
+                members: {
+                    guitar: 'John Petrucci',
+                    bass: 'John Myung',
+                    drum: 'Mike Mangini',
+                    keyboard: 'Jordan Rudess',
+                    vocals: 'James LaBrie',
+                },
+            };
+            let observableDreamTheater = new Observable(dreamTheater);
+            assert.deepEqual(JSON.stringify(dreamTheater), JSON.stringify(observableDreamTheater));
+        });
+
+        it('should correctly proxy an object with an array property', () => {
+            let bucciaratiCrew = {
+                members: [
+                    'Bruno Bucciarati',
+                    'Giorno Giovanna',
+                    'Guido Mista',
+                    'Narancia Ghirga',
+                    'Leone Abbacchio',
+                    'Pannacotta Fugo',
+                ],
+                stands: [
+                    'Sticky Fingers',
+                    'Gold Experience',
+                    'Sex Pistols',
+                    'Aerosmith',
+                    'Moody Blues',
+                    'Purple Haze',
+                ],
+            };
+
+            let observable = new Observable(bucciaratiCrew);
+            assert(isArray(observable.members));
+            assert(isArray(observable.stands));
+        });
     });
 
     describe('simple Array', () => {
@@ -48,14 +91,14 @@ describe('Unit: Observable', () => {
         observable.on('change', (changset) => {
             changes.push(changset);
         });
-        
+
         it('should not trigger changes if object is not changed', () => {
             observable[0] = 'Luke';
 
             assert.equal(changes.length, 0);
             assert.equal(observable.length, 3);
         });
-        
+
         it('should trigger changes if object has been updated', () => {
             observable[1] = 'Darth Vader';
 
