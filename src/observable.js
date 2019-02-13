@@ -265,8 +265,9 @@ export default class Observable {
         }
         // Ensure `data` is an observable.
         new Observable(data);
-        Object.keys(data).forEach(key => {
-            if (key !== OBSERVABLE_SYM && data[key] && !data[key][OBSERVABLE_SYM]) {
+        Object.keys(data).forEach((key) => {
+            let descriptor = Object.getOwnPropertyDescriptor(data, key);
+            if (key !== OBSERVABLE_SYM && descriptor && ('value' in descriptor)) {
                 // Key has been added and is not yet observed. Big Brother is on its way.
                 data[key] = subobserve(data, key, data[key]);
                 triggerChanges(data, {
