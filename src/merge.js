@@ -15,7 +15,10 @@ const defaults = {
  * @return {Object} The merged object.
  */
 export default function merge(...objects) {
-    let options = this.options || defaults;
+    let options = defaults;
+    if (typeof this !== 'undefined' && this.options) {
+        options = this.options;
+    }
     let first = objects.shift();
     let res = clone(first);
     objects.forEach((obj2) => {
