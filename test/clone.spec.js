@@ -63,7 +63,7 @@ describe('Unit: Clone', () => {
     it('should clone an object with custom callback', () => {
         let original = [1, 2, 3];
         let cloned = clone(original, (arr, index, val) => {
-            if (index === 1) {
+            if (index == 1) {
                 return 2 * val;
             }
             return val;
@@ -121,5 +121,32 @@ describe('Unit: Clone', () => {
         const TEST_FUN = () => { };
         assert.equal(clone(TEST_FUN), TEST_FUN);
         assert(clone(TEST_FUN) !== TEST_FUN.bind(null));
+    });
+
+    it('should clone properties with getter/setter', () => {
+        const a = {
+            test: 2,
+        };
+        Object.defineProperty(a, 'test2', {
+            get() {
+                return this.test;
+            },
+            set(val) {
+                this.test = this.test * val;
+            },
+        });
+        let cloned = clone(a);
+        assert.equal(cloned.test, 2);
+        assert.equal(cloned.test2, 2);
+
+        cloned.test2 = 3;
+        assert.equal(cloned.test, 6);
+    });
+
+    it('should clone arrays with custom properties', () => {
+        const a = [1, 2];
+        Object.defineProperty(a, 'test', { value: 3 });
+        let cloned = clone(a);
+        assert.equal(cloned.test, 3);
     });
 });
