@@ -2,9 +2,16 @@
   "name": "@chialab/proteins",
   "version": "3.0.2",
   "description": "A primer for JavaScript libraries and frameworks development.",
-  "main": "dist/proteins.js",
-  "module": "index.js",
+  "lib": "src/index.js",
+  "main": "dist/cjs/proteins.js",
+  "module": "dist/esm/proteins.js",
+  "browser": "dist/umd/proteins.js",
   "types": "proteins.d.ts",
+  "directories": {
+    "src": "src",
+    "test": "test",
+    "dist": "dist"
+  },
   "scripts": {
     "build": "rna build --production",
     "test": "rna unit 'test/*.js' --node + unit 'test/*.js' --browser --context 'test/context.html'",
@@ -13,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chialab/proteins.git"
+    "url": "git@github.com:chialab/proteins.git"
   },
   "keywords": [
     "proteins",
@@ -26,14 +33,12 @@
   "bugs": {
     "url": "https://github.com/chialab/proteins/issues"
   },
-  "homepage": "https://proteins.chialab.io",
+  "homepage": "https://chialab.io/p/proteins",
   "devDependencies": {
-    "babel-eslint": "^10.0.1",
+    "babel-eslint": "^10.0.3",
     "chai": "^4.1.2",
-    "eslint": "^5.8.0",
-    "eslint-plugin-babel": "^5.2.1",
-    "eslint-plugin-mocha": "^5.2.0",
-    "stylelint": "^9.7.1",
-    "stylelint-order": "^1.0.0"
+    "eslint": "^6.6.0",
+    "eslint-plugin-babel": "^5.3.0",
+    "eslint-plugin-mocha": "^6.2.1"
   }
 }
