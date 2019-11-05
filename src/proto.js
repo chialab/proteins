@@ -3,6 +3,7 @@
  */
 
 import { isFunction, isObject } from './types.js';
+import hasOwnProperty from './has.js';
 
 const getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 const create = Object.create;
@@ -36,7 +37,7 @@ export function entries(Ctr, filter = () => true) {
     walk(Ctr, (proto) => {
         Object.getOwnPropertyNames(proto)
             .forEach((key) => {
-                if (!res.hasOwnProperty(key)) {
+                if (!hasOwnProperty(res, key)) {
                     let descriptor = getOwnPropertyDescriptor(proto, key);
                     if (filter(key, descriptor)) {
                         res[key] = descriptor;

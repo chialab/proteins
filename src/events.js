@@ -1,4 +1,5 @@
 import Symbolic from './symbolic.js';
+import has from './has.js';
 import { isFunction } from './types.js';
 
 const SYM = Symbolic('listeners');
@@ -58,7 +59,7 @@ export function off(scope, name, callback) {
  * @return {Promise} The final Promise of the callbacks chain
  */
 export function trigger(scope, name, ...args) {
-    const callbacksList = (scope.hasOwnProperty(SYM) && scope[SYM].hasOwnProperty(name) && scope[SYM][name]) || [];
+    const callbacksList = (has(scope, SYM) && has(scope[SYM], name) && scope[SYM][name]) || [];
     let finalResults = callbacksList
         .slice(0)
         .reduce((results, callback) => {

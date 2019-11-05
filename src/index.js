@@ -13,6 +13,7 @@ import equivalent from './equivalent.js';
 import mix from './mixin.js';
 import Symbolic from './symbolic.js';
 import Observable from './observable.js';
+import has from './has.js';
 import * as keypath from './keypath.js';
 import * as Factory from './factory.js';
 import * as Proto from './proto.js';
@@ -20,6 +21,7 @@ import * as Url from './url.js';
 
 export * from './types.js';
 export * from './events.js';
+export { has };
 export { Symbolic };
 export { Observable };
 export { clone };

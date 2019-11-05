@@ -1,4 +1,5 @@
 import Symbolic from './symbolic.js';
+import hasOwnProperty from './has.js';
 
 const MIXINS_SYM = Symbolic('mixins');
 
@@ -43,7 +44,7 @@ class MixinScope {
                 Class = mixin(Class);
             }
         });
-        Class[MIXINS_SYM] = Class.hasOwnProperty(MIXINS_SYM) ? Class[MIXINS_SYM] : [];
+        Class[MIXINS_SYM] = hasOwnProperty(Class, MIXINS_SYM) ? Class[MIXINS_SYM] : [];
         Class[MIXINS_SYM].push(...mixins);
         return Class;
     }

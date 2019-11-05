@@ -4,6 +4,7 @@
 
 import * as keypath from './keypath.js';
 import Symbolic from './symbolic.js';
+import has from './has.js';
 
 const REF_SYM = Symbolic('ref');
 const URL_REGEX = /((?:^(?:[a-z]+:))|^)?(?:\/\/)?([^?/$]*)([^?]*)?(\?.*)?/i;
@@ -97,7 +98,7 @@ export function serialize(obj, prefix, chunkFn = chunk) {
     let keys = Object.keys(obj);
     if (keys.length) {
         for (let p in obj) {
-            if (obj.hasOwnProperty(p) && obj[p] !== undefined) {
+            if (has(obj, p) && obj[p] !== undefined) {
                 let k = prefix ? `${prefix}[${p}]` : p;
                 let v = obj[p];
                 if (v instanceof Date) {
@@ -406,7 +407,7 @@ export class SearchParams {
  * @property {string} hash The url's hash.
  *
  * @param {string} path The url to handle.
- * @param {string} [baseUrl] The optional base url. 
+ * @param {string} [baseUrl] The optional base url.
  */
 export class Url {
     constructor(path, baseUrl) {

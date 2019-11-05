@@ -10,6 +10,7 @@ import Symbolic from './symbolic.js';
 import * as keypath from './keypath.js';
 import clone from './clone.js';
 import merge from './merge.js';
+import hasOwnProperty from './has.js';
 import { isObject, isString } from './types.js';
 import { on, off, trigger } from './events.js';
 import { has } from './proto.js';
@@ -57,7 +58,7 @@ export const FactoryMixin = (SuperClass) => class extends SuperClass {
      * @memberof Factory.BaseFactory
      */
     static get SYM() {
-        if (!this.hasOwnProperty(FACTORY_SYM)) {
+        if (!hasOwnProperty(this, FACTORY_SYM)) {
             let sym = Symbolic(this.name);
             FACTORY_SYMBOLS[sym] = this;
             this[FACTORY_SYM] = sym;
@@ -335,7 +336,7 @@ export const InjectableMixin = (SuperClass) => class extends mix(SuperClass).wit
     }
 };
 
-export class BaseFactory extends mix().with(FactoryMixin) { } 
+export class BaseFactory extends mix().with(FactoryMixin) { }
 
 export class Emitter extends mix().with(EmitterMixin) { }
 
