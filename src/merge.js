@@ -1,4 +1,5 @@
 import clone from './clone.js';
+import has from './has.js';
 import { isObject, isArray } from './types.js';
 
 const defaults = {
@@ -22,46 +23,61 @@ export default function merge(...objects) {
     let first = objects.shift();
     let res = clone(first);
     let descriptors;
+    const buildDescriptor = (descriptor, val) => {
+        let newDescriptor = {
+            configurable: true,
+            enumerable: descriptor.enumerable,
+        };
+        if (descriptor.get || descriptor.set) {
+            newDescriptor['get'] = descriptor.get;
+            newDescriptor['set'] = descriptor.set;
+        } else {
+            // `value` and `writable` are allowed in a descriptor only when there isn't a getter/setter.
+            newDescriptor['value'] = val;
+            newDescriptor['writable'] = descriptor.writable;
+        }
+        return newDescriptor;
+    };
     objects.forEach((obj2) => {
-        // Use descriptors to include custom properties, getters and setters.
         descriptors = Object.getOwnPropertyDescriptors(obj2);
+        if (isObject(first) && isObject(obj2)) {
+            for (const key in descriptors) {
+                if (options.strictMerge && !Object.getOwnPropertyDescriptor(first, key)) {
+                    continue;
+                }
 
-        if (isObject(res) && isObject(obj2)) {
-            Object.keys(descriptors).forEach((key) => {
-                if (!options.strictMerge || !!Object.getOwnPropertyDescriptor(first, key)) {
-                    let rightDescriptor = descriptors[key];
-                    let rightVal = clone(rightDescriptor.value);
-                    let leftDescriptor = Object.getOwnPropertyDescriptor(res, key);
-                    let leftVal = leftDescriptor.value;
-
-                    if (rightVal && isObject(rightVal) && leftVal && isObject(leftVal) && options.mergeObjects) {
-                        res[key] = merge.call(this, leftVal, rightVal);
-                    } else if (isArray(rightVal) && isArray(leftVal) && options.joinArrays) {
-                        res[key] = merge.call(this, res[key], rightDescriptor);
-                    } else {
-                        res[key] = clone(obj2[key]);
+                let leftDescriptor = Object.getOwnPropertyDescriptor(res, key);
+                let rightDescriptor = descriptors[key];
+                let rightVal = clone(rightDescriptor.value);
+                let merged = rightVal;
+                if (leftDescriptor) {
+                    let leftVal = clone(leftDescriptor.value);
+                    if (isObject(leftVal) && isObject(rightVal) && options.mergeObjects) {
+                        merged = merge.call(this, leftVal, rightVal);
+                    } else if (isArray(leftVal) && isArray(rightVal) && options.joinArrays) {
+                        merged = merge.call(this, leftVal, rightVal);
                     }
                 }
-            });
+                Object.defineProperty(res, key, buildDescriptor(rightDescriptor, merged));
+            }
         } else if (isArray(first) && isArray(obj2)) {
             // Skip length descriptor.
             delete descriptors.length;
-
-            Object.keys(descriptors).forEach((key) => {
+            for (const key in descriptors) {
                 if (options.joinArrays &&
-                    // If property has a value
-                    descriptors[key].hasOwnProperty('value') &&
-                    // and key is a number
+                    // If key is a number
                     !isNaN(key) &&
-                    // and `first` already own a property with this key
-                    !!Object.getOwnPropertyDescriptor(first, key)
+                    // and property has a value
+                    has(descriptors[key], 'value') &&
+                    // and `first` already owns a property with this key
+                    Object.getOwnPropertyDescriptor(first, key)
                 ) {
                     // append the value instead of overwriting.
-                    res[res.length] = clone(descriptors[key].value);
+                    Object.defineProperty(res, res.length, buildDescriptor(descriptors[key], clone(descriptors[key].value)));
                 } else {
-                    Object.defineProperty(res, key, descriptors[key]);
+                    Object.defineProperty(res, key, buildDescriptor(descriptors[key], clone(descriptors[key].value)));
                 }
-            });
+            }
         } else {
             throw 'incompatible types';
         }
@@ -75,7 +91,7 @@ export default function merge(...objects) {
  * @method config
  * @memberof merge
  * @param {Object} options Merge options.
- * @param {Boolean} options.mergeObjects Should merge objects keys.
+ * @param {Boolean} options.mergeObjects Should ricursively merge objects keys.
  * @param {Boolean} options.joinArrays Should join arrays instead of update keys.
  * @param {Boolean} options.strictMerge Should merge only keys which already are in the first object.
  * @return {Function} The new merge function.

@@ -54,6 +54,39 @@ describe('Unit: Merge', () => {
         assert.equal(hybrid.awards.special.getTime(), new Date('2017/01/02').getTime());
     });
 
+    it('should merge two objects with getter/setter', () => {
+        const test = {
+            prop1: 1,
+            prop2: {
+                array_prop: [1, 2, 3],
+            },
+        };
+        const test2 = {
+            prop2: {
+                array_prop: [4, 5],
+                array_prop2: [6, 7],
+            },
+            prop3: 3,
+        };
+        Object.defineProperty(test2, 'customProp', {
+            get() {
+                return 'customProp_value';
+            },
+            set(value) {
+                return value;
+            },
+        });
+        let merged = merge(test, test2);
+        assert.equal(merged['prop1'], 1);
+        assert.deepEqual(merged['prop2'], {
+            array_prop: [4, 5],
+            array_prop2: [6, 7],
+        });
+        assert.equal(merged['prop3'], 3);
+        assert.ownInclude(Object.getOwnPropertyNames(merged), 'customProp');
+        assert.equal(merged['customProp'], 'customProp_value');
+    });
+
     it('should merge two objects in strict mode', () => {
         let hybrid = merge.config({ strictMerge: true })(obj1, obj2);
         assert.equal(hybrid.firstName, 'Alan');
@@ -117,7 +150,7 @@ describe('Unit: Merge', () => {
         assert.ownInclude(Object.getOwnPropertyNames(actual), 'customProp2');
     });
 
-    it.only('should merge two arrays with custom properties (with joinArrays: true)', () => {
+    it('should merge two arrays with custom properties (with joinArrays: true)', () => {
         const actual = merge.config({ joinArrays: true })(array1, array2);
         // Values of array1 will be overwritten by those of array2 because their keys match.
         const expected = [...array1, ...array2];
