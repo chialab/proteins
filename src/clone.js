@@ -34,8 +34,6 @@ export default function clone(obj, callback = noop, cache = new WeakMap()) {
         }
         for (let key in descriptors) {
             const desc = descriptors[key];
-            let clonedVal = clone(obj[key], callback, cache);
-            let val = callback(obj, key, clonedVal);
             let newDescriptor = {
                 configurable: true,
                 enumerable: desc.enumerable,
@@ -45,7 +43,8 @@ export default function clone(obj, callback = noop, cache = new WeakMap()) {
                 newDescriptor['set'] = desc.set;
             } else {
                 // `value` and `writable` are allowed in a descriptor only when there isn't a getter/setter.
-                newDescriptor['value'] = val;
+                let clonedVal = clone(desc.value, callback, cache);
+                newDescriptor['value'] = callback(obj, key, clonedVal);
                 newDescriptor['writable'] = desc.writable;
             }
             Object.defineProperty(res, key, newDescriptor);
