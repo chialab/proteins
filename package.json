@@ -6,14 +6,14 @@
   "main": "dist/cjs/proteins.js",
   "module": "dist/esm/proteins.js",
   "browser": "dist/umd/proteins.js",
-  "types": "proteins.d.ts",
+  "types": "dist/proteins.d.ts",
   "directories": {
     "src": "src",
     "test": "test",
     "dist": "dist"
   },
   "scripts": {
-    "build": "rna build --production",
+    "build": "rna build --production --typings",
     "test": "rna unit 'test/*.js' --node + unit 'test/*.js' --browser --context 'test/context.html'",
     "lint": "rna lint 'src/**/*.js'",
     "prepublishOnly": "rna build --production"
