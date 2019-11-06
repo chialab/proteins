@@ -23,7 +23,7 @@ export default function merge(...objects) {
     let first = objects.shift();
     let res = clone(first);
     let descriptors;
-    const buildDescriptor = (descriptor, val) => {
+    function buildDescriptor(descriptor, val) {
         let newDescriptor = {
             configurable: true,
             enumerable: descriptor.enumerable,
@@ -37,25 +37,31 @@ export default function merge(...objects) {
             newDescriptor['writable'] = descriptor.writable;
         }
         return newDescriptor;
-    };
+    }
     objects.forEach((obj2) => {
         descriptors = Object.getOwnPropertyDescriptors(obj2);
         if (isObject(first) && isObject(obj2)) {
             for (const key in descriptors) {
-                if (options.strictMerge && !Object.getOwnPropertyDescriptor(first, key)) {
-                    continue;
+                let leftDescriptor = Object.getOwnPropertyDescriptor(first, key);
+                let rightDescriptor = descriptors[key];
+                let rightVal = rightDescriptor.value;
+
+                if (options.strictMerge) {
+                    if (!leftDescriptor ||
+                        (leftDescriptor.value && !rightVal) ||
+                        (!leftDescriptor.value && rightVal)
+                    ) {
+                        continue;
+                    }
                 }
 
-                let leftDescriptor = Object.getOwnPropertyDescriptor(res, key);
-                let rightDescriptor = descriptors[key];
-                let rightVal = clone(rightDescriptor.value);
-                let merged = rightVal;
-                if (leftDescriptor) {
-                    let leftVal = clone(leftDescriptor.value);
+                let merged = rightDescriptor.value;
+                if (leftDescriptor && rightVal) {
+                    let leftVal = leftDescriptor.value;
                     if (isObject(leftVal) && isObject(rightVal) && options.mergeObjects) {
-                        merged = merge.call(this, leftVal, rightVal);
+                        merged = merge.call(this, leftVal, clone(rightVal));
                     } else if (isArray(leftVal) && isArray(rightVal) && options.joinArrays) {
-                        merged = merge.call(this, leftVal, rightVal);
+                        merged = merge.call(this, leftVal, clone(rightVal));
                     }
                 }
                 Object.defineProperty(res, key, buildDescriptor(rightDescriptor, merged));

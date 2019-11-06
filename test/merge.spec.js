@@ -150,7 +150,7 @@ describe('Unit: Merge', () => {
         assert.ownInclude(Object.getOwnPropertyNames(actual), 'customProp2');
     });
 
-    it('should merge two arrays with custom properties (with joinArrays: true)', () => {
+    it('should merge two arrays with custom properties (joinArrays)', () => {
         const actual = merge.config({ joinArrays: true })(array1, array2);
         // Values of array1 will be overwritten by those of array2 because their keys match.
         const expected = [...array1, ...array2];
@@ -168,6 +168,51 @@ describe('Unit: Merge', () => {
         assert.ownInclude(Object.getOwnPropertyNames(actual), 'customProp');
         assert.ownInclude(Object.getOwnPropertyNames(actual), 'customProp2');
         assert.equal(actual['customProp2'], expected['customProp2']);
+    });
+
+    it('should skip different property names (strictMerge)', () => {
+        const obj = {
+            prop1: 1,
+            prop2: 2,
+        };
+        const obj2 = {
+            prop2: 7,
+            prop3: 3,
+        };
+
+        const merged = merge.config({ strictMerge: true })(obj, obj2);
+        assert.deepEqual(merged, {
+            prop1: 1,
+            prop2: 7,
+        });
+    });
+
+    it('should skip properties when different descriptor structure (strictMerge)', () => {
+        const obj = {
+            prop1: 1,
+        };
+        const descriptor = {
+            get() {
+                return 2;
+            },
+            set(value) {
+                return value;
+            },
+        };
+        Object.defineProperty(obj, 'prop2', descriptor);
+
+        const obj2 = {
+            prop1: 7,
+            prop2: 5,
+        };
+
+        const merged = merge.config({ strictMerge: true })(obj, obj2);
+        const descriptors = Object.getOwnPropertyDescriptors(merged);
+
+        assert.equal(merged.prop1, 7);
+        assert.include(Object.keys(descriptors['prop2']), 'get');
+        assert.include(Object.keys(descriptors['prop2']), 'set');
+        assert.equal(merged.prop2, 2);
     });
 
     it('should throws with incompatible types', () => {
