@@ -30,7 +30,7 @@ export default function clone(obj, callback = noop, cache = new WeakMap()) {
         const descriptors = Object.getOwnPropertyDescriptors(obj);
         if (isArray(obj)) {
             // do not redefine `length` property.
-            delete descriptors['length'];
+            delete descriptors.length;
         }
         for (let key in descriptors) {
             const desc = descriptors[key];
@@ -39,13 +39,13 @@ export default function clone(obj, callback = noop, cache = new WeakMap()) {
                 enumerable: desc.enumerable,
             };
             if (desc.get || desc.set) {
-                newDescriptor['get'] = desc.get;
-                newDescriptor['set'] = desc.set;
+                newDescriptor.get = desc.get;
+                newDescriptor.set = desc.set;
             } else {
                 // `value` and `writable` are allowed in a descriptor only when there isn't a getter/setter.
                 let clonedVal = clone(desc.value, callback, cache);
-                newDescriptor['value'] = callback(obj, key, clonedVal);
-                newDescriptor['writable'] = desc.writable;
+                newDescriptor.value = callback(obj, key, clonedVal);
+                newDescriptor.writable = desc.writable;
             }
             Object.defineProperty(res, key, newDescriptor);
         }
