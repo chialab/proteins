@@ -1,5 +1,5 @@
 import clone from './clone.js';
-import has from './has.js';
+import { getDescriptors, buildDescriptor } from './_helpers.js';
 import { isObject, isArray } from './types.js';
 
 const defaults = {
@@ -20,70 +20,69 @@ export default function merge(...objects) {
     if (typeof this !== 'undefined' && this.options) {
         options = this.options;
     }
-    let first = objects.shift();
-    let res = clone(first);
-    let descriptors;
-    function buildDescriptor(descriptor, val) {
-        let newDescriptor = {
-            configurable: true,
-            enumerable: descriptor.enumerable,
-        };
-        if (descriptor.get || descriptor.set) {
-            newDescriptor['get'] = descriptor.get;
-            newDescriptor['set'] = descriptor.set;
-        } else {
-            // `value` and `writable` are allowed in a descriptor only when there isn't a getter/setter.
-            newDescriptor['value'] = val;
-            newDescriptor['writable'] = descriptor.writable;
-        }
-        return newDescriptor;
-    }
-    objects.forEach((obj2) => {
-        descriptors = Object.getOwnPropertyDescriptors(obj2);
-        if (isObject(first) && isObject(obj2)) {
-            for (const key in descriptors) {
-                let leftDescriptor = Object.getOwnPropertyDescriptor(first, key);
-                let rightDescriptor = descriptors[key];
-                let rightVal = rightDescriptor.value;
+    const first = objects.shift();
+    const res = clone(first);
 
+    objects.forEach((obj2) => {
+        if (isObject(first) && isObject(obj2)) {
+            const descriptors = getDescriptors(obj2);
+            Object.keys(descriptors).forEach((key) => {
+                const leftDescriptor = Object.getOwnPropertyDescriptor(first, key);
+                const rightDescriptor = descriptors[key];
+                if (!('value' in rightDescriptor)) {
+                    Object.defineProperty(res, key, buildDescriptor(rightDescriptor));
+                    return;
+                }
+
+                const rightVal = rightDescriptor.value;
                 if (options.strictMerge) {
                     if (!leftDescriptor ||
                         (leftDescriptor.value && !rightVal) ||
                         (!leftDescriptor.value && rightVal)
                     ) {
-                        continue;
+                        return;
                     }
                 }
 
-                let merged = rightDescriptor.value;
+                let merged = clone(rightVal);
                 if (leftDescriptor && rightVal) {
-                    let leftVal = leftDescriptor.value;
+                    const leftVal = leftDescriptor.value;
                     if (isObject(leftVal) && isObject(rightVal) && options.mergeObjects) {
-                        merged = merge.call(this, leftVal, clone(rightVal));
+                        merged = merge.call(this, leftVal, merged);
                     } else if (isArray(leftVal) && isArray(rightVal) && options.joinArrays) {
-                        merged = merge.call(this, leftVal, clone(rightVal));
+                        merged = merge.call(this, leftVal, merged);
                     }
                 }
                 Object.defineProperty(res, key, buildDescriptor(rightDescriptor, merged));
-            }
+            });
         } else if (isArray(first) && isArray(obj2)) {
+            const descriptors = getDescriptors(obj2);
             // Skip length descriptor.
             delete descriptors.length;
-            for (const key in descriptors) {
-                if (options.joinArrays &&
-                    // If key is a number
-                    !isNaN(key) &&
-                    // and property has a value
-                    has(descriptors[key], 'value') &&
-                    // and `first` already owns a property with this key
-                    Object.getOwnPropertyDescriptor(first, key)
-                ) {
-                    // append the value instead of overwriting.
-                    Object.defineProperty(res, res.length, buildDescriptor(descriptors[key], clone(descriptors[key].value)));
-                } else {
-                    Object.defineProperty(res, key, buildDescriptor(descriptors[key], clone(descriptors[key].value)));
+            Object.keys(descriptors).forEach((key) => {
+                const rightDescriptor = descriptors[key];
+                let merged;
+                if (!isNaN(key) && ('value' in rightDescriptor)) {
+                    const leftVal = first[key];
+                    const rightVal = rightDescriptor.value;
+                    merged = clone(rightVal);
+                    if (options.joinArrays) {
+                        // check if already in the left array
+                        if (first.indexOf(rightVal) === -1) {
+                            // append the value instead of overwriting
+                            res.push(merged);
+                        }
+                        return;
+                    }
+
+                    if (isObject(leftVal) && isObject(rightVal) && options.mergeObjects) {
+                        merged = merge.call(this, leftVal, merged);
+                    } else if (isArray(leftVal) && isArray(rightVal)) {
+                        merged = merge.call(this, leftVal, merged);
+                    }
                 }
-            }
+                Object.defineProperty(res, key, buildDescriptor(rightDescriptor, merged));
+            });
         } else {
             throw 'incompatible types';
         }

@@ -1,5 +1,6 @@
 import { isObject, isDate, isArray, isFunction } from './types.js';
 import { get, reconstruct } from './proto.js';
+import { getDescriptors, buildDescriptor } from './_helpers.js';
 
 /**
  * Useless callback function.
@@ -27,27 +28,18 @@ export default function clone(obj, callback = noop, cache = new WeakMap()) {
         }
         let res = reconstruct(get(obj));
         cache.set(obj, res);
-        const descriptors = Object.getOwnPropertyDescriptors(obj);
+        const descriptors = getDescriptors(obj);
         if (isArray(obj)) {
             // do not redefine `length` property.
             delete descriptors.length;
         }
         for (let key in descriptors) {
-            const desc = descriptors[key];
-            let newDescriptor = {
-                configurable: true,
-                enumerable: desc.enumerable,
-            };
-            if (desc.get || desc.set) {
-                newDescriptor.get = desc.get;
-                newDescriptor.set = desc.set;
-            } else {
-                // `value` and `writable` are allowed in a descriptor only when there isn't a getter/setter.
-                let clonedVal = clone(desc.value, callback, cache);
-                newDescriptor.value = callback(obj, key, clonedVal);
-                newDescriptor.writable = desc.writable;
+            const descriptor = descriptors[key];
+            let value;
+            if ('value' in descriptor) {
+                value = callback(obj, key, clone(descriptor.value, callback, cache));
             }
-            Object.defineProperty(res, key, newDescriptor);
+            Object.defineProperty(res, key, buildDescriptor(descriptor, value));
         }
         return res;
     } else if (isDate(obj)) {

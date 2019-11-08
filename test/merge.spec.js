@@ -1,6 +1,7 @@
 /* eslint-env mocha */
 import merge from '../src/merge.js';
 import { isUndefined, isDate } from '../src/types.js';
+import { getDescriptors } from '../src/_helpers.js';
 import chai from 'chai/chai';
 
 const { assert } = chai;
@@ -100,7 +101,7 @@ describe('Unit: Merge', () => {
         assert.equal(hybrid.awards.special.getTime(), new Date('2017/01/02').getTime());
     });
 
-    it('should merge two objects with array join', () => {
+    it('should merge two objects (joinArrays)', () => {
         let hybrid = merge.config({ joinArrays: true })(obj1, obj2);
         assert.equal(hybrid.firstName, 'Alan');
         assert.equal(hybrid.lastName, 'Rickman');
@@ -152,7 +153,6 @@ describe('Unit: Merge', () => {
 
     it('should merge two arrays with custom properties (joinArrays)', () => {
         const actual = merge.config({ joinArrays: true })(array1, array2);
-        // Values of array1 will be overwritten by those of array2 because their keys match.
         const expected = [...array1, ...array2];
         expected['customProp'] = 'customProp_value';
         Object.defineProperty(expected, 'customProp2', {
@@ -207,7 +207,7 @@ describe('Unit: Merge', () => {
         };
 
         const merged = merge.config({ strictMerge: true })(obj, obj2);
-        const descriptors = Object.getOwnPropertyDescriptors(merged);
+        const descriptors = getDescriptors(merged);
 
         assert.equal(merged.prop1, 7);
         assert.include(Object.keys(descriptors['prop2']), 'get');
@@ -215,7 +215,7 @@ describe('Unit: Merge', () => {
         assert.equal(merged.prop2, 2);
     });
 
-    it('should throws with incompatible types', () => {
+    it('should throw with incompatible types', () => {
         assert.throws(() => merge({}, 2), 'incompatible types');
     });
 });
