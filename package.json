@@ -13,10 +13,10 @@
     "dist": "dist"
   },
   "scripts": {
-    "build": "rna build --production --typings",
+    "build": "rm -rf dist && rna build --production --typings",
     "test": "rna unit 'test/*.js' --node + unit 'test/*.js' --browser --context 'test/context.html'",
     "lint": "rna lint 'src/**/*.js'",
-    "prepublishOnly": "rna build --production"
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
