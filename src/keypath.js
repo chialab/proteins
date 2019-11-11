@@ -1,3 +1,5 @@
+import hasOwnProperty from './has.js';
+
 /**
  * @module keypath
  */
@@ -65,7 +67,7 @@ function pathToArray(path) {
  * Get a deep property of an object using paths
  * @function get
  * @memberof keypath
- * 
+ *
  * @param {Object} obj The object scope
  * @param {String|Array} path The path of the property to retrieve
  * @return {*} The property value
@@ -110,7 +112,7 @@ export function set(obj, path, value, ensure = true) {
     }
     let current = path.shift();
     let currentObj;
-    if (!obj.hasOwnProperty(current)) {
+    if (!hasOwnProperty(obj, current)) {
         if (ensure) {
             let next = path[0];
             if (isNaN(next) && next !== '') {
@@ -151,7 +153,7 @@ export function has(obj, path) {
             return has(obj[current], path);
         }
     }
-    if (current in obj || obj.hasOwnProperty(current)) {
+    if (current in obj || hasOwnProperty(obj, current)) {
         if (path.length === 0) {
             return true;
         }
@@ -165,7 +167,7 @@ export function has(obj, path) {
  * If the value already exists, do nothing.
  * @function ensure
  * @memberof keypath
- * 
+ *
  * @param {Object} obj The object scope
  * @param {String|Array} path The path of the property to retrieve
  * @param {*} value The default value to set
@@ -184,7 +186,7 @@ export function ensure(obj, path, value) {
 /**
  * Push or insert a value in array.
  * @memberof keypath
- * 
+ *
  * @param {Object} obj The object scope
  * @param {String|Array} path The path of the property to retrieve
  * @param {*} value The value to push
@@ -216,7 +218,7 @@ export function insert(obj, path, value, index) {
  * * Number → reset to 0
  * * any → reset to null
  * @memberof keypath
- * 
+ *
  * @param {Object} obj The object scope
  * @param {String|Array} path The path of the property to retrieve
  * @return {*} The modified object
@@ -231,7 +233,7 @@ export function empty(obj, path) {
         parent = get(obj, path.slice(0, -1));
     }
     let current = path[path.length - 1];
-    if (parent && parent.hasOwnProperty(current)) {
+    if (parent && hasOwnProperty(parent, current)) {
         let arr = parent[current];
         if (isArray(arr)) {
             arr.splice(0, arr.length);
@@ -256,7 +258,7 @@ export function empty(obj, path) {
 /**
  * Remove a key from the parent path.
  * @memberof keypath
- * 
+ *
  * @param {Object} obj The object scope
  * @param {String|Array} path The path of the property to retrieve
  * @return {*} The parent path object

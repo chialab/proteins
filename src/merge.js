@@ -1,4 +1,5 @@
 import clone from './clone.js';
+import { getDescriptors, buildDescriptor } from './_helpers.js';
 import { isObject, isArray } from './types.js';
 
 const defaults = {
@@ -19,27 +20,73 @@ export default function merge(...objects) {
     if (typeof this !== 'undefined' && this.options) {
         options = this.options;
     }
-    let first = objects.shift();
-    let res = clone(first);
+    const first = objects.shift();
+    const res = clone(first);
+
     objects.forEach((obj2) => {
-        if (isObject(res) && isObject(obj2)) {
-            Object.keys(obj2).forEach((key) => {
-                if (!options.strictMerge || first.hasOwnProperty(key)) {
-                    let entry = obj2[key];
-                    if (isObject(entry) && isObject(res[key]) && options.mergeObjects) {
-                        res[key] = merge.call(this, res[key], entry);
-                    } else if (isArray(entry) && isArray(res[key]) && options.joinArrays) {
-                        res[key] = merge.call(this, res[key], entry);
-                    }  else {
-                        res[key] = clone(obj2[key]);
+        if (isObject(first) && isObject(obj2)) {
+            const descriptors = getDescriptors(obj2);
+            Object.keys(descriptors).forEach((key) => {
+                const leftDescriptor = Object.getOwnPropertyDescriptor(first, key);
+                const rightDescriptor = descriptors[key];
+                if (!('value' in rightDescriptor)) {
+                    Object.defineProperty(res, key, buildDescriptor(rightDescriptor));
+                    return;
+                }
+
+                if (options.strictMerge) {
+                    if (!leftDescriptor) {
+                        return;
+                    }
+                    if (typeof leftDescriptor.get !== typeof rightDescriptor.get) {
+                        return;
+                    }
+                    if (typeof leftDescriptor.set !== typeof rightDescriptor.set) {
+                        return;
                     }
                 }
+
+                let rightVal = clone(rightDescriptor.value);
+                if (leftDescriptor && rightVal) {
+                    const leftVal = leftDescriptor.value;
+                    if (isObject(leftVal) && isObject(rightVal) && options.mergeObjects) {
+                        rightVal = merge.call(this, leftVal, rightVal);
+                    } else if (isArray(leftVal) && isArray(rightVal) && options.joinArrays) {
+                        rightVal = merge.call(this, leftVal, rightVal);
+                    }
+                }
+                Object.defineProperty(res, key, buildDescriptor(rightDescriptor, rightVal));
             });
         } else if (isArray(first) && isArray(obj2)) {
-            obj2.forEach((val) => {
-                if (first.indexOf(val) === -1) {
-                    res.push(clone(val));
+            const descriptors = getDescriptors(obj2);
+            // Skip length descriptor.
+            delete descriptors.length;
+            Object.keys(descriptors).forEach((key) => {
+                const rightDescriptor = descriptors[key];
+                if (!('value' in rightDescriptor)) {
+                    Object.defineProperty(res, key, buildDescriptor(rightDescriptor));
+                    return;
                 }
+
+                const leftVal = first[key];
+                let rightVal = clone(rightDescriptor.value);
+                if (!isNaN(key)) {
+                    if (options.joinArrays) {
+                        // check if already in the left array
+                        if (first.indexOf(rightVal) === -1) {
+                            // append the value instead of overwriting
+                            res.push(rightVal);
+                        }
+                        return;
+                    }
+
+                    if (isObject(leftVal) && isObject(rightVal) && options.mergeObjects) {
+                        rightVal = merge.call(this, leftVal, rightVal);
+                    } else if (isArray(leftVal) && isArray(rightVal)) {
+                        rightVal = merge.call(this, leftVal, rightVal);
+                    }
+                }
+                Object.defineProperty(res, key, buildDescriptor(rightDescriptor, rightVal));
             });
         } else {
             throw 'incompatible types';
@@ -54,7 +101,7 @@ export default function merge(...objects) {
  * @method config
  * @memberof merge
  * @param {Object} options Merge options.
- * @param {Boolean} options.mergeObjects Should merge objects keys.
+ * @param {Boolean} options.mergeObjects Should ricursively merge objects keys.
  * @param {Boolean} options.joinArrays Should join arrays instead of update keys.
  * @param {Boolean} options.strictMerge Should merge only keys which already are in the first object.
  * @return {Function} The new merge function.
