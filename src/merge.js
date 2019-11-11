@@ -34,26 +34,28 @@ export default function merge(...objects) {
                     return;
                 }
 
-                const rightVal = rightDescriptor.value;
                 if (options.strictMerge) {
-                    if (!leftDescriptor ||
-                        (leftDescriptor.value && !rightVal) ||
-                        (!leftDescriptor.value && rightVal)
-                    ) {
+                    if (!leftDescriptor) {
+                        return;
+                    }
+                    if (typeof leftDescriptor.get !== typeof rightDescriptor.get) {
+                        return;
+                    }
+                    if (typeof leftDescriptor.set !== typeof rightDescriptor.set) {
                         return;
                     }
                 }
 
-                let merged = clone(rightVal);
+                let rightVal = clone(rightDescriptor.value);
                 if (leftDescriptor && rightVal) {
                     const leftVal = leftDescriptor.value;
                     if (isObject(leftVal) && isObject(rightVal) && options.mergeObjects) {
-                        merged = merge.call(this, leftVal, merged);
+                        rightVal = merge.call(this, leftVal, rightVal);
                     } else if (isArray(leftVal) && isArray(rightVal) && options.joinArrays) {
-                        merged = merge.call(this, leftVal, merged);
+                        rightVal = merge.call(this, leftVal, rightVal);
                     }
                 }
-                Object.defineProperty(res, key, buildDescriptor(rightDescriptor, merged));
+                Object.defineProperty(res, key, buildDescriptor(rightDescriptor, rightVal));
             });
         } else if (isArray(first) && isArray(obj2)) {
             const descriptors = getDescriptors(obj2);
@@ -61,27 +63,30 @@ export default function merge(...objects) {
             delete descriptors.length;
             Object.keys(descriptors).forEach((key) => {
                 const rightDescriptor = descriptors[key];
-                let merged;
-                if (!isNaN(key) && ('value' in rightDescriptor)) {
-                    const leftVal = first[key];
-                    const rightVal = rightDescriptor.value;
-                    merged = clone(rightVal);
+                if (!('value' in rightDescriptor)) {
+                    Object.defineProperty(res, key, buildDescriptor(rightDescriptor));
+                    return;
+                }
+
+                const leftVal = first[key];
+                let rightVal = clone(rightDescriptor.value);
+                if (!isNaN(key)) {
                     if (options.joinArrays) {
                         // check if already in the left array
                         if (first.indexOf(rightVal) === -1) {
                             // append the value instead of overwriting
-                            res.push(merged);
+                            res.push(rightVal);
                         }
                         return;
                     }
 
                     if (isObject(leftVal) && isObject(rightVal) && options.mergeObjects) {
-                        merged = merge.call(this, leftVal, merged);
+                        rightVal = merge.call(this, leftVal, rightVal);
                     } else if (isArray(leftVal) && isArray(rightVal)) {
-                        merged = merge.call(this, leftVal, merged);
+                        rightVal = merge.call(this, leftVal, rightVal);
                     }
                 }
-                Object.defineProperty(res, key, buildDescriptor(rightDescriptor, merged));
+                Object.defineProperty(res, key, buildDescriptor(rightDescriptor, rightVal));
             });
         } else {
             throw 'incompatible types';

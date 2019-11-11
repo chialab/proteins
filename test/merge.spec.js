@@ -123,7 +123,7 @@ describe('Unit: Merge', () => {
         'value_2_1',
         'value_2_2',
     ];
-    array2['customProp'] = 'customProp_value';
+    array2.customProp = 'customProp_value';
     Object.defineProperty(array2, 'customProp2', {
         get() {
             return 'customProp2_value';
@@ -132,11 +132,12 @@ describe('Unit: Merge', () => {
             return value;
         },
     });
+    array2.customProp3 = { test: 1 };
 
     it('should merge two arrays with custom properties', () => {
         // Values of array1 will be overwritten by those of array2 because their keys match.
         const expected = [...array2];
-        expected['customProp'] = 'customProp_value';
+        expected.customProp = 'customProp_value';
         Object.defineProperty(expected, 'customProp2', {
             get() {
                 return 'customProp2_value';
@@ -145,10 +146,15 @@ describe('Unit: Merge', () => {
                 return value;
             },
         });
+        expected.customProp3 = { test: 1 };
         const actual = merge(array1, array2);
+        const actualProperties = Object.getOwnPropertyNames(actual);
         assert.deepEqual(actual, expected);
-        assert.ownInclude(Object.getOwnPropertyNames(actual), 'customProp');
-        assert.ownInclude(Object.getOwnPropertyNames(actual), 'customProp2');
+        assert.ownInclude(actualProperties, 'customProp');
+        assert.ownInclude(actualProperties, 'customProp2');
+        assert.ownInclude(actualProperties, 'customProp3');
+        assert.notEqual(array2.customProp3, actual.customProp3);
+        assert.equal(actual.customProp3.test, 1);
     });
 
     it('should merge two arrays with custom properties (joinArrays)', () => {
