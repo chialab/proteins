@@ -41,6 +41,11 @@ export default function clone(obj, callback = noop, cache = new WeakMap()) {
             }
             Object.defineProperty(res, key, buildDescriptor(descriptor, value));
         }
+        if (Object.isFrozen(obj)) {
+            Object.freeze(res);
+        } else if (Object.isSealed(obj)) {
+            Object.seal(res);
+        }
         return res;
     } else if (isDate(obj)) {
         return new Date(obj.getTime());
