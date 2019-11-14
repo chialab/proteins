@@ -150,10 +150,24 @@ describe('Unit: Clone', () => {
         assert.equal(cloned.test, 3);
     });
 
-    it('should freeze clones of frozen objects', () => {
+    it('should unfreeze clones of frozen objects', () => {
         const a = { test: 1 };
         Object.freeze(a);
         const cloned = clone(a);
+        cloned.test = 2;
+        assert.isNotFrozen(cloned);
+        assert.equal(cloned.test, 2);
+        // it does not works
+        // assert.throws(() => {
+        //     'use strict';
+        //     cloned.test = 2;
+        // }, TypeError);
+    });
+
+    it('should freeze clones of frozen objects with strict mode', () => {
+        const a = { test: 1 };
+        Object.freeze(a);
+        const cloned = clone(a, true);
         assert.isFrozen(cloned);
         assert.equal(cloned.test, 1);
         // it does not works
@@ -163,10 +177,24 @@ describe('Unit: Clone', () => {
         // }, TypeError);
     });
 
-    it('should seal clones of sealed objects', () => {
+    it('should unseal clones of sealed objects', () => {
         const a = { test: 1 };
         Object.seal(a);
         const cloned = clone(a);
+        cloned.missing = true;
+        assert.isNotSealed(cloned);
+        assert.equal(cloned.missing, true);
+        // it does not works
+        // assert.throws(() => {
+        //     'use strict';
+        //     cloned.missing = 2;
+        // }, TypeError);
+    });
+
+    it('should seal clones of sealed objects with strict mode', () => {
+        const a = { test: 1 };
+        Object.seal(a);
+        const cloned = clone(a, true);
         assert.isSealed(cloned);
         // it does not works
         // assert.throws(() => {

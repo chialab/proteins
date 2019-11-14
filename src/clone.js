@@ -18,10 +18,15 @@ function noop(scope, key, prop) { return prop; }
  * @method clone
  * @param {*} obj The instance to clone.
  * @param {Function} [callback] A modifier function for each property.
+ * @param {boolean} [useStrict] Should preserve frozen and sealed objects.
  * @param {WeakMap} [cache] The cache for circular references.
  * @return {*} The clone of the object.
  */
-export default function clone(obj, callback = noop, cache = new WeakMap()) {
+export default function clone(obj, callback = noop, useStrict = false, cache = new WeakMap()) {
+    if (typeof callback === 'boolean') {
+        useStrict = callback;
+        callback = noop;
+    }
     if (isObject(obj) || isArray(obj)) {
         if (cache.has(obj)) {
             return cache.get(obj);
@@ -37,14 +42,16 @@ export default function clone(obj, callback = noop, cache = new WeakMap()) {
             const descriptor = descriptors[key];
             let value;
             if ('value' in descriptor) {
-                value = callback(obj, key, clone(descriptor.value, callback, cache));
+                value = callback(obj, key, clone(descriptor.value, callback, useStrict, cache));
             }
-            Object.defineProperty(res, key, buildDescriptor(descriptor, value));
+            Object.defineProperty(res, key, buildDescriptor(descriptor, value, useStrict ? descriptor.writable : true));
         }
-        if (Object.isFrozen(obj)) {
-            Object.freeze(res);
-        } else if (Object.isSealed(obj)) {
-            Object.seal(res);
+        if (useStrict) {
+            if (Object.isFrozen(obj)) {
+                Object.freeze(res);
+            } else if (Object.isSealed(obj)) {
+                Object.seal(res);
+            }
         }
         return res;
     } else if (isDate(obj)) {
