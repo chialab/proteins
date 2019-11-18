@@ -129,6 +129,10 @@ describe('Unit: Observable', () => {
         it('should trigger changes', () => {
             assert.equal(changes.length, 4);
         });
+
+        it('should be of type Array', () => {
+            assert(Array.isArray(observable));
+        });
     });
 
     describe('complex objects', () => {

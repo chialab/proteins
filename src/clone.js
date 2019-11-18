@@ -31,15 +31,15 @@ export default function clone(obj, callback = noop, useStrict = false, cache = n
         if (cache.has(obj)) {
             return cache.get(obj);
         }
-        let res = reconstruct(get(obj));
+        const res = reconstruct(get(obj));
         cache.set(obj, res);
+        const newDescriptors = getDescriptors(res);
         const descriptors = getDescriptors(obj);
-        if (isArray(obj)) {
-            // do not redefine `length` property.
-            delete descriptors.length;
-        }
         for (let key in descriptors) {
             const descriptor = descriptors[key];
+            if (newDescriptors[key] && !newDescriptors[key].configurable) {
+                continue;
+            }
             let value;
             if ('value' in descriptor) {
                 value = callback(obj, key, clone(descriptor.value, callback, useStrict, cache));

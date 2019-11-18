@@ -34,10 +34,12 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
  */
 const ProxyHelper = typeof Proxy !== 'undefined' ? Proxy : class {
     constructor(data, handler) {
-        let res = reconstruct(get(data));
-        Object.keys(data).forEach((key) => {
-            this.define(res, data, key, handler);
-        });
+        const res = reconstruct(get(data));
+        Object.keys(data)
+            .filter((key) => Object.getOwnPropertyDescriptor(data, key).configurable)
+            .forEach((key) => {
+                this.define(res, data, key, handler);
+            });
         if (isArray(data)) {
             let lastLength = data.length;
             res.on('change', () => {
@@ -50,18 +52,12 @@ const ProxyHelper = typeof Proxy !== 'undefined' ? Proxy : class {
                     lastLength = data.length;
                 }
             });
-            this.define(res, data, 'length', {
-                enumerable: false,
-                get() {
-                    return lastLength;
-                },
-            });
         }
         res[OBSERVABLE_SYM] = data[OBSERVABLE_SYM];
         return res;
     }
     define(res, data, property, handler) {
-        let desc = {
+        const desc = {
             configurable: true,
             enumerable: ('enumerable' in handler) ? handler.enumerable : !Symbolic.isSymbolic(property),
         };
@@ -179,6 +175,12 @@ function subobserve(target, name, value) {
  * @private
  */
 const handler = {
+    getPrototypeOf(target) {
+        if (isArray(target)) {
+            return target.constructor.prototype;
+        }
+        return Reflect.getPrototypeOf(target);
+    },
     get: (target, name) => target[name],
     set: (target, name, value) => {
         if (Symbolic.isSymbolic(name)) {
@@ -267,7 +269,7 @@ export default class Observable {
         new Observable(data);
         Object.keys(data).forEach((key) => {
             let descriptor = Object.getOwnPropertyDescriptor(data, key);
-            if (key !== OBSERVABLE_SYM && descriptor && ('value' in descriptor)) {
+            if (key !== OBSERVABLE_SYM && descriptor && descriptor.configurable && ('value' in descriptor)) {
                 // Key has been added and is not yet observed. Big Brother is on its way.
                 data[key] = subobserve(data, key, data[key]);
                 triggerChanges(data, {
