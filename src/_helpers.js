@@ -18,9 +18,10 @@ export function getDescriptors(obj) {
  * Build a new configurable descriptor starting from passed `descriptor`.
  * @param {Object} descriptor The descriptor to clone.
  * @param {*} val The value to set as `value` descriptor property.
+ * @param {boolean} writable Writable configuration of the descriptor.
  * @return {Object} New descriptor.
  */
-export function buildDescriptor(descriptor, val) {
+export function buildDescriptor(descriptor, val, writable = true) {
     let newDescriptor = {
         configurable: true,
         enumerable: descriptor.enumerable,
@@ -31,7 +32,7 @@ export function buildDescriptor(descriptor, val) {
     } else {
         // `value` and `writable` are allowed in a descriptor only when there isn't a getter/setter.
         newDescriptor.value = val;
-        newDescriptor.writable = descriptor.writable;
+        newDescriptor.writable = writable;
     }
     return newDescriptor;
 }
