@@ -179,6 +179,12 @@ function subobserve(target, name, value) {
  * @private
  */
 const handler = {
+    getPrototypeOf(target) {
+        if (Array.isArray(target)) {
+            return target.constructor.prototype;
+        }
+        return Reflect.getPrototypeOf(target);
+    },
     get: (target, name) => target[name],
     set: (target, name, value) => {
         if (Symbolic.isSymbolic(name)) {

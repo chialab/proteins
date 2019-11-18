@@ -104,24 +104,24 @@ export function has(Ctr, property) {
  * Retrieve prototype of an object.
  * @memberof Proto
  *
- * @param {Object} Ctr The object to analyze.
+ * @param {Object} obj The object to analyze.
  * @return {Object} The prototype.
  */
-export function get(Ctr) {
+export function get(obj) {
     if (Object.getPrototypeOf) {
-        return Object.getPrototypeOf(Ctr);
+        return Object.getPrototypeOf(obj);
     }
-    if (isObject(Ctr.__proto__)) {
-        return Ctr.__proto__;
+    if (isObject(obj.__proto__)) {
+        return obj.__proto__;
     }
-    return Ctr.constructor.prototype;
+    return obj.constructor.prototype;
 }
 
 /**
  * Set prototype to an object.
  * @memberof Proto
  *
- * @param {Object} Ctr The object to update.
+ * @param {Object} obj The object to update.
  * @param {Object|Function} proto The prototype or the class to use.
  */
 export function set(obj, proto) {
@@ -160,7 +160,7 @@ export function extend(proto1, proto2) {
  */
 export function reconstruct(Ctr) {
     if (isFunction(Ctr)) {
-        return create(Ctr.prototype);
+        return reconstruct(Ctr.prototype);
     } else if (Ctr === Array.prototype) {
         return [];
     }

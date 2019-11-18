@@ -1,6 +1,7 @@
 /* eslint-env mocha */
 import clone from '../src/clone.js';
 import { isDate, isNumber, isString, isObject, isArray, isUndefined } from '../src/types.js';
+import Observable from '../src/observable.js';
 import chai from 'chai/chai';
 
 const { assert } = chai;
@@ -148,5 +149,12 @@ describe('Unit: Clone', () => {
         Object.defineProperty(a, 'test', { value: 3 });
         let cloned = clone(a);
         assert.equal(cloned.test, 3);
+    });
+
+    it.only('should clone Observable arrays', () => {
+        const a = new Observable([1, 2]);
+        const cloned = clone(a);
+        assert(Array.isArray(cloned));
+        assert.notStrictEqual(cloned, [1, 2]);
     });
 });
