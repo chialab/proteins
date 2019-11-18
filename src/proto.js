@@ -2,7 +2,7 @@
  * @module Proto
  */
 
-import { isFunction, isObject } from './types.js';
+import { isFunction, isObject, isArray } from './types.js';
 import hasOwnProperty from './has.js';
 
 const getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
@@ -161,8 +161,10 @@ export function extend(proto1, proto2) {
 export function reconstruct(Ctr) {
     if (isFunction(Ctr)) {
         return reconstruct(Ctr.prototype);
-    } else if (Ctr === Array.prototype) {
-        return [];
+    } else if (isArray(Ctr)) {
+        const res = [];
+        set(res, Ctr);
+        return res;
     }
     return create(Ctr);
 }

@@ -204,10 +204,10 @@ describe('Unit: Clone', () => {
         // }, TypeError);
     });
 
-    it.only('should clone Observable arrays', () => {
+    it('should clone Observable arrays', () => {
         const a = new Observable([1, 2]);
         const cloned = clone(a);
-        assert(Array.isArray(cloned));
+        assert(isArray(cloned));
         assert.notStrictEqual(cloned, [1, 2]);
     });
 });
