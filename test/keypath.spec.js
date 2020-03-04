@@ -101,6 +101,23 @@ describe('Unit: Keypath', () => {
             assert.equal(keypath.get(obj, '1a'), 'foo');
             assert.equal(keypath.get(obj, ['1a']), 'foo');
         });
+
+        it('should return default value passed for missing values under object', () => {
+            let obj = getTestObj();
+            assert.isFalse(keypath.get(obj, 'a.b', false));
+            assert.isTrue(keypath.get(obj, 'a.b', true));
+            assert.isNull(keypath.get(obj, 'a.b', null));
+
+            let expected = [];
+            assert.deepEqual(keypath.get(obj, 'a.b', []), expected);
+
+            expected = {
+                a: {
+                    b: true,
+                },
+            };
+            assert.deepEqual(keypath.get(obj, 'a.b', expected), expected);
+        });
     });
 
     describe('set', () => {
