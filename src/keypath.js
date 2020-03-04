@@ -70,7 +70,7 @@ function pathToArray(path) {
  *
  * @param {Object} obj The object scope
  * @param {String|Array} path The path of the property to retrieve
- * @param {mixed} defaultValue The default value returned if path was not found. Default is undefined.
+ * @param {*} defaultValue The default value returned if path was not found. Default is undefined.
  * @return {*} The property value
  * @throws {Error} throw error when object scope is undefined
  * @throws {Error} throw error when paths is invalid or undefined
