@@ -14,9 +14,13 @@
   },
   "scripts": {
     "build": "rm -rf dist && rna build --production --typings",
-    "test": "rna unit 'test/*.js' --node + unit 'test/*.js' --browser --context 'test/context.html'",
+    "test": "yarn test:browser && yarn test:node",
+    "test:browser": "rna unit 'test/*.js' --coverage --browser",
+    "test:saucelabs": "rna unit 'test/*.js' --coverage --saucelabs --concurrency 2",
+    "test:node": "rna unit 'test/*.js' --coverage --node",
     "lint": "rna lint 'src/**/*.js'",
-    "prepublishOnly": "npm run build"
+    "docs": "rna documentate --output docs/API.md --header '# API Reference'",
+    "prepack": "npm run build"
   },
   "repository": {
     "type": "git",

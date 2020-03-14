@@ -1,0 +1,176 @@
+name: Main
+on: push
+
+jobs:
+  # BUILD
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    if: contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v1
+      - name: Setup Node
+        uses: actions/setup-node@v1
+      - name: Config Yarn cache
+        run: yarn config set cache-folder $GITHUB_WORKSPACE/.yarn
+      - name: Set up Yarn cache
+        uses: actions/cache@v1
+        with:
+          path: .yarn
+          key: yarn-cache-${{ runner.OS }}-${{ hashFiles('**/yarn.lock') }}
+      - name: Set up NPM cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: npm-cache-${{ hashFiles('**/yarn.lock') }}
+      - name: Install RNA
+        run: npm install -g @chialab/rna-cli
+      - name: Install project dependencies
+        run: yarn install
+      - name: Run build script
+        run: yarn run build
+      - name: Cache distribution files
+        uses: actions/cache@v1
+        with:
+          path: dist
+          key: build-${{ github.sha }}
+      - name: Upload distribution files
+        uses: actions/upload-artifact@v1
+        with:
+          name: Proteins
+          path: dist
+  # TEST
+  test-node:
+    name: Test Node
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v1
+      - name: Setup Node
+        uses: actions/setup-node@v1
+      - name: Config Yarn cache
+        run: yarn config set cache-folder $GITHUB_WORKSPACE/.yarn
+      - name: Set up Yarn cache
+        uses: actions/cache@v1
+        with:
+          path: .yarn
+          key: yarn-cache-${{ runner.OS }}-${{ hashFiles('**/yarn.lock') }}
+      - name: Set up NPM cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: npm-cache-${{ hashFiles('**/yarn.lock') }}
+      - name: Install RNA
+        run: npm install -g @chialab/rna-cli
+      - name: Install project dependencies
+        run: yarn install
+      - name: Fetch build artifacts
+        uses: actions/cache@v1
+        with:
+          path: dist
+          key: build-${{ github.sha }}
+      - name: Run tests
+        run: yarn run test:node
+      - name: Upload coverage to codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: test/__coverage__/*/lcov.info
+  test-browsers:
+    name: Test Browsers
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v1
+      - name: Setup Node
+        uses: actions/setup-node@v1
+      - name: Config Yarn cache
+        run: yarn config set cache-folder $GITHUB_WORKSPACE/.yarn
+      - name: Set up Yarn cache
+        uses: actions/cache@v1
+        with:
+          path: .yarn
+          key: yarn-cache-${{ runner.OS }}-${{ hashFiles('**/yarn.lock') }}
+      - name: Set up NPM cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: npm-cache-${{ hashFiles('**/yarn.lock') }}
+      - name: Install RNA
+        run: npm install -g @chialab/rna-cli
+      - name: Install project dependencies
+        run: yarn install
+      - name: Fetch build artifacts
+        uses: actions/cache@v1
+        with:
+          path: dist
+          key: build-${{ github.sha }}
+      - name: Run tests
+        run: yarn run test:saucelabs
+        env:
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+      - name: Upload coverage to codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: test/__coverage__/*/lcov.info
+  test-compat:
+    name: Test compat library
+    needs:
+      - build
+    runs-on: windows-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v1
+      - name: Setup Node
+        uses: actions/setup-node@v1
+      - name: Config Yarn cache
+        run: yarn config set cache-folder $GITHUB_WORKSPACE/.yarn
+      - name: Set up Yarn cache
+        uses: actions/cache@v1
+        with:
+          path: .yarn
+          key: yarn-cache-${{ runner.OS }}-${{ hashFiles('**/yarn.lock') }}
+      - name: Set up NPM cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: npm-cache-${{ hashFiles('**/yarn.lock') }}
+      - name: Install RNA
+        run: npm install -g @chialab/rna-cli
+      - name: Install project dependencies
+        run: yarn install
+      - name: Fetch build artifacts
+        uses: actions/cache@v1
+        with:
+          path: dist
+          key: build-${{ github.sha }}
+      - name: Run tests
+        run: yarn run test:compat
+  # DOCS
+  api:
+    name: Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v1
+      - name: Push documentation to wiki
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_WIKI_TOKEN }}
+        run: |
+          git config --global user.email "dev@chialab.io"
+          git config --global user.name "chialab-io"
+          git clone https://${GITHUB_TOKEN}@github.com/chialab/proteins.wiki.git wiki
+          cd wiki
+          git checkout ${GITHUB_REF#refs/heads/} || git checkout -B ${GITHUB_REF#refs/heads/}
+          cp -rf ../docs/* .
+          git add .
+          git diff-index --quiet HEAD || git commit -m "Lastest api reference ${GITHUB_REF#refs/heads/} auto-pushed to wiki"
+          git push --set-upstream origin ${GITHUB_REF#refs/heads/} --follow-tags
+          cd ..
