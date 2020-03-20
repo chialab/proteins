@@ -55,7 +55,7 @@ export function off(scope, name, callback) {
  *
  * @param {Object} scope The event scope
  * @param {String} name Event name
- * @param {...*} [args] Arguments to pass to callbacks
+ * @param {...*} args Arguments to pass to callbacks
  * @return {Promise} The final Promise of the callbacks chain
  */
 export function trigger(scope, name, ...args) {

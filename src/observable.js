@@ -12,7 +12,7 @@ import Symbolic from './symbolic.js';
  */
 /**
  * Observable Symbol.
- * @type {Symbolic}
+ * @type {unique symbol}
  * @private
  */
 const OBSERVABLE_SYM = Symbolic('observable');
