@@ -35,7 +35,7 @@ class MixinScope {
      * @memberof mix.MixinScope
      *
      * @param {...Function} mixins *N* mixin functions.
-     * @return {Function} The extended class.
+     * @return {*} The extended class.
      */
     with(...mixins) {
         let Class = this.superClass;

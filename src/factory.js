@@ -17,25 +17,25 @@ import { has } from './proto.js';
 
 /**
  * Symbol for Factory instances.
- * @type {unique symbol}
+ * @type {Symbolic}
  */
 const FACTORY_SYM = Symbolic('fsymbol');
 
 /**
  * Symbol for Factory context.
- * @type {unique symbol}
+ * @type {Symbolic}
  */
 export const CONTEXT_SYM = Symbolic('context');
 
 /**
  * Symbol for Factory configuration.
- * @type {unique symbol}
+ * @type {Symbolic}
  */
 export const CONFIG_SYM = Symbolic('config');
 
 /**
  * Symbol for Factory listeners.
- * @type {unique symbol}
+ * @type {Symbolic}
  */
 export const LISTENERS_SYM = Symbolic('listeners');
 
@@ -54,7 +54,7 @@ export const FactoryMixin = (SuperClass) =>
     class BaseFactory extends SuperClass {
         /**
          * A symbolic defintion for the Factory constructor.
-         * @type {unique symbol}
+         * @type {Symbolic}
          */
         static get SYM() {
             if (!hasOwnProperty(this, FACTORY_SYM)) {

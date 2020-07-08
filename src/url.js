@@ -402,6 +402,7 @@ export class SearchParams {
  * @property {string} password The password used (if defined).
  * @property {string} host The url's host.
  * @property {string} hostname The url's hostname.
+ * @property {string} pathname The url's pathname.
  * @property {string} port The url's port (if defined).
  * @property {string} search The url's query params.
  * @property {string} hash The url's hash.
