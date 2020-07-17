@@ -10,7 +10,7 @@
 import clone from './clone.js';
 import merge from './merge.js';
 import equivalent from './equivalent.js';
-import mix from './mixin.js';
+import mix, { MixinScope } from './mixin.js';
 import Symbolic from './symbolic.js';
 import Observable from './observable.js';
 import has from './has.js';
@@ -28,6 +28,7 @@ export { clone };
 export { merge };
 export { equivalent };
 export { mix };
+export { MixinScope };
 export { keypath };
 export { Url };
 export { Factory };

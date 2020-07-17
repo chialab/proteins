@@ -7,10 +7,8 @@ const MIXINS_SYM = Symbolic('mixins');
  * Mix a class with a mixin.
  * Inspired by Justin Fagnani (https://github.com/justinfagnani).
  *
- * @method mix
  * @param {Function} SuperClass The class to extend.
  * @return {MixinScope} A MixinScope instance.
- * @module mix
  */
 export default function mix(SuperClass) {
     return new MixinScope(SuperClass);
@@ -18,13 +16,10 @@ export default function mix(SuperClass) {
 
 /**
  * A Mixin helper class.
- * @class MixinScope
- * @memberof mix
  */
-class MixinScope {
+export class MixinScope {
     /**
      * Create a mixable class.
-     * @private
      * @param {Function} superClass The class to extend.
      */
     constructor(superClass) {
@@ -32,7 +27,6 @@ class MixinScope {
     }
     /**
      * Mix the super class with a list of mixins.
-     * @memberof mix.MixinScope
      *
      * @param {...Function} mixins *N* mixin functions.
      * @return {*} The extended class.
@@ -50,7 +44,6 @@ class MixinScope {
     }
     /**
      * Check if the SuperClass has been already mixed with a mixin function.
-     * @memberof mix.MixinScope
      *
      * @param {Function} mixin The mixin function.
      * @return {Boolean}
