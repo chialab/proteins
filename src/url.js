@@ -302,6 +302,9 @@ export class SearchParams {
      * @return {Array} Entries list in format [[key, value], [...]].
      */
     entries() {
+        if (!this.url.search) {
+            return [];
+        }
         let search = this.url.search.substring(1);
         let unserialized = unserialize(search);
         return Object.keys(unserialized)
