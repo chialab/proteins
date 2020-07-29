@@ -146,7 +146,7 @@ export function unserialize(str) {
  * @memberof Url
  *
  * @param {...string} paths A list of paths to join.
- * @return {string} The final joint string.
+ * @return {string} The final join string.
  */
 export function join(...paths) {
     let len = paths.length - 1;
@@ -235,10 +235,14 @@ export function isLocalUrl(url) {
  *
  * @param {Url} url The url to update.
  * @param {string} path The query string.
+ * @return {string}
  */
 function updateSearchPath(url, path) {
     let href = url.href.split('?')[0];
-    url.href = `${href}?${path}`;
+    if (!path) {
+        return url.href = href;
+    }
+    return url.href = `${href}?${path}`;
 }
 
 /**
