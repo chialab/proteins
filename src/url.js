@@ -149,17 +149,9 @@ export function unserialize(str) {
  * @return {string} The final join string.
  */
 export function join(...paths) {
-    let len = paths.length - 1;
     return paths
+        .map((path) => (path || '').replace(/^\/*/, '').replace(/\/*$/, ''))
         .filter((path) => !!path)
-        .map((path, index) => {
-            if (index === 0) {
-                return path.replace(/\/*$/, '');
-            } else if (index === len) {
-                return path.replace(/^\/*/, '');
-            }
-            return path.replace(/^\/*/, '').replace(/\/*$/, '');
-        })
         .join('/');
 }
 
