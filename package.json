@@ -4,12 +4,12 @@
   "type": "module",
   "description": "A primer for JavaScript libraries and frameworks development.",
   "lib": "src/index.js",
-  "main": "dist/cjs/proteins.js",
+  "main": "dist/cjs/proteins.cjs",
   "module": "dist/esm/proteins.js",
   "browser": "dist/umd/proteins.js",
   "typings": "types/index.d.ts",
   "exports": {
-    "require": "./dist/cjs/proteins.js",
+    "require": "./dist/cjs/proteins.cjs",
     "default": "./dist/esm/proteins.js"
   },
   "directories": {
@@ -18,7 +18,10 @@
     "dist": "dist"
   },
   "scripts": {
-    "build": "rimraf dist && rna build --production && npm run types",
+    "build": "rimraf dist && npm run build:esm && npm run build:cjs && npm run build:umd && npm run types",
+    "build:esm": "rna build --production --format esm --output dist/esm/proteins.js",
+    "build:cjs": "rna build --production --format esm --output dist/cjs/proteins.cjs",
+    "build:umd": "rna build --production --format umd --output dist/umd/proteins.js",
     "types": "rimraf types && tsc -p config/tsconfig.json",
     "test": "yarn test:browser && yarn test:node",
     "test:browser": "rna unit 'test/*.js' --coverage --browser",
