@@ -19,7 +19,7 @@
   },
   "scripts": {
     "build": "rimraf dist && rna build --production && npm run types",
-    "types": "rimraf types && tsc",
+    "types": "rimraf types && tsc -p config/tsconfig.json",
     "test": "yarn test:browser && yarn test:node",
     "test:browser": "rna unit 'test/*.js' --coverage --browser",
     "test:saucelabs": "rna unit 'test/*.js' --coverage --saucelabs --concurrency 2",
