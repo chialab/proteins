@@ -1,4 +1,3 @@
-# RNA
 .*
 /node_modules
 /reports
@@ -8,8 +7,5 @@ sauce.browsers.js
 karma.conf.js
 yarn.lock
 package-lock.json
-
-# RNA
-
 /docs
 logo.svg

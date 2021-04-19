@@ -1,23 +1,30 @@
 {
   "name": "@chialab/proteins",
   "version": "3.2.6",
+  "type": "module",
   "description": "A primer for JavaScript libraries and frameworks development.",
   "lib": "src/index.js",
   "main": "dist/cjs/proteins.js",
   "module": "dist/esm/proteins.js",
   "browser": "dist/umd/proteins.js",
+  "typings": "types/index.d.ts",
+  "exports": {
+    "require": "./dist/cjs/proteins.js",
+    "default": "./dist/esm/proteins.js"
+  },
   "directories": {
     "src": "src",
     "test": "test",
     "dist": "dist"
   },
   "scripts": {
-    "build": "rm -rf dist && rna build --production --typings",
+    "build": "rimraf dist && rna build --production && npm run types",
+    "types": "rimraf types && tsc",
     "test": "yarn test:browser && yarn test:node",
     "test:browser": "rna unit 'test/*.js' --coverage --browser",
     "test:saucelabs": "rna unit 'test/*.js' --coverage --saucelabs --concurrency 2",
     "test:node": "rna unit 'test/*.js' --coverage --node",
-    "lint": "rna lint 'src/**/*.js'",
+    "lint": "eslint src --cache",
     "docs": "rna documentate --output docs/API.md --header '# API Reference'",
     "prepack": "npm run build"
   },
@@ -38,10 +45,10 @@
   },
   "homepage": "https://chialab.io/p/proteins",
   "devDependencies": {
-    "babel-eslint": "^10.0.3",
+    "@chialab/eslint-config": "^2.2.1",
     "chai": "^4.1.2",
-    "eslint": "^6.6.0",
-    "eslint-plugin-babel": "^5.3.0",
-    "eslint-plugin-mocha": "^6.2.1"
+    "eslint": "^7.24.0",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.2.4"
   }
 }
