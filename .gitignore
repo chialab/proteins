@@ -2,7 +2,6 @@
 npm-debug.log
 yarn-error.log
 .eslintcache
-/test/__coverage__
-/test/__generated__
+/coverage
 /dist
 /types
