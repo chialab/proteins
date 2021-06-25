@@ -29,7 +29,7 @@
     "typecheck": "tsc --noEmit",
     "docs": "(echo \"# API Reference\n\"; rna apidoc src/index.ts -F markdown) > docs/API.md",
     "prepack": "npm run build",
-    "release": "semantic-release"
+    "release": "source .env && semantic-release --no-ci"
   },
   "repository": {
     "type": "git",
@@ -51,7 +51,15 @@
       "main"
     ],
     "plugins": [
-      "@semantic-release/commit-analyzer",
+      ["@semantic-release/commit-analyzer", {
+        "preset": "angular",
+        "releaseRules": [
+          { "type": "fix", "release": "patch" },
+          { "type": "style", "release": "patch" },
+          { "type": "refactor", "release": "minor" },
+          { "type": "feat", "release": "minor" }
+        ]
+      }],
       "@semantic-release/npm",
       "@semantic-release/github"
     ]
