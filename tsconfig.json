@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "es2015",
+    "lib": ["es2017", "dom"],
+    "sourceMap": true,
+    "inlineSources": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "allowJs": true,
+    "checkJs": false,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "moduleResolution": "node"
+  },
+  "include": [
+    "./src/**/*.js"
+  ],
+}

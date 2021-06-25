@@ -12,7 +12,6 @@ const PORT_REGEX = /:\d*$/;
 
 /**
  * Parse and split an url in its components.
- * @memberof Url
  *
  * @param {string} url The url to parse.
  * @return {Object} The url properties.
@@ -71,7 +70,6 @@ export function parse(url = '') {
 
 /**
  * Serialize a key/value pair matching differente operators.
- * @private
  *
  * @param {string} key The pair key.
  * @param {string} val The pair value.
@@ -86,7 +84,6 @@ function chunk(key, val) {
 
 /**
  * Serialize an object in FormData format.
- * @memberof Url
  *
  * @param {Object} obj The object to convert.
  * @param {string} prefix The prefix to use in case of recursion.
@@ -119,7 +116,6 @@ export function serialize(obj, prefix, chunkFn = chunk) {
 
 /**
  * Unserialize a string in FormData format to an object.
- * @memberof Url
  *
  * @param {string} str A search string to unserialize.
  * @return {object} The unserialized object.
@@ -143,7 +139,6 @@ export function unserialize(str) {
 
 /**
  * Join url paths.
- * @memberof Url
  *
  * @param {...string} paths A list of paths to join.
  * @return {string} The final join string.
@@ -157,7 +152,6 @@ export function join(...paths) {
 
 /**
  * Resolve relative url path.
- * @memberof Url
  *
  * @param {string} base The base path.
  * @param {string} relative The relative path.
@@ -190,7 +184,6 @@ export function resolve(base, relative) {
 
 /**
  * Check if an url is absolute.
- * @memberof Url
  *
  * @param {string} url The url to check.
  * @return {boolean}
@@ -201,7 +194,6 @@ export function isAbsoluteUrl(url) {
 
 /**
  * Check if an url is a data url.
- * @memberof Url
  *
  * @param {string} url The url to check.
  * @return {boolean}
@@ -212,7 +204,6 @@ export function isDataUrl(url) {
 
 /**
  * Check if an url points to a local file.
- * @memberof Url
  *
  * @param {string} url The url to check.
  * @return {boolean}
@@ -223,7 +214,6 @@ export function isLocalUrl(url) {
 
 /**
  * Update query string params to an url
- * @private
  *
  * @param {Url} url The url to update.
  * @param {string} path The query string.
@@ -239,7 +229,6 @@ function updateSearchPath(url, path) {
 
 /**
  * Convert search params entries to a query string.
- * @private
  *
  * @param {Array} entries Search params entries.
  * @return {string} The query string.
@@ -254,24 +243,26 @@ function entriesToString(entries) {
 
 /**
  * Search params interface for Url.
- * @class SearchParams
- * @memberof Url
- * @property {Url} url The referenced Url.
- *
- * @param {Url} ref The referenced Url instance.
  */
 export class SearchParams {
+    /**
+     * Create search params instance.
+     * @param {Url} ref The referenced Url instance.
+     */
     constructor(ref) {
         this[REF_SYM] = ref;
     }
 
+    /**
+     * The referenced Url.
+     * @type {Url}
+     */
     get url() {
         return this[REF_SYM];
     }
 
     /**
      * List all entry keys.
-     * @memberof Url.SearchParams
      *
      * @return {Array} Entry keys list.
      */
@@ -282,7 +273,6 @@ export class SearchParams {
 
     /**
      * List all entry values.
-     * @memberof Url.SearchParams
      *
      * @return {Array} Entry values list.
      */
@@ -293,7 +283,6 @@ export class SearchParams {
 
     /**
      * List all entries.
-     * @memberof Url.SearchParams
      *
      * @return {Array} Entries list in format [[key, value], [...]].
      */
@@ -309,7 +298,6 @@ export class SearchParams {
 
     /**
      * Retrieve an entry.
-     * @memberof Url.SearchParams
      *
      * @param {string} name The entity name to get.
      * @return {*} The entity value.
@@ -325,7 +313,6 @@ export class SearchParams {
 
     /**
      * Check if entity is defined.
-     * @memberof Url.SearchParams
      *
      * @param {string} name The entity name to check.
      * @return {Boolean}
@@ -336,7 +323,6 @@ export class SearchParams {
 
     /**
      * Set an entry value.
-     * @memberof Url.SearchParams
      *
      * @param {string} name The entity name to set.
      * @param {*} value The entity value to set
@@ -353,7 +339,6 @@ export class SearchParams {
 
     /**
      * Remove an entity from the search params.
-     * @memberof Url.SearchParams
      *
      * @param {string} name The entity name to remove.
      */
@@ -368,7 +353,6 @@ export class SearchParams {
 
     /**
      * Sort entities by keys names.
-     * @memberof Url.SearchParams
      */
     sort() {
         const entries = this.entries();
@@ -392,30 +376,67 @@ export class SearchParams {
 
 /**
  * Url helper class.
- * @class Url
- * @memberof Url
- * @property {SearchParams} searchParams The url query string interface.
- * @property {string} href The full url string.
- * @property {string} protocol The url's protocol (if defined).
- * @property {string} username The username used (if defined).
- * @property {string} password The password used (if defined).
- * @property {string} host The url's host.
- * @property {string} hostname The url's hostname.
- * @property {string} pathname The url's pathname.
- * @property {string} port The url's port (if defined).
- * @property {string} search The url's query params.
- * @property {string} hash The url's hash.
- *
- * @param {string} path The url to handle.
- * @param {string} [baseUrl] The optional base url.
  */
 export class Url {
+    /**
+     * Create a Url instance.
+     * @param {string} path The url to handle.
+     * @param {string} [baseUrl] The optional base url.
+     */
     constructor(path, baseUrl) {
-        if (baseUrl) {
-            this.href = resolve(baseUrl, path);
-        } else {
-            this.href = path;
-        }
+        /**
+         * The url's protocol (if defined).
+         * @type {string|undefined}
+         */
+        this.protocol = undefined;
+        /**
+         * The username used (if defined).
+         * @type {string|undefined}
+         */
+        this.username = undefined;
+        /**
+         * The password used (if defined).
+         * @type {string|undefined}
+         */
+        this.password = undefined;
+        /**
+         * The url's host.
+         * @type {string|undefined}
+         */
+        this.host = undefined;
+        /**
+         * The url's hostname.
+         * @type {string|undefined}
+         */
+        this.hostname = undefined;
+        /**
+         * The url's pathname.
+         * @type {string|undefined}
+         */
+        this.pathname = undefined;
+        /**
+         * The url's port (if defined).
+         * @type {string|undefined}
+         */
+        this.port = undefined;
+        /**
+         * The url's query params.
+         * @type {string|undefined}
+         */
+        this.search = undefined;
+        /** The url's hash.
+         * @type {string|undefined}
+         */
+        this.hash = undefined;
+        /**
+         * The full url string.
+         * @type {string}
+        */
+        this.href = baseUrl ? resolve(baseUrl, path) : path;
+        /**
+         * The url query string interface.
+         * @type {SearchParams}
+         */
         this.searchParams = new SearchParams(this);
     }
 
@@ -433,7 +454,6 @@ export class Url {
 
     /**
      * Join current Url with paths.
-     * @memberof Url.Url
      *
      * @param {...string} paths A list of paths to join.
      * @return {Url} A new url instance.
@@ -444,7 +464,6 @@ export class Url {
 
     /**
      * Resolve a path relative to the current Url.
-     * @memberof Url.Url
      *
      * @param {string} path The relative path.
      * @return {Url} A new url instance.
@@ -455,7 +474,6 @@ export class Url {
 
     /**
      * Check if current Url is absolute.
-     * @memberof Url.Url
      *
      * @return {Boolean}
      */
@@ -465,7 +483,6 @@ export class Url {
 
     /**
      * Check if current Url is a data url.
-     * @memberof Url.Url
      *
      * @return {Boolean}
      */
@@ -475,7 +492,6 @@ export class Url {
 
     /**
      * Check if current Url points to local file.
-     * @memberof Url.Url
      *
      * @return {Boolean}
      */

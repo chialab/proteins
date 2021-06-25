@@ -10,16 +10,23 @@
     "require": "./dist/cjs/proteins.cjs",
     "default": "./dist/esm/proteins.js"
   },
+  "files": [
+    "dist",
+    "types",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
     "build": "npm run types && rimraf dist && npm run build:esm && npm run build:cjs",
     "build:esm": "rimraf dist/esm && rna build src/index.js --format esm --output dist/esm/proteins.js",
     "build:cjs": "rimraf dist/cjs && rna build src/index.js --format cjs --output dist/cjs/proteins.cjs",
-    "types": "rimraf types && tsc -p config/tsconfig.json",
+    "types": "rimraf types && tsc --declaration --emitDeclarationOnly --declarationDir 'types' --incremental false",
     "test": "npm run test:browser && npm run test:node",
     "test:browser": "rna test:browser 'test/*.js' --coverage",
     "test:saucelabs": "rna test:saucelabs 'test/*.js' --coverage --concurrency 2",
     "test:node": "rna test:node 'test/*.js' --coverage",
     "lint": "eslint src --cache",
+    "typecheck": "tsc --noEmit",
     "docs": "(echo \"# API Reference\n\"; rna apidoc src/index.ts -F markdown) > docs/API.md",
     "prepack": "npm run build"
   },
