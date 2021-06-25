@@ -1,6 +1,6 @@
 {
   "name": "@chialab/proteins",
-  "version": "0.0.0-development",
+  "version": "3.4.0",
   "type": "module",
   "description": "A primer for JavaScript libraries and frameworks development.",
   "main": "dist/cjs/proteins.cjs",
@@ -45,24 +45,6 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/chialab/proteins/issues"
-  },
-  "release": {
-    "branches": [
-      "main"
-    ],
-    "plugins": [
-      ["@semantic-release/commit-analyzer", {
-        "preset": "angular",
-        "releaseRules": [
-          { "type": "fix", "release": "patch" },
-          { "type": "style", "release": "patch" },
-          { "type": "refactor", "release": "minor" },
-          { "type": "feat", "release": "minor" }
-        ]
-      }],
-      "@semantic-release/npm",
-      "@semantic-release/github"
-    ]
   },
   "homepage": "https://chialab.io/p/proteins",
   "devDependencies": {
