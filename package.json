@@ -1,6 +1,6 @@
 {
   "name": "@chialab/proteins",
-  "version": "3.3.3",
+  "version": "0.0.0-development",
   "type": "module",
   "description": "A primer for JavaScript libraries and frameworks development.",
   "main": "dist/cjs/proteins.cjs",
@@ -28,11 +28,12 @@
     "lint": "eslint src --cache",
     "typecheck": "tsc --noEmit",
     "docs": "(echo \"# API Reference\n\"; rna apidoc src/index.ts -F markdown) > docs/API.md",
-    "prepack": "npm run build"
+    "prepack": "npm run build",
+    "release": "semantic-release"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:chialab/proteins.git"
+    "url": "https://github.com/chialab/proteins"
   },
   "keywords": [
     "proteins",
@@ -44,6 +45,16 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/chialab/proteins/issues"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/npm",
+      "@semantic-release/github"
+    ]
   },
   "homepage": "https://chialab.io/p/proteins",
   "devDependencies": {
@@ -58,6 +69,7 @@
     "chai": "^4.1.2",
     "eslint": "^7.24.0",
     "rimraf": "^3.0.2",
+    "semantic-release": "^17.4.4",
     "typescript": "^4.2.4"
   }
 }
