@@ -29,7 +29,7 @@
     [
       "@semantic-release/git",
       {
-        "assets": ["dist/**/*", "docs", "types", "package.json"],
+        "assets": ["dist", "public", "docs", "types", "package.json"],
         "message": "release: ${nextRelease.version}"
       }
     ],
