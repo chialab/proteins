@@ -1,21 +1,18 @@
-/* eslint-env mocha */
-import Symbolic from '../src/symbolic.js';
-import chai from 'chai/chai';
-
-const { assert } = chai;
+import { assert } from '@esm-bundle/chai/esm/chai.js';
+import { Symbolic } from '@chialab/proteins';
 
 describe('Unit: Symbolic', () => {
     it('should set a symbolic property', () => {
         const AGE = Symbolic('age');
-        let user = {
+        const user = {
             firstName: 'Alan',
             lastName: 'Turing',
         };
 
         user[AGE] = 29;
 
-        let enumKeys = [];
-        for (let k in user) {
+        const enumKeys = [];
+        for (const k in user) {
             enumKeys.push(k);
         }
 
@@ -24,6 +21,6 @@ describe('Unit: Symbolic', () => {
         assert.equal(user[AGE], 29);
         assert.equal(Object.keys(user).length, 2);
         assert.equal(enumKeys.length, 2);
-        assert(!Object.hasOwnProperty('age'));
+        assert(!Object.prototype.hasOwnProperty.call(Object, 'age'));
     });
 });

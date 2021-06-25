@@ -1,13 +1,16 @@
-/* eslint-env mocha */
-import merge from '../src/merge.js';
-import { isUndefined, isDate } from '../src/types.js';
-import { getDescriptors } from '../src/_helpers.js';
-import chai from 'chai/chai';
+import { assert } from '@esm-bundle/chai/esm/chai.js';
+import { merge, isUndefined, isDate } from '@chialab/proteins';
 
-const { assert } = chai;
+function getDescriptors(obj) {
+    return Object.getOwnPropertyNames(obj)
+        .reduce((acc, propName) => {
+            acc[propName] = Object.getOwnPropertyDescriptor(obj, propName);
+            return acc;
+        }, {});
+}
 
 describe('Unit: Merge', () => {
-    let obj1 = {
+    const obj1 = {
         firstName: 'Alan',
         lastName: 'Turing',
         birthday: new Date('1912/06/23'),
@@ -24,7 +27,7 @@ describe('Unit: Merge', () => {
         },
     };
 
-    let obj2 = {
+    const obj2 = {
         lastName: 'Rickman',
         birthday: new Date('1946/02/21'),
         enemies: [
@@ -43,7 +46,7 @@ describe('Unit: Merge', () => {
     };
 
     it('should merge two objects', () => {
-        let hybrid = merge(obj1, obj2);
+        const hybrid = merge(obj1, obj2);
         assert.equal(hybrid.firstName, 'Alan');
         assert.equal(hybrid.lastName, 'Rickman');
         assert.equal(hybrid.birthday.getTime(), new Date('1946/02/21').getTime());
@@ -73,11 +76,8 @@ describe('Unit: Merge', () => {
             get() {
                 return 'customProp_value';
             },
-            set(value) {
-                return value;
-            },
         });
-        let merged = merge(test, test2);
+        const merged = merge(test, test2);
         assert.equal(merged['prop1'], 1);
         assert.deepEqual(merged['prop2'], {
             array_prop: [4, 5],
@@ -89,7 +89,7 @@ describe('Unit: Merge', () => {
     });
 
     it('should merge two objects in strict mode', () => {
-        let hybrid = merge.config({ strictMerge: true })(obj1, obj2);
+        const hybrid = merge.config({ strictMerge: true })(obj1, obj2);
         assert.equal(hybrid.firstName, 'Alan');
         assert.equal(hybrid.lastName, 'Rickman');
         assert.equal(hybrid.birthday.getTime(), new Date('1946/02/21').getTime());
@@ -102,7 +102,7 @@ describe('Unit: Merge', () => {
     });
 
     it('should merge two objects (joinArrays)', () => {
-        let hybrid = merge.config({ joinArrays: true })(obj1, obj2);
+        const hybrid = merge.config({ joinArrays: true })(obj1, obj2);
         assert.equal(hybrid.firstName, 'Alan');
         assert.equal(hybrid.lastName, 'Rickman');
         assert.equal(hybrid.birthday.getTime(), new Date('1946/02/21').getTime());
@@ -115,24 +115,24 @@ describe('Unit: Merge', () => {
         assert.equal(hybrid.awards.special.getTime(), new Date('2017/01/02').getTime());
     });
 
-    let array1 = [
+    const array1 = [
         'value_1_1',
         'value_1_2',
     ];
-    let array2 = [
+    const array2 = [
         'value_2_1',
         'value_2_2',
     ];
-    array2.customProp = 'customProp_value';
-    Object.defineProperty(array2, 'customProp2', {
-        get() {
-            return 'customProp2_value';
-        },
-        set(value) {
-            return value;
-        },
+
+    before(() => {
+        array2.customProp = 'customProp_value';
+        Object.defineProperty(array2, 'customProp2', {
+            get() {
+                return 'customProp2_value';
+            },
+        });
+        array2.customProp3 = { test: 1 };
     });
-    array2.customProp3 = { test: 1 };
 
     it('should merge two arrays with custom properties', () => {
         // Values of array1 will be overwritten by those of array2 because their keys match.
@@ -141,9 +141,6 @@ describe('Unit: Merge', () => {
         Object.defineProperty(expected, 'customProp2', {
             get() {
                 return 'customProp2_value';
-            },
-            set(value) {
-                return value;
             },
         });
         expected.customProp3 = { test: 1 };
@@ -164,9 +161,6 @@ describe('Unit: Merge', () => {
         Object.defineProperty(expected, 'customProp2', {
             get() {
                 return 'customProp2_value';
-            },
-            set(value) {
-                return value;
             },
         });
 

@@ -35,7 +35,7 @@ export default function clone(obj, callback = noop, useStrict = false, cache = n
         cache.set(obj, res);
         const newDescriptors = getDescriptors(res);
         const descriptors = getDescriptors(obj);
-        for (let key in descriptors) {
+        for (const key in descriptors) {
             const descriptor = descriptors[key];
             if (newDescriptors[key] && !newDescriptors[key].configurable) {
                 continue;

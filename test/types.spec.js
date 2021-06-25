@@ -1,8 +1,5 @@
-/* eslint-env mocha */
-import { isObject, isDate, isNumber, isString, isBoolean, isFunction, isUndefined, isFalsy } from '../src/types.js';
-import chai from 'chai/chai';
-
-const { assert } = chai;
+import { assert } from '@esm-bundle/chai/esm/chai.js';
+import { isObject, isDate, isNumber, isString, isBoolean, isFunction, isUndefined, isFalsy } from '@chialab/proteins';
 
 describe('Unit: Types', () => {
     it('should recognize Object instances', () => {

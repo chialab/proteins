@@ -51,7 +51,7 @@ export class MixinScope {
     has(mixin) {
         let Class = this.superClass;
         while (Class && Class !== Object) {
-            let attached = Class[MIXINS_SYM] || [];
+            const attached = Class[MIXINS_SYM] || [];
             if (attached.indexOf(mixin) !== -1) {
                 return true;
             }

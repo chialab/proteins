@@ -1,44 +1,36 @@
-/* eslint-env mocha */
-import {
-    Url,
-    resolve,
-    serialize,
-    unserialize,
-} from '../src/url.js';
-import chai from 'chai/chai';
-
-const { assert } = chai;
+import { assert } from '@esm-bundle/chai/esm/chai.js';
+import { Url } from '@chialab/proteins';
 
 describe('Unit: Url', () => {
     it('should check url validity', () => {
-        assert.doesNotThrow(() => new Url('local.host'));
-        assert.doesNotThrow(() => new Url('local.host:80'));
-        assert.doesNotThrow(() => new Url('//local.host'));
-        assert.doesNotThrow(() => new Url('//local.host:80'));
-        assert.doesNotThrow(() => new Url('http://localhost/'));
-        assert.doesNotThrow(() => new Url('http://localhost:80'));
-        assert.doesNotThrow(() => new Url('127.0.0.1'));
-        assert.doesNotThrow(() => new Url('127.0.0.1:8080'));
-        assert.doesNotThrow(() => new Url('/posts'));
-        assert.doesNotThrow(() => new Url('/posts?size=50'));
-        assert.doesNotThrow(() => new Url('/posts?size=50&help'));
-        assert.doesNotThrow(() => new Url('/posts?size=50/help'));
-        assert.doesNotThrow(() => new Url('file:///'));
-        assert.doesNotThrow(() => new Url('[::1]'), '[::1]');
-        assert.doesNotThrow(() => new Url('[::1]:8080'), '[::1]:8080');
-        assert.doesNotThrow(() => new Url('http://[2a00:1450:4002:809::200e]'));
-        assert.doesNotThrow(() => new Url('https://user:pass@[::1]:443/path?query#id'));
-        assert.throws(() => new Url('http://'), SyntaxError);
-        assert.throws(() => new Url(':80'), SyntaxError);
-        assert.throws(() => new Url('http:///'), SyntaxError);
-        assert.throws(() => new Url('http://:80'), SyntaxError);
-        assert.throws(() => new Url('?size=50'), SyntaxError);
-        assert.throws(() => new Url('?size=50/help'), SyntaxError);
+        assert.doesNotThrow(() => new Url.Url('local.host'));
+        assert.doesNotThrow(() => new Url.Url('local.host:80'));
+        assert.doesNotThrow(() => new Url.Url('//local.host'));
+        assert.doesNotThrow(() => new Url.Url('//local.host:80'));
+        assert.doesNotThrow(() => new Url.Url('http://localhost/'));
+        assert.doesNotThrow(() => new Url.Url('http://localhost:80'));
+        assert.doesNotThrow(() => new Url.Url('127.0.0.1'));
+        assert.doesNotThrow(() => new Url.Url('127.0.0.1:8080'));
+        assert.doesNotThrow(() => new Url.Url('/posts'));
+        assert.doesNotThrow(() => new Url.Url('/posts?size=50'));
+        assert.doesNotThrow(() => new Url.Url('/posts?size=50&help'));
+        assert.doesNotThrow(() => new Url.Url('/posts?size=50/help'));
+        assert.doesNotThrow(() => new Url.Url('file:///'));
+        assert.doesNotThrow(() => new Url.Url('[::1]'), '[::1]');
+        assert.doesNotThrow(() => new Url.Url('[::1]:8080'), '[::1]:8080');
+        assert.doesNotThrow(() => new Url.Url('http://[2a00:1450:4002:809::200e]'));
+        assert.doesNotThrow(() => new Url.Url('https://user:pass@[::1]:443/path?query#id'));
+        assert.throws(() => new Url.Url('http://'), SyntaxError);
+        assert.throws(() => new Url.Url(':80'), SyntaxError);
+        assert.throws(() => new Url.Url('http:///'), SyntaxError);
+        assert.throws(() => new Url.Url('http://:80'), SyntaxError);
+        assert.throws(() => new Url.Url('?size=50'), SyntaxError);
+        assert.throws(() => new Url.Url('?size=50/help'), SyntaxError);
         // unhandled yet
     });
 
     it('should get information on a base url', () => {
-        let url = new Url('http://www.chialab.it:80/posts?size=10');
+        const url = new Url.Url('http://www.chialab.it:80/posts?size=10');
 
         assert.equal(url.href, 'http://www.chialab.it:80/posts?size=10');
         assert.equal(url.protocol, 'http:');
@@ -48,22 +40,22 @@ describe('Unit: Url', () => {
         assert.equal(url.search, '?size=10');
         assert.equal(url.origin, 'http://www.chialab.it:80');
 
-        assert(new Url('http://www.chialab.it:80').isAbsoluteUrl());
-        assert(new Url('mailto:test@test.com').isAbsoluteUrl());
-        assert(new Url('tel:5555').isAbsoluteUrl());
-        assert(!new Url('http://www.chialab.it:80').isDataUrl());
-        assert(!new Url('http://www.chialab.it:80').isLocalUrl());
-        assert(!new Url('/posts').isAbsoluteUrl());
-        assert(!new Url('/posts').isDataUrl());
-        assert(!new Url('/posts').isLocalUrl());
-        assert(new Url('file:///').isAbsoluteUrl());
-        assert(!new Url('file:///').isDataUrl());
-        assert(new Url('file:///').isLocalUrl());
+        assert(new Url.Url('http://www.chialab.it:80').isAbsoluteUrl());
+        assert(new Url.Url('mailto:test@test.com').isAbsoluteUrl());
+        assert(new Url.Url('tel:5555').isAbsoluteUrl());
+        assert(!new Url.Url('http://www.chialab.it:80').isDataUrl());
+        assert(!new Url.Url('http://www.chialab.it:80').isLocalUrl());
+        assert(!new Url.Url('/posts').isAbsoluteUrl());
+        assert(!new Url.Url('/posts').isDataUrl());
+        assert(!new Url.Url('/posts').isLocalUrl());
+        assert(new Url.Url('file:///').isAbsoluteUrl());
+        assert(!new Url.Url('file:///').isDataUrl());
+        assert(new Url.Url('file:///').isLocalUrl());
     });
 
     it('should exec operations on search path', () => {
-        let url = new Url('http://www.chialab.it:80/posts?size=10');
-        let searchParams = url.searchParams;
+        const url = new Url.Url('http://www.chialab.it:80/posts?size=10');
+        const searchParams = url.searchParams;
 
         assert.equal(searchParams.entries().length, 1);
         assert.equal(searchParams.get('size'), '10');
@@ -99,30 +91,30 @@ describe('Unit: Url', () => {
     });
 
     it('should resolve locations', () => {
-        let url = new Url('/posts', 'chialab.it');
+        const url = new Url.Url('/posts', 'chialab.it');
 
         assert.equal(url.href, 'chialab.it/posts');
 
-        let url2 = url.join('2', 'info');
+        const url2 = url.join('2', 'info');
         assert.equal(url2.href, 'chialab.it/posts/2/info');
 
-        let url3 = url2.resolve('../3/info');
+        const url3 = url2.resolve('../3/info');
         assert.equal(url3.href, 'chialab.it/posts/3/info');
 
-        let url4 = url3.resolve('./edit');
+        const url4 = url3.resolve('./edit');
         assert.equal(url4.href, 'chialab.it/posts/3/edit');
 
-        let url5 = resolve('https://example.com/index.html', '/callback.html');
+        const url5 = Url.resolve('https://example.com/index.html', '/callback.html');
         assert.equal(url5, 'https://example.com/callback.html');
 
-        let url6 = resolve('https://example.com/index.html', 'callback.html');
+        const url6 = Url.resolve('https://example.com/index.html', 'callback.html');
         assert.equal(url6, 'https://example.com/callback.html');
 
-        assert.throws(() => new Url('/posts').resolve('/article'), Error);
+        assert.throws(() => new Url.Url('/posts').resolve('/article'), Error);
     });
 
     it('should serialize objects', () => {
-        let person = {
+        const person = {
             firstName: 'Alan',
             age: 21,
             birthday: new Date('1912-06-11T22:00:00.000Z'),
@@ -131,8 +123,8 @@ describe('Unit: Url', () => {
                 jobs: {},
             },
         };
-        let serialized = serialize(person);
-        let unserialized = unserialize(serialized);
+        const serialized = Url.serialize(person);
+        const unserialized = Url.unserialize(serialized);
 
         assert.equal(serialized, `firstName=Alan&age=21&birthday=${encodeURIComponent('1912-06-11T22:00:00.000Z')}&${encodeURIComponent('filter[tags][0]')}=math&${encodeURIComponent('filter[jobs]')}`);
         assert.equal(person.firstName, unserialized.firstName);
@@ -141,8 +133,8 @@ describe('Unit: Url', () => {
     });
 
     it('should unserialize complex string', () => {
-        let serialized = 'filter[name]=Alan&filter[geo][latitude]=41&filter[type]=person&size=1&filter[tags][]=math';
-        let unserialized = unserialize(serialized);
+        const serialized = 'filter[name]=Alan&filter[geo][latitude]=41&filter[type]=person&size=1&filter[tags][]=math';
+        const unserialized = Url.unserialize(serialized);
         assert.deepEqual(unserialized, {
             filter: {
                 name: 'Alan',

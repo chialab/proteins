@@ -22,7 +22,7 @@ export function getDescriptors(obj) {
  * @return {Object} New descriptor.
  */
 export function buildDescriptor(descriptor, val, writable = true) {
-    let newDescriptor = {
+    const newDescriptor = {
         configurable: true,
         enumerable: descriptor.enumerable,
     };

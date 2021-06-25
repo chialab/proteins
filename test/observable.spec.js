@@ -1,22 +1,21 @@
-/* eslint-env mocha */
-import Observable from '../src/observable.js';
-import Symbolic from '../src/symbolic.js';
-import chai from 'chai/chai';
-import { isArray } from '../src/types.js';
-
-const { assert } = chai;
+import { assert } from '@esm-bundle/chai/esm/chai.js';
+import { Observable, Symbolic, isArray } from '@chialab/proteins';
 
 describe('Unit: Observable', () => {
     describe('simple object', () => {
-        let changes = [];
-        let observable = new Observable({
-            firstName: 'Alan',
-            lastName: 'Turing',
-            birthday: new Date('1912/06/23'),
-        });
+        let observable;
+        const changes = [];
 
-        observable.on('change', (changset) => {
-            changes.push(changset);
+        before(() => {
+            observable = new Observable({
+                firstName: 'Alan',
+                lastName: 'Turing',
+                birthday: new Date('1912/06/23'),
+            });
+
+            observable.on('change', (changset) => {
+                changes.push(changset);
+            });
         });
 
         it('should not trigger changes if object is not changed', () => {
@@ -28,7 +27,7 @@ describe('Unit: Observable', () => {
         it('should trigger changes if object has been updated', () => {
             observable.lastName = 'Skywalker';
 
-            let change = changes[0];
+            const change = changes[0];
             assert.equal(change.value, 'Skywalker');
             assert.equal(change.oldValue, 'Turing');
         });
@@ -41,7 +40,7 @@ describe('Unit: Observable', () => {
         // without defining a value for `enumerable` while using `Object.defineProperty`
         // in `ProxyHelper`, IE can't recognize object properties and is not be able to JSON.stringify the object.
         it('should correctly proxy an object', () => {
-            let dreamTheater = {
+            const dreamTheater = {
                 members: {
                     guitar: 'John Petrucci',
                     bass: 'John Myung',
@@ -50,12 +49,12 @@ describe('Unit: Observable', () => {
                     vocals: 'James LaBrie',
                 },
             };
-            let observableDreamTheater = new Observable(dreamTheater);
+            const observableDreamTheater = new Observable(dreamTheater);
             assert.deepEqual(JSON.stringify(dreamTheater), JSON.stringify(observableDreamTheater));
         });
 
         it('should correctly proxy an object with an array property', () => {
-            let bucciaratiCrew = {
+            const bucciaratiCrew = {
                 members: [
                     'Bruno Bucciarati',
                     'Giorno Giovanna',
@@ -74,22 +73,26 @@ describe('Unit: Observable', () => {
                 ],
             };
 
-            let observable = new Observable(bucciaratiCrew);
+            const observable = new Observable(bucciaratiCrew);
             assert(isArray(observable.members));
             assert(isArray(observable.stands));
         });
     });
 
     describe('simple Array', () => {
-        let changes = [];
-        let observable = new Observable([
-            'Luke',
-            'Anakin',
-            'Padme',
-        ]);
+        const changes = [];
+        let observable;
 
-        observable.on('change', (changset) => {
-            changes.push(changset);
+        before(() => {
+            observable = new Observable([
+                'Luke',
+                'Anakin',
+                'Padme',
+            ]);
+
+            observable.on('change', (changset) => {
+                changes.push(changset);
+            });
         });
 
         it('should not trigger changes if object is not changed', () => {
@@ -102,7 +105,7 @@ describe('Unit: Observable', () => {
         it('should trigger changes if object has been updated', () => {
             observable[1] = 'Darth Vader';
 
-            let change = changes[0];
+            const change = changes[0];
             assert.equal(change.value, 'Darth Vader');
             assert.equal(change.oldValue, 'Anakin');
         });
@@ -136,28 +139,32 @@ describe('Unit: Observable', () => {
     });
 
     describe('complex objects', () => {
-        let changes1 = [];
-        let changes2 = [];
-        let observable = new Observable({
-            prop1: 1,
-            prop2: ['a', 'b'],
-            prop3: {
-                prop3_1: 1,
-                prop3_2: ['c', 'd'],
-            },
-            prop4: [
-                { prop4_1: 1 },
-                { prop4_2: [] },
-            ],
-        });
-        let observable2 = new Observable(observable);
+        const changes1 = [];
+        const changes2 = [];
+        let observable, observable2;
 
-        observable.on('change', (changset) => {
-            changes1.push(changset);
-        });
+        before(() => {
+            observable = new Observable({
+                prop1: 1,
+                prop2: ['a', 'b'],
+                prop3: {
+                    prop3_1: 1,
+                    prop3_2: ['c', 'd'],
+                },
+                prop4: [
+                    { prop4_1: 1 },
+                    { prop4_2: [] },
+                ],
+            });
+            observable2 = new Observable(observable);
 
-        observable2.on('change', (changset) => {
-            changes2.push(changset);
+            observable.on('change', (changset) => {
+                changes1.push(changset);
+            });
+
+            observable2.on('change', (changset) => {
+                changes2.push(changset);
+            });
         });
 
         it('should trigger changes', () => {
@@ -176,7 +183,7 @@ describe('Unit: Observable', () => {
         });
 
         it('should compute property name', () => {
-            let paths = changes1.map((change) => change.property);
+            const paths = changes1.map((change) => change.property);
             assert.deepEqual(paths, [
                 'prop1',
                 'prop2.2',
@@ -190,18 +197,18 @@ describe('Unit: Observable', () => {
     });
 
     describe('symbolic keys', () => {
-        let changes = [];
-        let sym = Symbolic('tags');
-        let observable = new Observable({
-            name: 'Alan',
-            [sym]: ['math'],
-        });
-
-        observable.on('change', (changset) => {
-            changes.push(changset);
-        });
-
         it('should be ignored', () => {
+            const changes = [];
+            const sym = Symbolic('tags');
+            const observable = new Observable({
+                name: 'Alan',
+                [sym]: ['math'],
+            });
+
+            observable.on('change', (changset) => {
+                changes.push(changset);
+            });
+
             observable[sym] = [];
             observable.name = 'Steve';
             assert.equal(changes.length, 1);
@@ -227,7 +234,7 @@ describe('Unit: Observable', () => {
     describe('Observable object with thousands of instances', () => {
         it('should not crash in Firefox', () => {
             assert.doesNotThrow(() => {
-                let obj = [[], [], [], [], [], [], [], [], []];
+                const obj = [[], [], [], [], [], [], [], [], []];
                 let obs = new Observable(obj);
                 for (let i = 0; i < 3000; i++) {
                     obs = new Observable(obs);
@@ -237,12 +244,12 @@ describe('Unit: Observable', () => {
     });
 
     describe('Reobserve object when adding properties', () => {
-        const observable = new Observable({ foo: 'foo' });
-        const changes = [];
-        observable.on('change', changeset => {
-            changes.push(changeset);
-        });
         it('should trigger changes', () => {
+            const observable = new Observable({ foo: 'foo' });
+            const changes = [];
+            observable.on('change', changeset => {
+                changes.push(changeset);
+            });
             observable.bar = 'bar';
             observable.baz = 'baz';
             Observable.reobserve(observable);

@@ -33,12 +33,12 @@ export function walk(Ctr, callback) {
  * @return {Object}
  */
 export function entries(Ctr, filter = () => true) {
-    let res = {};
+    const res = {};
     walk(Ctr, (proto) => {
         Object.getOwnPropertyNames(proto)
             .forEach((key) => {
                 if (!hasOwnProperty(res, key)) {
-                    let descriptor = getOwnPropertyDescriptor(proto, key);
+                    const descriptor = getOwnPropertyDescriptor(proto, key);
                     if (filter(key, descriptor)) {
                         res[key] = descriptor;
                     }
@@ -78,9 +78,9 @@ export function properties(Ctr) {
  * @return {Array<Object>}
  */
 export function reduce(Ctr, property) {
-    let res = [];
+    const res = [];
     walk(Ctr, (proto) => {
-        let descriptor = getOwnPropertyDescriptor(proto, property);
+        const descriptor = getOwnPropertyDescriptor(proto, property);
         if (descriptor) {
             res.push(descriptor);
         }

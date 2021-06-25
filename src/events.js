@@ -17,8 +17,8 @@ export function on(scope, name, callback) {
         throw new TypeError('callback is not a function');
     }
     scope[SYM] = scope[SYM] || {};
-    let callbacks = scope[SYM];
-    let evtCallbacks = callbacks[name] = callbacks[name] || [];
+    const callbacks = scope[SYM];
+    const evtCallbacks = callbacks[name] = callbacks[name] || [];
     evtCallbacks.push(callback);
     return off.bind(null, scope, name, callback);
 }
@@ -32,16 +32,16 @@ export function on(scope, name, callback) {
  */
 export function off(scope, name, callback) {
     if (callback) {
-        let callbacks = scope[SYM];
+        const callbacks = scope[SYM];
         if (callbacks) {
-            let evtCallbacks = callbacks[name] = callbacks[name] || [];
-            let io = evtCallbacks.indexOf(callback);
+            const evtCallbacks = callbacks[name] = callbacks[name] || [];
+            const io = evtCallbacks.indexOf(callback);
             if (io !== -1) {
                 evtCallbacks.splice(io, 1);
             }
         }
     } else if (name) {
-        let callbacks = scope[SYM];
+        const callbacks = scope[SYM];
         if (callbacks) {
             delete callbacks[name];
         }
@@ -60,14 +60,14 @@ export function off(scope, name, callback) {
  */
 export function trigger(scope, name, ...args) {
     const callbacksList = (has(scope, SYM) && has(scope[SYM], name) && scope[SYM][name]) || [];
-    let finalResults = callbacksList
+    const finalResults = callbacksList
         .slice(0)
         .reduce((results, callback) => {
             if (callbacksList.indexOf(callback) === -1) {
                 // the callback has been removed from the callback list.
                 return results;
             }
-            let lastResult = results[results.length - 1];
+            const lastResult = results[results.length - 1];
             let result;
             if (lastResult instanceof Promise) {
                 // wait for the previous result.

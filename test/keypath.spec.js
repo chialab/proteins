@@ -1,4 +1,5 @@
-/* eslint-env mocha */
+import { assert } from '@esm-bundle/chai/esm/chai.js';
+import { isObject, isArray, keypath } from '@chialab/proteins';
 
 /**
  * Here we are using some tests from https://github.com/mariocasciaro/object-path
@@ -6,15 +7,6 @@
  * we want to mantain compatibility for those methods
  * which achive the same result.
  */
-
-import * as keypath from '../src/keypath.js';
-import {
-    isObject,
-    isArray,
-} from '../src/types.js';
-import chai from 'chai/chai';
-
-const { assert } = chai;
 
 function getTestObj() {
     return {
@@ -33,7 +25,7 @@ function getTestObj() {
 describe('Unit: Keypath', () => {
     describe('get', () => {
         it('should return the value using unicode key', () => {
-            let obj = {
+            const obj = {
                 '15\u00f8C': {
                     '3\u0111': 1,
                 },
@@ -43,7 +35,7 @@ describe('Unit: Keypath', () => {
         });
 
         it('should return the value using dot in key', () => {
-            let obj = {
+            const obj = {
                 'a.b': {
                     'looks.like': 1,
                 },
@@ -53,49 +45,49 @@ describe('Unit: Keypath', () => {
         });
 
         it('should return the value under shallow object', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
             assert.equal(keypath.get(obj, 'a'), 'b');
             assert.equal(keypath.get(obj, ['a']), 'b');
         });
 
         it('should work with number path', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
             assert.equal(keypath.get(obj.b.d, 0), 'a');
             assert.equal(keypath.get(obj.b, 0), null);
         });
 
         it('should return the value under deep object', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
             assert.equal(keypath.get(obj, 'b.f'), 'i');
             assert.equal(keypath.get(obj, ['b', 'f']), 'i');
         });
 
         it('should return the value under array', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
             assert.equal(keypath.get(obj, 'b.d.0'), 'a');
             assert.equal(keypath.get(obj, ['b', 'd', 0]), 'a');
         });
 
         it('should return the value under array deep', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
             assert.equal(keypath.get(obj, 'b.e.1.f'), 'g');
             assert.equal(keypath.get(obj, ['b', 'e', 1, 'f']), 'g');
         });
 
         it('should return undefined for missing values under object', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
             assert.equal(keypath.get(obj, 'a.b'), undefined);
             assert.equal(keypath.get(obj, ['a', 'b']), undefined);
         });
 
         it('should return undefined for missing values under array', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
             assert.equal(keypath.get(obj, 'b.d.5'), undefined);
             assert.equal(keypath.get(obj, ['b', 'd', '5']), undefined);
         });
 
         it('should return the value under integer-like key', () => {
-            let obj = {
+            const obj = {
                 '1a': 'foo',
             };
             assert.equal(keypath.get(obj, '1a'), 'foo');
@@ -103,7 +95,7 @@ describe('Unit: Keypath', () => {
         });
 
         it('should return default value passed for missing values under object', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
             assert.isFalse(keypath.get(obj, 'a.b', false));
             assert.isTrue(keypath.get(obj, 'a.b', true));
             assert.isNull(keypath.get(obj, 'a.b', null));
@@ -122,7 +114,7 @@ describe('Unit: Keypath', () => {
 
     describe('set', () => {
         it('should set the value using unicode key', () => {
-            let obj = {
+            const obj = {
                 '15\u00f8C': {
                     '3\u0111': 1,
                 },
@@ -134,7 +126,7 @@ describe('Unit: Keypath', () => {
         });
 
         it('should set the value using dot in key', () => {
-            let obj = {
+            const obj = {
                 'a.b': {
                     'looks.like': 1,
                 },
@@ -157,7 +149,7 @@ describe('Unit: Keypath', () => {
         });
 
         it('should set value using number path', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
             keypath.set(obj.b.d, 0, 'o');
             assert.equal(obj.b.d[0], 'o');
         });
@@ -251,23 +243,23 @@ describe('Unit: Keypath', () => {
 
     describe('del', () => {
         it('should work with number path', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
             keypath.del(obj.b.d, 1);
             assert.deepEqual(obj.b.d, ['a']);
         });
 
         it('should remove null and undefined props (but not explode on nested)', () => {
-            let obj = {
+            const obj = {
                 nullProp: null,
                 undefinedProp: undefined,
             };
-            assert(obj.hasOwnProperty('nullProp'));
-            assert(obj.hasOwnProperty('undefinedProp'));
+            assert(Object.prototype.hasOwnProperty.call(obj, 'nullProp'));
+            assert(Object.prototype.hasOwnProperty.call(obj, 'undefinedProp'));
 
             keypath.del(obj, 'nullProp.foo');
             keypath.del(obj, 'undefinedProp.bar');
-            assert(obj.hasOwnProperty('nullProp'));
-            assert(obj.hasOwnProperty('undefinedProp'));
+            assert(Object.prototype.hasOwnProperty.call(obj, 'nullProp'));
+            assert(Object.prototype.hasOwnProperty.call(obj, 'undefinedProp'));
             assert.deepEqual(obj, {
                 nullProp: null,
                 undefinedProp: undefined,
@@ -275,13 +267,13 @@ describe('Unit: Keypath', () => {
 
             keypath.del(obj, 'nullProp');
             keypath.del(obj, 'undefinedProp');
-            assert(!obj.hasOwnProperty('nullProp'));
-            assert(!obj.hasOwnProperty('undefinedProp'));
+            assert(!Object.prototype.hasOwnProperty.call(obj, 'nullProp'));
+            assert(!Object.prototype.hasOwnProperty.call(obj, 'undefinedProp'));
             assert.deepEqual(obj, {});
         });
 
         it('should delete deep paths', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
 
             keypath.set(obj, 'b.g.1.0', 'test');
             keypath.set(obj, 'b.g.1.1', 'test');
@@ -295,15 +287,15 @@ describe('Unit: Keypath', () => {
             assert.equal(obj.b['\ubeef'], 'test');
 
             keypath.del(obj, 'b.h.az');
-            assert(!obj.b.h.hasOwnProperty('az'));
-            assert(obj.b.hasOwnProperty('h'));
+            assert(!Object.prototype.hasOwnProperty.call(obj.b.h, 'az'));
+            assert(Object.prototype.hasOwnProperty.call(obj.b, 'h'));
 
             keypath.del(obj, 'b.g.1.1');
             assert.equal(obj.b.g[1].length, 1);
             assert.equal(obj.b.g[1][0], 'test');
 
             keypath.del(obj, 'b.\ubeef');
-            assert(!obj.b.hasOwnProperty('\ubeef'));
+            assert(!Object.prototype.hasOwnProperty.call(obj.b, '\ubeef'));
 
             keypath.del(obj, ['b', 'dot.dot']);
             assert.equal(keypath.get(obj, ['b', 'dot.dot']), undefined);
@@ -312,14 +304,14 @@ describe('Unit: Keypath', () => {
             assert.equal(obj.b.g[1].length, 0);
 
             keypath.del(obj, ['b']);
-            assert(!obj.hasOwnProperty('b'));
+            assert(!Object.prototype.hasOwnProperty.call(obj, 'b'));
             assert.deepEqual(obj, {
                 a: 'b',
             });
         });
 
         it('should remove items from existing array', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
 
             keypath.del(obj, 'b.d.0');
             assert.equal(obj.b.d.length, 1);
@@ -337,7 +329,7 @@ describe('Unit: Keypath', () => {
         });
 
         it('should handle empty paths properly', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
             assert(!keypath.has(obj, ''));
             assert(!keypath.has(obj, ['']));
             obj[''] = 1;
@@ -346,7 +338,7 @@ describe('Unit: Keypath', () => {
         });
 
         it('should test under shallow object', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
             assert(keypath.has(obj, 'a'));
             assert(keypath.has(obj, ['a']));
             assert(!keypath.has(obj, 'z'));
@@ -354,7 +346,7 @@ describe('Unit: Keypath', () => {
         });
 
         it('should work with number path', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
             assert(keypath.has(obj.b.d, 0));
             assert(!keypath.has(obj.b, 0));
             assert(!keypath.has(obj.b.d, 10));
@@ -362,7 +354,7 @@ describe('Unit: Keypath', () => {
         });
 
         it('should test under deep object', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
             assert(keypath.has(obj, 'b.f'));
             assert(keypath.has(obj, ['b', 'f']));
             assert(!keypath.has(obj, 'b.g'));
@@ -370,7 +362,7 @@ describe('Unit: Keypath', () => {
         });
 
         it('should test value under array', () => {
-            let obj = {
+            const obj = {
                 b: ['a'],
             };
             obj.b[3] = {
@@ -384,13 +376,13 @@ describe('Unit: Keypath', () => {
         });
 
         it('should work with properties manually added to an array', () => {
-            let arr = [];
+            const arr = [];
             arr['property'] = 'new property';
             assert(keypath.has(arr, 'property'));
         });
 
         it('should test the value under array deep', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
             assert(keypath.has(obj, 'b.e.1.f'));
             assert(keypath.has(obj, ['b', 'e', 1, 'f']));
             assert(!keypath.has(obj, 'b.e.1.f.g.h.i'));
@@ -398,7 +390,7 @@ describe('Unit: Keypath', () => {
         });
 
         it('should test the value under integer-like key', () => {
-            let obj = {
+            const obj = {
                 '1a': 'foo',
             };
             assert(keypath.has(obj, '1a'));
@@ -406,7 +398,7 @@ describe('Unit: Keypath', () => {
         });
 
         it('should distinct nonexistent key and key = undefined', () => {
-            let obj = {};
+            const obj = {};
             assert(!keypath.has(obj, 'key'));
 
             obj.key = undefined;
@@ -414,7 +406,7 @@ describe('Unit: Keypath', () => {
         });
 
         it('should work with deep undefined/null values', () => {
-            let obj = {};
+            const obj = {};
             assert(!keypath.has(obj, 'missing.test'));
 
             obj.missing = null;
@@ -427,7 +419,7 @@ describe('Unit: Keypath', () => {
 
     describe('insert', () => {
         it('should push value to existing array using unicode key', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
             keypath.insert(obj, 'b.\u1290c', 'l');
             assert.equal(obj.b['\u1290c'][0], 'l');
             keypath.insert(obj, ['b', '\u1290c'], 'l');
@@ -435,7 +427,7 @@ describe('Unit: Keypath', () => {
         });
 
         it('should push value to existing array using dot key', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
             keypath.insert(obj, ['b', 'z.d'], 'l');
             assert.equal(keypath.get(obj, ['b', 'z.d', 0]), 'l');
         });
@@ -459,14 +451,14 @@ describe('Unit: Keypath', () => {
         });
 
         it('should create intermediary array', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
 
             keypath.insert(obj, 'b.c.0', 'asdf');
             assert.equal(obj.b.c[0][0], 'asdf');
         });
 
         it('should insert in another index', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
 
             keypath.insert(obj, 'b.d', 'asdf', 1);
             assert.equal(obj.b.d[1], 'asdf');
@@ -475,7 +467,7 @@ describe('Unit: Keypath', () => {
         });
 
         it('should handle sparse array', () => {
-            let obj = getTestObj();
+            const obj = getTestObj();
             obj.b.d = new Array(4);
             obj.b.d[0] = 'a';
             obj.b.d[1] = 'b';
@@ -488,7 +480,7 @@ describe('Unit: Keypath', () => {
 
     describe('empty', () => {
         it('should ignore invalid arguments safely', () => {
-            let obj = {};
+            const obj = {};
             assert.equal(keypath.empty(obj, 'path'), undefined);
             assert.equal(keypath.empty(obj, ''), undefined);
 
@@ -499,7 +491,7 @@ describe('Unit: Keypath', () => {
         });
 
         it('should empty each path according to their types', () => {
-            let obj = {
+            const obj = {
                 string: 'some string',
                 array: ['some', 'array', [1, 2, 3]],
                 number: 21,
@@ -527,11 +519,11 @@ describe('Unit: Keypath', () => {
 
             keypath.empty(obj, 'object.undefinedProp');
             assert.equal(obj.object.undefinedProp, undefined);
-            assert(obj.object.hasOwnProperty('undefinedProp'));
+            assert(Object.prototype.hasOwnProperty.call(obj.object, 'undefinedProp'));
 
             keypath.empty(obj, 'object.notAProp');
             assert.equal(obj.object.notAProp, undefined);
-            assert(!obj.object.hasOwnProperty('notAProp'));
+            assert(!Object.prototype.hasOwnProperty.call(obj.object, 'notAProp'));
 
             keypath.empty(obj, 'string');
             keypath.empty(obj, 'number');

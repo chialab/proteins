@@ -111,11 +111,11 @@ export function set(obj, path, value, ensure = true) {
         }
         return value;
     }
-    let current = path.shift();
+    const current = path.shift();
     let currentObj;
     if (!hasOwnProperty(obj, current)) {
         if (ensure) {
-            let next = path[0];
+            const next = path[0];
             if (isNaN(next) && next !== '') {
                 currentObj = obj[current] = {};
             } else {
@@ -177,7 +177,7 @@ export function has(obj, path) {
  * @throws {Error} throw error when paths is invalid or undefined
  */
 export function ensure(obj, path, value) {
-    let val = get(obj, path);
+    const val = get(obj, path);
     if (!val) {
         set(obj, path, value);
     }
@@ -233,13 +233,13 @@ export function empty(obj, path) {
     if (path.length > 1) {
         parent = get(obj, path.slice(0, -1));
     }
-    let current = path[path.length - 1];
+    const current = path[path.length - 1];
     if (parent && hasOwnProperty(parent, current)) {
-        let arr = parent[current];
+        const arr = parent[current];
         if (isArray(arr)) {
             arr.splice(0, arr.length);
         } else if (isObject(arr)) {
-            for (let k in arr) {
+            for (const k in arr) {
                 delete arr[k];
             }
         } else if (isString(arr)) {
@@ -269,7 +269,7 @@ export function empty(obj, path) {
 export function del(obj, path) {
     assertArgs(obj, path);
     path = pathToArray(path);
-    let pathToDelete = path.pop();
+    const pathToDelete = path.pop();
     let subObj = obj;
     if (path.length) {
         subObj = get(obj, path);

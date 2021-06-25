@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-    <a href="https://www.npmjs.com/package/@chialab/proteins"><img alt="NPM" src="https://img.shields.io/npm/v/@chialab/proteins.svg?style=flat-square"></a>
+    <a href="https://www.npmjs.com/package/@chialab/proteins"><img alt="NPM" src="https://img.shields.io/npm/v/@chialab/proteins.svg"></a>
 </p>
 
 ---
@@ -20,7 +20,6 @@ Add as a dependency of a Node project:
 
 ```sh
 $ npm install @chialab/proteins
-# or
 $ yarn add @chialab/proteins
 ```
 
@@ -39,21 +38,12 @@ Use via cdn:
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/chialab-sl-014.svg)](https://app.saucelabs.com/u/chialab-sl-014)
 
-
-
-### Requirements
-
-In order to build and test Proteins, the following requirements are needed:
-* [NodeJS](https://nodejs.org/) (>= 10.0.0)
-* [Yarn](https://yarnpkg.com)
-* [RNA](https://github.com/chialab/rna-cli) (>= 3.0.0)
-
 ### Build the project
 
 Install the dependencies and run the `build` script:
 ```
-$ yarn install
-$ yarn build
+$ npm run install
+$ npm run build
 ```
 
 This will generate the UMD and ESM bundles in the `dist` folder, as well as the declaration file.
@@ -63,7 +53,7 @@ This will generate the UMD and ESM bundles in the `dist` folder, as well as the 
 Run the `test` script:
 
 ```
-$ yarn test
+$ npm run test
 ```
 
 ---

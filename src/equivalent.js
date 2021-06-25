@@ -35,12 +35,12 @@ function internalEquivalent(obj1, obj2, processing = []) {
                 processSourceIndex = processing.indexOf(obj1, processSourceIndex);
             }
             processing.push(obj1, obj2);
-            let sourceKeys = Object.keys(obj1).sort();
-            let targetKeys = Object.keys(obj2).sort();
+            const sourceKeys = Object.keys(obj1).sort();
+            const targetKeys = Object.keys(obj2).sort();
             if (internalEquivalent(sourceKeys, targetKeys)) {
                 // objects keys are equivalent.
                 for (let i = 0, len = sourceKeys.length; i < len; i++) {
-                    let key = sourceKeys[i];
+                    const key = sourceKeys[i];
                     if (!internalEquivalent(obj1[key], obj2[key], processing)) {
                         // deep check failed.
                         return false;

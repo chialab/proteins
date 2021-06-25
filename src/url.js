@@ -18,11 +18,11 @@ const PORT_REGEX = /:\d*$/;
  * @return {Object} The url properties.
  */
 export function parse(url = '') {
-    let hashSplit = url.split('#');
-    let hash = hashSplit.length > 1 ? hashSplit.pop() : undefined;
+    const hashSplit = url.split('#');
+    const hash = hashSplit.length > 1 ? hashSplit.pop() : undefined;
     url = hashSplit.join('#');
-    let match = url.match(URL_REGEX);
-    let res = {
+    const match = url.match(URL_REGEX);
+    const res = {
         host: undefined,
         hostname: undefined,
         port: undefined,
@@ -35,14 +35,14 @@ export function parse(url = '') {
         if (match[2]) {
             let host = match[2];
             res.host = host;
-            let port = host.match(PORT_REGEX);
+            const port = host.match(PORT_REGEX);
             if (port) {
                 res.port = port[0].substring(1);
                 host = host.replace(port[0], '');
             }
-            let authSplit = host.split('@');
+            const authSplit = host.split('@');
             res.hostname = authSplit.pop();
-            let authChunk = authSplit.join('@').split(':');
+            const authChunk = authSplit.join('@').split(':');
             res.username = authChunk.shift();
             res.password = authChunk.join(':');
         }
@@ -94,12 +94,12 @@ function chunk(key, val) {
  * @return {string} An object to serialize.
  */
 export function serialize(obj, prefix, chunkFn = chunk) {
-    let str = [];
-    let keys = Object.keys(obj);
+    const str = [];
+    const keys = Object.keys(obj);
     if (keys.length) {
-        for (let p in obj) {
+        for (const p in obj) {
             if (has(obj, p) && obj[p] !== undefined) {
-                let k = prefix ? `${prefix}[${p}]` : p;
+                const k = prefix ? `${prefix}[${p}]` : p;
                 let v = obj[p];
                 if (v instanceof Date) {
                     v = v.toISOString();
@@ -126,14 +126,14 @@ export function serialize(obj, prefix, chunkFn = chunk) {
  */
 export function unserialize(str) {
     str = decodeURI(str);
-    let chunks = str.split('&');
-    let res = {};
+    const chunks = str.split('&');
+    const res = {};
 
     for (let i = 0, len = chunks.length; i < len; i++) {
-        let chunk = chunks[i].split('=');
+        const chunk = chunks[i].split('=');
         if (chunk[0] && chunk[1]) {
-            let key = chunk[0].replace(/\[(.*?)\]/g, '.$1');
-            let val = decodeURIComponent(chunk[1]);
+            const key = chunk[0].replace(/\[(.*?)\]/g, '.$1');
+            const val = decodeURIComponent(chunk[1]);
             keypath.set(res, key, val);
         }
     }
@@ -165,14 +165,14 @@ export function join(...paths) {
  */
 export function resolve(base, relative) {
     if (relative[0] === '/') {
-        let baseInfo = parse(base);
+        const baseInfo = parse(base);
         if (!baseInfo.origin) {
             throw new Error('base url is not an absolute url');
         }
         base = `${baseInfo.origin}/`;
     }
-    let stack = base.split('/');
-    let parts = relative.split('/').filter((part) => part !== '');
+    const stack = base.split('/');
+    const parts = relative.split('/').filter((part) => part !== '');
     if (stack.length > 1) {
         stack.pop();
     }
@@ -230,7 +230,7 @@ export function isLocalUrl(url) {
  * @return {string}
  */
 function updateSearchPath(url, path) {
-    let href = url.href.split('?')[0];
+    const href = url.href.split('?')[0];
     if (!path) {
         return url.href = href;
     }
@@ -245,7 +245,7 @@ function updateSearchPath(url, path) {
  * @return {string} The query string.
  */
 function entriesToString(entries) {
-    let unserialized = {};
+    const unserialized = {};
     entries.forEach((entry) => {
         unserialized[entry[0]] = entry[1];
     });
@@ -301,8 +301,8 @@ export class SearchParams {
         if (!this.url.search) {
             return [];
         }
-        let search = this.url.search.substring(1);
-        let unserialized = unserialize(search);
+        const search = this.url.search.substring(1);
+        const unserialized = unserialize(search);
         return Object.keys(unserialized)
             .map((key) => [key, unserialized[key]]);
     }
@@ -315,7 +315,7 @@ export class SearchParams {
      * @return {*} The entity value.
      */
     get(name) {
-        let entries = this.entries();
+        const entries = this.entries();
         for (let i = 0, len = entries.length; i < len; i++) {
             if (entries[i][0] === name) {
                 return entries[i][1];
@@ -343,7 +343,7 @@ export class SearchParams {
      */
     set(name, value) {
         this.delete(name);
-        let entries = this.entries();
+        const entries = this.entries();
         entries.push([name, value]);
         updateSearchPath(
             this.url,
@@ -371,10 +371,10 @@ export class SearchParams {
      * @memberof Url.SearchParams
      */
     sort() {
-        let entries = this.entries();
+        const entries = this.entries();
         entries.sort((entry1, entry2) => {
-            let key1 = entry1[0];
-            let key2 = entry2[0];
+            const key1 = entry1[0];
+            const key2 = entry2[0];
             if (key1 < key2) {
                 return -1;
             } else if (key1 > key2) {
@@ -424,9 +424,9 @@ export class Url {
     }
 
     set href(href) {
-        let info = parse(href);
+        const info = parse(href);
         this[REF_SYM] = href;
-        for (let k in info) {
+        for (const k in info) {
             this[k] = info[k];
         }
     }

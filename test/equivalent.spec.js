@@ -1,8 +1,5 @@
-/* eslint-env mocha */
-import equivalent from '../src/equivalent.js';
-import chai from 'chai/chai';
-
-const { assert } = chai;
+import { assert } from '@esm-bundle/chai/esm/chai.js';
+import { equivalent } from '@chialab/proteins';
 
 describe('Unit: Equivalent', () => {
     const TEST_FUN = () => { };
@@ -12,14 +9,17 @@ describe('Unit: Equivalent', () => {
         answer: 42,
         correct: true,
     };
+    // eslint-disable-next-line
     CIRCULAR_REFERENCE.question = {
         text: 'The Ultimate Question of Life, the Universe and Everything',
         attempts: [CIRCULAR_REFERENCE],
     };
+
     const ANOTHER_CIRCULAR_REFERENCE = {
         answer: 42,
         correct: true,
     };
+    // eslint-disable-next-line
     ANOTHER_CIRCULAR_REFERENCE.question = {
         text: 'The Ultimate Question of Life, the Universe and Everything',
         attempts: [ANOTHER_CIRCULAR_REFERENCE],
@@ -101,7 +101,7 @@ describe('Unit: Equivalent', () => {
                 a: true,
             }
         ));
-        let obj = {
+        const obj = {
             arr: [1, 2, 3],
         };
         assert(equivalent(

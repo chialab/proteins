@@ -1,29 +1,25 @@
-/* eslint-env mocha */
-import { on, off, trigger } from '../src/events.js';
-import chai from 'chai/chai';
-
-const { assert } = chai;
+import { assert } from '@esm-bundle/chai/esm/chai.js';
+import { on, off, trigger } from '@chialab/proteins';
 
 describe('Unit: Events', () => {
     const context = {};
     const check = {};
 
-    function prepareFn(number) {
-        return (...args) => {
-            check[number] = args;
-        };
-    }
+    let callback1, callback2, callback3, callback4;
 
-    const callback1 = prepareFn(1);
-    const callback2 = prepareFn(2);
-    const callback3 = prepareFn(3);
-    const callback4 = prepareFn(4);
+    const prepareFn = (number) => (...args) => {
+        check[number] = args;
+    };
 
     beforeEach(() => {
-        for (let k in check) {
+        for (const k in check) {
             delete check[k];
         }
         off(context);
+        callback1 = prepareFn(1);
+        callback2 = prepareFn(2);
+        callback3 = prepareFn(3);
+        callback4 = prepareFn(4);
     });
 
     describe('on', () => {
@@ -86,7 +82,7 @@ describe('Unit: Events', () => {
 
     describe('trigger', () => {
         it('should return a promise', () => {
-            let res = trigger(context, 'eventWithNoCallbacks');
+            const res = trigger(context, 'eventWithNoCallbacks');
             assert(res instanceof Promise);
         });
 
@@ -94,7 +90,7 @@ describe('Unit: Events', () => {
             on(context, 'test', (num) => num ** 2);
             on(context, 'test', (num) => Promise.resolve(num ** 3));
             on(context, 'test', (num) => Promise.resolve(num ** 4));
-            let result = await trigger(context, 'test', 2);
+            const result = await trigger(context, 'test', 2);
             assert.deepEqual(result, [4, 8, 16]);
         });
 

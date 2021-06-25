@@ -1,129 +1,7 @@
-/* eslint-env mocha */
-import { trigger } from '../src/events.js';
-import { Factory, Emitter, CONTEXT_SYM } from '../src/factory.js';
-import chai from 'chai/chai';
+import { assert } from '@esm-bundle/chai/esm/chai.js';
+import { trigger, Factory } from '@chialab/proteins';
 
-const { assert } = chai;
-
-describe('Unit: Emitter', () => {
-    let obj = new Emitter();
-    let check = {};
-
-    function prepareFn(number) {
-        return (...args) => {
-            check[number] = args;
-        };
-    }
-
-    let callback1 = prepareFn(1);
-    let callback2 = prepareFn(2);
-    let callback3 = prepareFn(3);
-    let callback4 = prepareFn(4);
-
-    obj.on('test1', callback1);
-    obj.on('test2', callback2);
-    obj.on('test3', callback3);
-    obj.on('test3', callback4);
-
-    function reset() {
-        check = {
-            1: false,
-            2: false,
-            3: false,
-            4: false,
-        };
-        return Promise.resolve();
-    }
-
-    describe('on', () => {
-        before((done) => {
-            reset().then(() =>
-                Promise.all([
-                    obj.trigger('test1', 2),
-                    obj.trigger('test2', 'callback'),
-                    obj.trigger('test3', 1, 4, 2),
-                ]).then(() => {
-                    done();
-                })
-            );
-        });
-
-        it('should add simple callback', () => {
-            assert.deepEqual(check['1'], [2]);
-        });
-
-        it('should add callback with one argument', () => {
-            assert.deepEqual(check['2'], ['callback']);
-        });
-
-        it('should add multiple callbacks with more arguments', () => {
-            assert.deepEqual(check['3'], [1, 4, 2]);
-            assert.deepEqual(check['4'], [1, 4, 2]);
-        });
-    });
-
-    describe('off', () => {
-        before((done) => {
-            reset().then(() => {
-                obj.off('test3', callback3);
-                Promise.all([
-                    obj.trigger('test3', 1, 4, 2),
-                ]).then(() => {
-                    done();
-                });
-            });
-        });
-
-        it('should remove a callback', () => {
-            assert.equal(check['3'], false);
-            assert.deepEqual(check['4'], [1, 4, 2]);
-        });
-    });
-
-    describe('off', () => {
-        before((done) => {
-            reset().then(() => {
-                obj.off('test2');
-                Promise.all([
-                    obj.trigger('test2', 'callback'),
-                ]).then(() => {
-                    done();
-                });
-            });
-        });
-
-        it('should remove an event', () => {
-            assert.equal(check['2'], false);
-        });
-    });
-
-    describe('off', () => {
-        before((done) => {
-            reset().then(() => {
-                obj.destroy();
-                Promise.all([
-                    obj.trigger('test1', 2),
-                    obj.trigger('test3', 1, 4, 2),
-                ]).then(() => {
-                    done();
-                });
-            });
-        });
-
-        it('should remove all events', () => {
-            assert.equal(check['1'], false);
-            // assert.equal(check['4'], false);
-        });
-    });
-
-    describe('not function callback', () => {
-        it('should throws', () => {
-            assert.throws(() => obj.on('event', 4), TypeError);
-        });
-    });
-});
-
-class InjectedFactory extends Factory {
+class InjectedFactory extends Factory.Factory {
     get prop() {
         return '__TEST__';
     }
@@ -133,13 +11,13 @@ class InjectedFactory extends Factory {
     }
 }
 
-class Injected2Factory extends Factory {
+class Injected2Factory extends Factory.Factory {
     test() {
         return 11;
     }
 }
 
-class Injected3Factory extends Factory {
+class Injected3Factory extends Factory.Factory {
     get inject() {
         return [Injected2Factory.SYM];
     }
@@ -149,7 +27,7 @@ class Injected3Factory extends Factory {
     }
 }
 
-class Injected4Factory extends Factory {
+class Injected4Factory extends Factory.Factory {
     get inject() {
         return [Injected3Factory.SYM];
     }
@@ -159,7 +37,7 @@ class Injected4Factory extends Factory {
     }
 }
 
-class MainFactory extends Factory {
+class MainFactory extends Factory.Factory {
     get inject() {
         return [InjectedFactory.SYM];
     }
@@ -185,26 +63,30 @@ class ChildFactory extends MainFactory {
 }
 
 describe('Unit: Factory', () => {
-    let factory = new MainFactory();
-    let child = factory.init(ChildFactory, {
-        mode: 2,
-        filters: ['lastName'],
+    let factory, child;
+
+    before(() => {
+        factory = new MainFactory();
+        child = factory.init(ChildFactory, {
+            mode: 2,
+            filters: ['lastName'],
+        });
     });
 
     it('should instantiate a factory', () => {
         assert(factory instanceof MainFactory);
-        assert.equal(factory[CONTEXT_SYM], factory);
+        assert.equal(factory[Factory.CONTEXT_SYM], factory);
     });
 
     it('should instantiate a factory in the same context', () => {
         assert(child instanceof ChildFactory);
         assert.equal(child[InjectedFactory.SYM], factory[InjectedFactory.SYM]);
         assert.equal(child.prop, 11);
-        assert.equal(child[CONTEXT_SYM], factory);
+        assert.equal(child[Factory.CONTEXT_SYM], factory);
     });
 
     it('should instantiate sub factories', () => {
-        assert(child[Injected4Factory.SYM] instanceof Factory);
+        assert(child[Injected4Factory.SYM] instanceof Factory.Factory);
         assert.equal(child[Injected4Factory.SYM].test(), 2);
         assert.equal(child[Injected4Factory.SYM][Injected3Factory.SYM][Injected2Factory.SYM], child[Injected2Factory.SYM]);
     });
@@ -234,24 +116,24 @@ describe('Unit: Factory', () => {
     it('should destroy a factory in the same context', () => {
         child.destroy();
         assert(child instanceof ChildFactory);
-        assert(!child[CONTEXT_SYM]);
+        assert(!child[Factory.CONTEXT_SYM]);
     });
 
     describe('listener', () => {
-        let scope = {
-            key: 1,
-        };
-        let check1 = 0;
-        let callback1 = function() {
-            check1 += this.key;
-        };
-        let check2 = 0;
-        let callback2 = function() {
-            check2 += this.key;
-        };
+        it('should listen to object event manager', async () => {
+            const scope = {
+                key: 1,
+            };
+            let check1 = 0;
+            function callback1() {
+                check1 += this.key;
+            }
+            let check2 = 0;
+            function callback2() {
+                check2 += this.key;
+            }
 
-        before((done) => {
-            Promise.all([
+            await Promise.all([
                 factory.listen(scope, 'event', callback1),
                 factory.listen(scope, 'event2', callback2),
                 trigger(scope, 'event'),
@@ -262,12 +144,7 @@ describe('Unit: Factory', () => {
                 factory.unlisten(),
                 // trigger(scope, 'event'),
                 // trigger(scope, 'event2'),
-            ]).then(() => {
-                done();
-            });
-        });
-
-        it('should listen to object event manager', () => {
+            ]);
             assert.equal(check1, 2);
             assert.equal(check2, 1);
         });

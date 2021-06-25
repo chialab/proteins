@@ -87,11 +87,11 @@ function triggerChanges(scope, changeset) {
  */
 const ARRAY_PROTO_WRAP = {
     push(...items) {
-        let length = this.length;
+        const length = this.length;
         items = items.map((item, index) =>
             subobserve(this, length + index, item)
         );
-        let res = ARRAY_PROTO.push.call(this, ...items);
+        const res = ARRAY_PROTO.push.call(this, ...items);
         triggerChanges(this, {
             property: length,
             added: items,
@@ -100,7 +100,7 @@ const ARRAY_PROTO_WRAP = {
         return res;
     },
     unshift(item) {
-        let res = ARRAY_PROTO.unshift.call(this, item);
+        const res = ARRAY_PROTO.unshift.call(this, item);
         subobserve(this, 0, item);
         triggerChanges(this, {
             property: 0,
@@ -110,7 +110,7 @@ const ARRAY_PROTO_WRAP = {
         return res;
     },
     pop() {
-        let res = ARRAY_PROTO.pop.call(this);
+        const res = ARRAY_PROTO.pop.call(this);
         triggerChanges(this, {
             property: this.length,
             added: [],
@@ -119,7 +119,7 @@ const ARRAY_PROTO_WRAP = {
         return res;
     },
     shift() {
-        let res = ARRAY_PROTO.shift.call(this);
+        const res = ARRAY_PROTO.shift.call(this);
         triggerChanges(this, {
             property: 0,
             added: [],
@@ -131,7 +131,7 @@ const ARRAY_PROTO_WRAP = {
         items = items.map((item, index) =>
             subobserve(this, length + index, item)
         );
-        let res = ARRAY_PROTO.splice.call(this, index, count, ...items);
+        const res = ARRAY_PROTO.splice.call(this, index, count, ...items);
         triggerChanges(this, {
             property: index,
             added: items,
@@ -154,7 +154,7 @@ function subobserve(target, name, value) {
         value = new Observable(value);
         value.on('change', (changeset) => {
             name = isArray(target) ? target.indexOf(value) : name;
-            let changes = {
+            const changes = {
                 property: `${name}.${changeset.property}`,
             };
             if (hasOwnProperty.call(changeset, 'value')) {
@@ -186,7 +186,7 @@ const handler = {
         if (Symbolic.isSymbolic(name)) {
             return target[name] = value;
         }
-        let oldValue = target[name];
+        const oldValue = target[name];
         if (target[name] !== value) {
             value = subobserve(target, name, value);
             target[name] = value;
@@ -210,12 +210,12 @@ export default class Observable {
         if (typeof data !== 'object') {
             throw new Error('Cannot observe this value.');
         }
-        let emitter = data[OBSERVABLE_SYM] || new Emitter();
+        const emitter = data[OBSERVABLE_SYM] || new Emitter();
 
         if (emitter.proxy) {
             return emitter.proxy;
         }
-        let proto = {
+        const proto = {
             on: { value: emitter.on.bind(emitter) },
             off: { value: emitter.off.bind(emitter) },
             trigger: { value: emitter.trigger.bind(emitter) },
@@ -268,7 +268,7 @@ export default class Observable {
         // Ensure `data` is an observable.
         new Observable(data);
         Object.keys(data).forEach((key) => {
-            let descriptor = Object.getOwnPropertyDescriptor(data, key);
+            const descriptor = Object.getOwnPropertyDescriptor(data, key);
             if (key !== OBSERVABLE_SYM && descriptor && descriptor.configurable && ('value' in descriptor)) {
                 // Key has been added and is not yet observed. Big Brother is on its way.
                 data[key] = subobserve(data, key, data[key]);

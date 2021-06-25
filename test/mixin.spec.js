@@ -1,8 +1,5 @@
-/* eslint-env mocha */
-import mix from '../src/mixin.js';
-import chai from 'chai/chai';
-
-const { assert } = chai;
+import { assert } from '@esm-bundle/chai/esm/chai.js';
+import { mix } from '@chialab/proteins';
 
 class SuperClass {
     constructor(name) {
@@ -29,11 +26,11 @@ const mixin2 = (Super) => class extends mix(Super).with(mixin) { };
 
 describe('Unit: Mixin', () => {
     describe('class creation', () => {
-        const PersonClass = mix().with(mixin);
-        let person = new PersonClass();
-        person.name = 'Alan';
-
         it('should extend a class', () => {
+            const PersonClass = mix().with(mixin);
+            const person = new PersonClass();
+            person.name = 'Alan';
+
             assert.equal(person.name, 'Alan');
             assert.equal(person.lastName, 'Turing');
             assert.equal(person.fullName, 'Alan Turing');
@@ -41,10 +38,10 @@ describe('Unit: Mixin', () => {
     });
 
     describe('class extension', () => {
-        const PersonClass = mix(SuperClass).with(mixin);
-        let person = new PersonClass('Alan');
-
         it('should extend a class', () => {
+            const PersonClass = mix(SuperClass).with(mixin);
+            const person = new PersonClass('Alan');
+
             assert.equal(person.name, 'Alan');
             assert.equal(person.lastName, 'Turing');
             assert.equal(person.fullName, 'Alan Turing');
@@ -53,10 +50,10 @@ describe('Unit: Mixin', () => {
     });
 
     describe('is mixed', () => {
-        const MiddleClass = mix(SuperClass).with(mixin);
-        const PersonClass = mix(MiddleClass).with(mixin2);
-
         it('should extend a class', () => {
+            const MiddleClass = mix(SuperClass).with(mixin);
+            const PersonClass = mix(MiddleClass).with(mixin2);
+
             assert(mix(PersonClass).has(mixin));
             assert(mix(PersonClass).has(mixin2));
             assert(!mix(PersonClass).has(() => { }));

@@ -1,16 +1,11 @@
-/* eslint-env mocha */
-import clone from '../src/clone.js';
-import { isDate, isNumber, isString, isObject, isArray, isUndefined } from '../src/types.js';
-import Observable from '../src/observable.js';
-import chai from 'chai/chai';
-
-const { assert } = chai;
+import { assert } from '@esm-bundle/chai/esm/chai.js';
+import { clone, isDate, isNumber, isString, isObject, isArray, isUndefined, Observable } from '@chialab/proteins';
 
 describe('Unit: Clone', () => {
     it('should clone a date', () => {
-        let original = new Date();
+        const original = new Date();
         original.test = true;
-        let cloned = clone(original);
+        const cloned = clone(original);
         assert(isDate(cloned));
         assert(cloned.getTime() === original.getTime());
         assert(original.test);
@@ -18,21 +13,21 @@ describe('Unit: Clone', () => {
     });
 
     it('should clone a number', () => {
-        let original = 2;
-        let cloned = clone(original);
+        const original = 2;
+        const cloned = clone(original);
         assert(isNumber(cloned));
         assert.equal(cloned, original);
     });
 
     it('should clone a string', () => {
-        let original = 'hello';
-        let cloned = clone(original);
+        const original = 'hello';
+        const cloned = clone(original);
         assert(isString(cloned));
         assert.equal(cloned, original);
     });
 
     it('should clone an object', () => {
-        let original = {
+        const original = {
             firstName: 'Alan',
             lastName: 'Turing',
             birthday: new Date('1912/06/23'),
@@ -44,7 +39,7 @@ describe('Unit: Clone', () => {
                 },
             ],
         };
-        let cloned = clone(original);
+        const cloned = clone(original);
         assert(isObject(cloned));
         assert.equal(cloned.firstName, 'Alan');
         assert.equal(cloned.lastName, 'Turing');
@@ -62,8 +57,8 @@ describe('Unit: Clone', () => {
     });
 
     it('should clone an object with custom callback', () => {
-        let original = [1, 2, 3];
-        let cloned = clone(original, (arr, index, val) => {
+        const original = [1, 2, 3];
+        const cloned = clone(original, (arr, index, val) => {
             if (index == 1) {
                 return 2 * val;
             }
@@ -89,8 +84,8 @@ describe('Unit: Clone', () => {
                 this.test2 = new A();
             }
         }
-        let b = new B();
-        let cloned = clone(b);
+        const b = new B();
+        const cloned = clone(b);
         assert(cloned instanceof B);
         assert(cloned instanceof A);
         assert(cloned !== b);
@@ -110,7 +105,7 @@ describe('Unit: Clone', () => {
             value: a,
         };
         a.value = b;
-        let cloned = clone(b);
+        const cloned = clone(b);
         assert.equal(cloned.test, 11);
         assert(cloned.value !== a);
         assert.equal(cloned.value.test, 2);
@@ -136,7 +131,7 @@ describe('Unit: Clone', () => {
                 this.test = this.test * val;
             },
         });
-        let cloned = clone(a);
+        const cloned = clone(a);
         assert.equal(cloned.test, 2);
         assert.equal(cloned.test2, 2);
 
@@ -147,7 +142,7 @@ describe('Unit: Clone', () => {
     it('should clone arrays with custom properties', () => {
         const a = [1, 2];
         Object.defineProperty(a, 'test', { value: 3 });
-        let cloned = clone(a);
+        const cloned = clone(a);
         assert.equal(cloned.test, 3);
     });
 

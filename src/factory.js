@@ -58,7 +58,7 @@ export const FactoryMixin = (SuperClass) =>
          */
         static get SYM() {
             if (!hasOwnProperty(this, FACTORY_SYM)) {
-                let sym = Symbolic(this.name);
+                const sym = Symbolic(this.name);
                 FACTORY_SYMBOLS[sym] = this;
                 this[FACTORY_SYM] = sym;
             }
@@ -89,7 +89,7 @@ export const FactoryMixin = (SuperClass) =>
          */
         init(Factory, ...args) {
             context = this[CONTEXT_SYM];
-            let res = new Factory(...args);
+            const res = new Factory(...args);
             context = null;
             return res;
         }
@@ -163,7 +163,7 @@ export const EmitterMixin = (SuperClass) =>
          * @return {Function} A listener destroyer.
          */
         listen(obj, name, callback) {
-            let destroyer = on(obj, name, callback);
+            const destroyer = on(obj, name, callback);
             this[LISTENERS_SYM].push(destroyer);
             return destroyer;
         }
@@ -237,9 +237,9 @@ export const ConfigurableMixin = (SuperClass) =>
             if (args.length === 0 && isString(config)) {
                 return keypath.get(current, config);
             }
-            let value = args[0];
+            const value = args[0];
             if (isString(config)) {
-                let oldValue = keypath.get(current, config);
+                const oldValue = keypath.get(current, config);
                 if (oldValue !== value) {
                     keypath.set(current, config, value);
                     this.trigger('config:changed', config, oldValue, value);
@@ -275,7 +275,7 @@ export const InjectableMixin = (SuperClass) =>
          */
         initialize(...args) {
             super.initialize(...args);
-            let ctx = this[CONTEXT_SYM];
+            const ctx = this[CONTEXT_SYM];
             this.inject.forEach((Injector) => {
                 if (Symbolic.isSymbolic(Injector)) {
                     Injector = FACTORY_SYMBOLS[Injector];
@@ -302,7 +302,7 @@ export const InjectableMixin = (SuperClass) =>
          */
         destroy() {
             this.inject.forEach((Injector) => {
-                let SYM = (Symbolic.isSymbolic(Injector)) ? Injector : Injector.SYM;
+                const SYM = (Symbolic.isSymbolic(Injector)) ? Injector : Injector.SYM;
                 delete this[SYM];
             });
             return super.destroy();
