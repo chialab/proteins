@@ -18,8 +18,8 @@
   ],
   "scripts": {
     "build": "npm run types && rimraf dist && npm run build:esm && npm run build:cjs",
-    "build:esm": "rimraf dist/esm && rna build src/index.js --format esm --output dist/esm/proteins.js",
-    "build:cjs": "rimraf dist/cjs && rna build src/index.js --format cjs --output dist/cjs/proteins.cjs",
+    "build:esm": "rimraf dist/esm && rna build src/index.js --format esm --output dist/esm/proteins.js --platform browser",
+    "build:cjs": "rimraf dist/cjs && rna build src/index.js --format cjs --output dist/cjs/proteins.cjs --platform node",
     "types": "rimraf types && tsc --declaration --emitDeclarationOnly --declarationDir 'types' --incremental false",
     "test": "npm run test:browser && npm run test:node",
     "test:browser": "rna test:browser --coverage",
