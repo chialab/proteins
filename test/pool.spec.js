@@ -2,6 +2,13 @@ import { pool } from '../src/index.js';
 import { assert } from '@esm-bundle/chai/esm/chai.js';
 
 describe('Unit: Pool', () => {
+    it('should return empty array when there are no tasks to run', () => {
+        const tasks = [];
+        return pool(2, tasks).then((res) => {
+            assert.deepEqual(res, []);
+        });
+    });
+
     it('should run all promises', () => {
         let bitmask = 0;
         const tasks = [
@@ -30,6 +37,21 @@ describe('Unit: Pool', () => {
 
         return pool(2, tasks).then((res) => {
             assert.deepEqual(res, [1, 2, 3, 4, 5]);
+        });
+    });
+
+    it('should return results in the correct order when number of promises is less than number of workers', () => {
+        const factory = (sleep, returnVal) => () => new Promise((resolve) => {
+            setTimeout(() => resolve(returnVal), sleep);
+        });
+        const tasks = [
+            factory(10, 1),
+            factory(5, 2),
+            factory(1, 3),
+        ];
+
+        return pool(5, tasks).then((res) => {
+            assert.deepEqual(res, [1, 2, 3]);
         });
     });
 
