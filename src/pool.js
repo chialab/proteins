@@ -36,7 +36,7 @@ export function pool(workers, promiseFactories) {
 
     return Promise.all(promises)
         .then(() => results);
-};
+}
 
 /**
  * Iterate over an array and keep track of the current index.
