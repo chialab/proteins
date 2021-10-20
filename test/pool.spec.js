@@ -60,11 +60,11 @@ describe('Unit: Pool', () => {
         });
         const tasks = [
             factory(20, 1),
-            factory(5, 2),
-            factory(1, 4),
+            factory(5, 1),
+            factory(1, 1),
             () => Promise.reject('foo'),
-            factory(10, 8),
-            factory(20, 16),
+            factory(10, 2),
+            factory(20, 2),
             () => Promise.reject('bar'),
         ];
 
@@ -73,7 +73,7 @@ describe('Unit: Pool', () => {
                 () => assert.fail('should have rejected'),
                 (err) => {
                     assert.equal(err, 'foo');
-                    assert.equal(bitmask, 6);
+                    assert.equal(bitmask, 1);
                 }
             );
     });
