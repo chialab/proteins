@@ -19,8 +19,8 @@ export function pool(workers, promiseFactories) {
 
     return Promise.all(promises)
         .then((results) => results
-            .reduce((results, workerResults) => results.concat(workerResults))
-            .sort(({ index: a }, { index: b }) => a - b)
+            .flat()
+            .sort((a, b) => a.index - b.index)
             .map(({ result }) => result)
         );
 }
