@@ -21,6 +21,7 @@ import * as Url from './url.js';
 
 export * from './types.js';
 export * from './events.js';
+export * from './pool.js';
 export { has };
 export { Symbolic };
 export { Observable };
