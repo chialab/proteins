@@ -2,7 +2,7 @@
  * Execute a bunch of promises in parallel limiting the number of parallel pending promises.
  *
  * @param {number} workers Number of parallel workers.
- * @param {(() => Promise<T>)[]} promiseFactories List of promise factories.
+ * @param {Iterable<() => Promise<T>>} promiseFactories Iterable of promise factories.
  * @returns {Promise<T[]>}
  * @template T
  */
@@ -11,43 +11,54 @@ export function pool(workers, promiseFactories) {
         throw new Error('Number of workers must be positive');
     }
 
-    const results = Array(promiseFactories.length);
-    const iterator = arrayIterator(promiseFactories);
-    const dequeuer = () => {
-        const next = iterator.next();
-        if (next.done) {
-            return Promise.resolve();
-        }
-
-        const { index, value } = next.value;
-
-        return value()
-            .then((res) => {
-                results[index] = res;
-
-                return dequeuer();
-            });
-    };
-
+    const iterator = indexedIterator(promiseFactories);
     const promises = [];
     for (let i = 0; i < workers; i++) {
-        promises.push(dequeuer());
+        promises.push(worker(iterator));
     }
 
     return Promise.all(promises)
-        .then(() => results);
+        .then((results) => results
+            .reduce((results, workerResults) => results.concat(workerResults))
+            .sort(({ index: a }, { index: b }) => a - b)
+            .map(({ result }) => result)
+        );
 }
 
 /**
- * Iterate over an array and keep track of the current index.
+ * Worker function that dequeues a promise factory and executes it.
  *
- * @param {T[]} arr Array to iterate over.
+ * @param {Iterator<{index: number, value: () => Promise<T>}>} iterator Iterator.
+ * @param {{index: number, result: T}[]} results
+ * @return {Promise<{index: number, result: T}[]>}
+ * @template T
+ */
+function worker(iterator, results = []) {
+    const next = iterator.next();
+    if (next.done) {
+        return Promise.resolve(results);
+    }
+
+    const { index, value } = next.value;
+
+    return value()
+        .then((result) => {
+            results.push({ index, result });
+
+            return worker(iterator, results);
+        });
+}
+
+/**
+ * Iterate over another iterable and keep track of the current index.
+ *
+ * @param {Iterable<T>} it Original iterable.
  * @returns {Generator<{index: number, value: T}>}
  * @template T
  */
-function* arrayIterator(arr) {
-    for (let index = 0; index < arr.length; index++) {
-        const value = arr[index];
-        yield { index, value };
+function* indexedIterator(it) {
+    let index = 0;
+    for (const value of it) {
+        yield { index: index++, value };
     }
 }

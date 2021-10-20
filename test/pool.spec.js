@@ -33,6 +33,23 @@ describe('Unit: Pool', () => {
         });
     });
 
+    it('should return results in the correct order when input is a generator', () => {
+        const factory = (sleep, returnVal) => () => new Promise((resolve) => {
+            setTimeout(() => resolve(returnVal), sleep);
+        });
+        const tasks = function* () {
+            yield factory(10, 1);
+            yield factory(20, 2);
+            yield factory(1, 3);
+            yield factory(5, 4);
+            yield factory(1, 5);
+        }();
+
+        return pool(2, tasks).then((res) => {
+            assert.deepEqual(res, [1, 2, 3, 4, 5]);
+        });
+    });
+
     it('should reject when a promise rejects', () => {
         let bitmask = 0;
         const factory = (sleep, bit) => () => new Promise((resolve) => {
