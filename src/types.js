@@ -79,3 +79,16 @@ export function isArray(obj) {
 export function isFalsy(obj) {
     return isUndefined(obj) || obj === null || obj === false || (typeof obj === 'number' && isNaN(obj));
 }
+
+/**
+ * Check if input is iterable.
+ * @param {*} input
+ * @returns {input is Iterable<any>} True if input is iterable.
+ */
+export function isIterable(input) {
+    if (input == null || typeof input !== 'object') {
+        return false
+    }
+
+    return typeof input[Symbol.iterator] === 'function';
+}

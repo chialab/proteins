@@ -4,7 +4,7 @@
 
 import * as keypath from './keypath.js';
 import Symbolic from './symbolic.js';
-import has from './has.js';
+import { isArray, isIterable } from './types.js';
 
 const REF_SYM = Symbolic('ref');
 const URL_REGEX = /((?:^(?:[a-z]+:))|^)?(?:\/\/)?([^?/$]*)([^?]*)?(\?.*)?/i;
@@ -85,32 +85,34 @@ function chunk(key, val) {
 /**
  * Serialize an object in FormData format.
  *
- * @param {Object} obj The object to convert.
+ * @param {Object} searchParams The object to convert.
  * @param {string} prefix The prefix to use in case of recursion.
  * @param {Function} [chunkFn] The callback function to use for chunking a key/value pair.
  * @return {string} An object to serialize.
  */
-export function serialize(obj, prefix, chunkFn = chunk) {
+export function serialize(searchParams, prefix, chunkFn = chunk) {
     const str = [];
-    const keys = Object.keys(obj);
-    if (keys.length) {
-        for (const p in obj) {
-            if (has(obj, p) && obj[p] !== undefined) {
-                const k = prefix ? `${prefix}[${p}]` : p;
-                let v = obj[p];
-                if (v instanceof Date) {
-                    v = v.toISOString();
-                }
-                str.push(
-                    (v !== null && typeof v === 'object') ?
-                        serialize(v, k) :
-                        chunkFn(k, `${v}`)
-                );
-            }
+    const entries = isIterable(searchParams) && !isArray(searchParams) ? searchParams : Object.entries(searchParams);
+
+    for (let [propertyKey, value] of entries) {
+        if (value == null) {
+            return;
         }
-    } else if (prefix) {
+
+        const key = prefix ? `${prefix}[${propertyKey}]` : propertyKey;
+        if (value instanceof Date) {
+            value = value.toISOString();
+        }
+
+        str.push(
+            (typeof value === 'object') ? serialize(value, key) : chunkFn(key, `${value}`)
+        );
+    }
+
+    if (!str.length) {
         str.push(chunkFn(prefix));
     }
+
     return str.join('&');
 }
 
@@ -284,7 +286,7 @@ export class SearchParams {
     /**
      * List all entries.
      *
-     * @return {Array} Entries list in format [[key, value], [...]].
+     * @return {[string, any]} Entries list in format [[key, value], [...]].
      */
     entries() {
         if (!this.url.search) {

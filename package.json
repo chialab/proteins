@@ -23,7 +23,7 @@
     "types": "rimraf types && tsc --declaration --emitDeclarationOnly --declarationDir 'types' --incremental false",
     "test": "npm run test:browser && npm run test:node",
     "test:browser": "rna test:browser --coverage",
-    "test:saucelabs": "rna test:saucelabs  --browsers 'modern' 'legacy'",
+    "test:saucelabs": "rna test:saucelabs --browsers 'modern' 'legacy'",
     "test:node": "rna test:node --coverage",
     "lint": "eslint src --cache",
     "typecheck": "tsc --noEmit",

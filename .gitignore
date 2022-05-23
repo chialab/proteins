@@ -3,5 +3,6 @@ npm-debug.log
 yarn-error.log
 .eslintcache
 .env
+/coverage
 /dist
 /types
