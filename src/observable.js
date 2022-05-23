@@ -129,7 +129,7 @@ const ARRAY_PROTO_WRAP = {
     },
     splice(index, count, ...items) {
         items = items.map((item, index) =>
-            subobserve(this, length + index, item)
+            subobserve(this, this.length + index, item)
         );
         const res = ARRAY_PROTO.splice.call(this, index, count, ...items);
         triggerChanges(this, {

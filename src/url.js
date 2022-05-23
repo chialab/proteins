@@ -94,19 +94,24 @@ export function serialize(searchParams, prefix, chunkFn = chunk) {
     const str = [];
     const entries = isIterable(searchParams) && !isArray(searchParams) ? searchParams : Object.entries(searchParams);
 
-    for (let [propertyKey, value] of entries) {
+    for (const [propertyKey, value] of entries) {
         if (value == null) {
             return;
         }
 
         const key = prefix ? `${prefix}[${propertyKey}]` : propertyKey;
+        let serialized = value;
         if (value instanceof Date) {
-            value = value.toISOString();
+            serialized = value.toISOString();
         }
 
-        str.push(
-            (typeof value === 'object') ? serialize(value, key) : chunkFn(key, `${value}`)
-        );
+        if (typeof serialized === 'object') {
+            serialized = serialize(serialized, key);
+        } else {
+            serialized = chunkFn(key, `${serialized}`);
+        }
+
+        str.push(serialized);
     }
 
     if (!str.length) {

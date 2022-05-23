@@ -87,7 +87,7 @@ export function isFalsy(obj) {
  */
 export function isIterable(input) {
     if (input == null || typeof input !== 'object') {
-        return false
+        return false;
     }
 
     return typeof input[Symbol.iterator] === 'function';
