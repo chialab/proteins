@@ -18,22 +18,17 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
-
-      - name: Set up NPM cache
-        uses: actions/cache@v2
-        with:
-          path: ./node_modules
-          key: npm-cache-${{ hashFiles('**/package-lock.json') }}
+          node-version: 14
+          cache: yarn
 
       - name: Install project dependencies
-        run: npm install
+        run: yarn install
 
       - name: Typecheck
-        run: npm run typecheck
+        run: yarn typecheck
 
       - name: Lint
-        run: npm run lint
+        run: yarn lint
 
   build:
     name: Build
@@ -46,19 +41,14 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
-
-      - name: Set up NPM cache
-        uses: actions/cache@v2
-        with:
-          path: ./node_modules
-          key: npm-cache-${{ hashFiles('**/package-lock.json') }}
+          node-version: 14
+          cache: yarn
 
       - name: Install project dependencies
-        run: npm install
+        run: yarn install
 
       - name: Run build script
-        run: npm run build
+        run: yarn build
 
       - name: Upload build
         uses: actions/upload-artifact@v2
@@ -77,16 +67,11 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
-
-      - name: Set up NPM cache
-        uses: actions/cache@v2
-        with:
-          path: ./node_modules
-          key: npm-cache-${{ hashFiles('**/package-lock.json') }}
+          node-version: 14
+          cache: yarn
 
       - name: Install project dependencies
-        run: npm install
+        run: yarn install
 
       - name: Fetch artifacts
         uses: actions/download-artifact@v2
@@ -95,7 +80,7 @@ jobs:
           path: dist
 
       - name: Run tests
-        run: npm run test:browser
+        run: yarn test:browser
 
       - name: Upload coverage to codecov
         uses: codecov/codecov-action@v1
@@ -114,16 +99,11 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
-
-      - name: Set up NPM cache
-        uses: actions/cache@v2
-        with:
-          path: ./node_modules
-          key: npm-cache-${{ hashFiles('**/package-lock.json') }}
+          node-version: 14
+          cache: yarn
 
       - name: Install project dependencies
-        run: npm install
+        run: yarn install
 
       - name: Fetch artifacts
         uses: actions/download-artifact@v2
@@ -132,7 +112,7 @@ jobs:
           path: dist
 
       - name: Run tests
-        run: npm run test:node
+        run: yarn test:node
 
       - name: Upload coverage to codecov
         uses: codecov/codecov-action@v1
@@ -151,16 +131,11 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
-
-      - name: Set up NPM cache
-        uses: actions/cache@v2
-        with:
-          path: ./node_modules
-          key: npm-cache-${{ hashFiles('**/package-lock.json') }}
+          node-version: 14
+          cache: yarn
 
       - name: Install project dependencies
-        run: npm install
+        run: yarn install
 
       - name: Fetch artifacts
         uses: actions/download-artifact@v2
@@ -169,7 +144,7 @@ jobs:
           path: dist
 
       - name: Run tests
-        run: npm run test:saucelabs
+        run: yarn test:saucelabs
         env:
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}

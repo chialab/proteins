@@ -1,3 +1,5 @@
+import { flat } from './_helpers.js';
+
 /**
  * Execute a bunch of promises in parallel limiting the number of parallel pending promises.
  *
@@ -18,8 +20,7 @@ export function pool(workers, promiseFactories) {
     }
 
     return Promise.all(promises)
-        .then((results) => results
-            .flat()
+        .then((results) => flat.call(results)
             .sort((a, b) => a.index - b.index)
             .map(({ result }) => result)
         );
