@@ -1,6 +1,6 @@
 <p align="center">
     <a href="https://www.chialab.io/p/proteins">
-        <img alt="Proteins logo" width="144" height="144" src="https://raw.githack.com/chialab/proteins/master/logo.svg" />
+        <img alt="Proteins logo" width="144" height="144" src="https://raw.githack.com/chialab/proteins/main/logo.svg" />
     </a>
 </p>
 
@@ -33,7 +33,7 @@ Use via cdn:
 ## Development
 
 [![Build status](https://github.com/chialab/proteins/workflows/Main/badge.svg)](https://github.com/chialab/proteins/actions?query=workflow%3ABuild)
-[![codecov](https://codecov.io/gh/chialab/proteins/branch/master/graph/badge.svg)](https://codecov.io/gh/chialab/proteins)
+[![codecov](https://codecov.io/gh/chialab/proteins/branch/main/graph/badge.svg)](https://codecov.io/gh/chialab/proteins)
 
 
 [![Sauce Test Status](https://saucelabs.com/browser-matrix/chialab-sl-014.svg)](https://app.saucelabs.com/u/chialab-sl-014)
@@ -76,4 +76,4 @@ $ npm run release
 
 ## License
 
-Proteins is released under the [MIT](https://github.com/chialab/proteins/blob/master/LICENSE) license.
+Proteins is released under the [MIT](https://github.com/chialab/proteins/blob/main/LICENSE) license.

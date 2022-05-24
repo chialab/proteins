@@ -1,3 +1,5 @@
+import { isArray } from './types.js';
+
 /**
  * Get object's property descriptors.
  * This method is compatible with IE 11, Safari 9 and Chrome older than 54,
@@ -38,6 +40,18 @@ export function buildDescriptor(descriptor, val, writable = true) {
 }
 
 /**
- * Object entries alias.
+ * Object.entries ponyfill.
  */
 export const entries = Object.entries || ((obj) => Object.keys(obj).map((key) => [key, obj[key]]));
+
+/**
+ * Array.prototype.flat ponyfill.
+ */
+export const flat = Array.prototype.flat || function() {
+    return this.reduce((acc, item) => {
+        if (isArray(item)) {
+            return acc.concat(flat.call(item));
+        }
+        return acc.concat([item]);
+    }, []);
+};
