@@ -96,7 +96,7 @@ export function serialize(searchParams, prefix, chunkFn = chunk) {
 
     for (const [propertyKey, value] of entries) {
         if (value == null) {
-            return;
+            continue;
         }
 
         const key = prefix ? `${prefix}[${propertyKey}]` : propertyKey;
