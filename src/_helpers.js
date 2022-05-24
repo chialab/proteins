@@ -36,3 +36,8 @@ export function buildDescriptor(descriptor, val, writable = true) {
     }
     return newDescriptor;
 }
+
+/**
+ * Object entries alias.
+ */
+export const entries = Object.entries || ((obj) => Object.keys(obj).map((key) => [key, obj[key]]));

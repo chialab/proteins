@@ -5,6 +5,7 @@
 import * as keypath from './keypath.js';
 import Symbolic from './symbolic.js';
 import { isArray, isIterable } from './types.js';
+import { entries as objectEntries } from './_helpers.js';
 
 const REF_SYM = Symbolic('ref');
 const URL_REGEX = /((?:^(?:[a-z]+:))|^)?(?:\/\/)?([^?/$]*)([^?]*)?(\?.*)?/i;
@@ -92,7 +93,7 @@ function chunk(key, val) {
  */
 export function serialize(searchParams, prefix, chunkFn = chunk) {
     const str = [];
-    const entries = isIterable(searchParams) && !isArray(searchParams) ? searchParams : Object.entries(searchParams);
+    const entries = isIterable(searchParams) && !isArray(searchParams) ? searchParams : objectEntries(searchParams);
 
     for (const [propertyKey, value] of entries) {
         if (value == null) {
