@@ -14,18 +14,23 @@
 
 ---
 
-## Install
+## Get the library
 
-Add as a dependency of a Node project:
+Usage via [unpkg.com](https://unpkg.com/) as ES6 module:
 
-```sh
-$ npm install @chialab/proteins
-$ yarn add @chialab/proteins
+```js
+import { isArray, isObject, merge, mix, ... } from 'https://unpkg.com/@chialab/proteins?module';
 ```
 
-Use via cdn:
-```html
-<script type="text/javascript" src="https://unpkg.com/@chialab/proteins"></script>
+Install via NPM:
+
+```sh
+$ npm i @chialab/dna
+$ yarn add @chialab/dna
+```
+
+```ts
+import { isArray, isObject, merge, mix, ... } from '@chialab/proteins';
 ```
 
 ---
@@ -42,34 +47,18 @@ Use via cdn:
 
 Install the dependencies and run the `build` script:
 ```
-$ npm run install
-$ npm run build
+$ yarn install
+$ yarn build
 ```
 
-This will generate the UMD and ESM bundles in the `dist` folder, as well as the declaration file.
+This will generate the cjs and esm bundles in the `dist` folder, as well as the declaration file.
 
 ### Test the project
 
-Run the `test` script:
+Run the `test` script for both Node and browser environments:
 
 ```
-$ npm run test
-```
-
-### Release
-
-The `release` script uses [Semantic Release](https://github.com/semantic-release/semantic-release) to update package version, create a Github release and publish to the NPM registry.
-
-An environment variable named `GH_TOKEN` with a [generated Github Access Token](https://github.com/settings/tokens/new?scopes=repo) needs to be defined in a local `.env` file.
-
-```sh
-$ echo 'export GH_TOKEN="abcxyz"' > .env
-```
-
-Now you are ready to run the `release` command:
-
-```sh
-$ npm run release
+$ yarn test
 ```
 
 ---
