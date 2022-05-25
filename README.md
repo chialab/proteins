@@ -25,8 +25,8 @@ import { isArray, isObject, merge, mix, ... } from 'https://unpkg.com/@chialab/p
 Install via NPM:
 
 ```sh
-$ npm i @chialab/dna
-$ yarn add @chialab/dna
+$ npm i @chialab/proteins
+$ yarn add @chialab/proteins
 ```
 
 ```ts
