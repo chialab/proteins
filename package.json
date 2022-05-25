@@ -17,9 +17,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "yarn types && rimraf dist && yarn build:esm && yarn build:cjs",
-    "build:esm": "rimraf dist/esm && rna build src/index.js --format esm --output dist/esm/proteins.js --platform browser",
-    "build:cjs": "rimraf dist/cjs && rna build src/index.js --format cjs --output dist/cjs/proteins.cjs --platform node",
+    "build": "rimraf dist && yarn types && rna build",
     "types": "rimraf types && tsc --declaration --emitDeclarationOnly --declarationDir 'types' --incremental false",
     "test": "yarn test:browser && yarn test:node",
     "test:browser": "rna test:browser --coverage",
@@ -28,7 +26,6 @@
     "lint": "eslint src --cache",
     "typecheck": "tsc --noEmit",
     "docs": "(echo \"# API Reference\n\"; rna apidoc src/index.ts -F markdown) > docs/API.md",
-    "release": "changeset publish",
     "prepack": "yarn build"
   },
   "repository": {
