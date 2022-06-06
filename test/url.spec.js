@@ -132,6 +132,15 @@ describe('Unit: Url', () => {
         assert.equal(person.birthday.getTime(), new Date(unserialized.birthday).getTime());
     });
 
+    it('should serialize empty objects', () => {
+        const person = {
+            firstName: undefined,
+        };
+        const serialized = Url.serialize(person);
+
+        assert.equal(serialized, '');
+    });
+
     it('should unserialize complex string', () => {
         const serialized = 'filter[name]=Alan&filter[geo][latitude]=41&filter[type]=person&size=1&filter[tags][]=math';
         const unserialized = Url.unserialize(serialized);

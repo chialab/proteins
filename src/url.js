@@ -108,14 +108,16 @@ export function serialize(searchParams, prefix, chunkFn = chunk) {
 
         if (typeof serialized === 'object') {
             serialized = serialize(serialized, key);
-        } else {
+        } else if (serialized != null) {
             serialized = chunkFn(key, `${serialized}`);
         }
 
-        str.push(serialized);
+        if (serialized != null) {
+            str.push(serialized);
+        }
     }
 
-    if (!str.length) {
+    if (!str.length && prefix != null) {
         str.push(chunkFn(prefix));
     }
 
