@@ -1,6 +1,6 @@
 {
   "name": "@chialab/proteins",
-  "version": "3.7.0",
+  "version": "3.7.1",
   "type": "module",
   "description": "A primer for JavaScript libraries and frameworks development.",
   "main": "dist/cjs/proteins.cjs",
