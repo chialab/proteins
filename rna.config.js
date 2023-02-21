@@ -7,17 +7,16 @@ const config = {
             input: 'src/index.js',
             output: 'dist/esm/proteins.js',
             format: 'esm',
-            minify: true,
             platform: 'browser',
         },
         {
             input: 'src/index.js',
             output: 'dist/cjs/proteins.cjs',
             format: 'cjs',
-            minify: true,
             platform: 'node',
         },
     ],
+    minify: true,
 };
 
 export default config;

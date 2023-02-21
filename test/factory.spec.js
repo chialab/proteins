@@ -1,4 +1,4 @@
-import { assert } from '@esm-bundle/chai/esm/chai.js';
+import { assert } from '@chialab/ginsenghino';
 import { trigger, Factory } from '@chialab/proteins';
 
 class InjectedFactory extends Factory.Factory {

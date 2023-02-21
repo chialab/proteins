@@ -1,4 +1,4 @@
-import { assert } from '@esm-bundle/chai/esm/chai.js';
+import { assert } from '@chialab/ginsenghino';
 import { Url } from '@chialab/proteins';
 
 describe('Unit: Url', () => {

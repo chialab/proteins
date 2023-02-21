@@ -1,4 +1,4 @@
-import { assert } from '@esm-bundle/chai/esm/chai.js';
+import { assert } from '@chialab/ginsenghino';
 import { merge, isUndefined, isDate } from '@chialab/proteins';
 
 function getDescriptors(obj) {

@@ -1,4 +1,4 @@
-import { assert } from '@esm-bundle/chai/esm/chai.js';
+import { assert } from '@chialab/ginsenghino';
 import { Observable, Symbolic, isArray } from '@chialab/proteins';
 
 describe('Unit: Observable', () => {

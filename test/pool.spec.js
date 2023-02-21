@@ -1,5 +1,5 @@
-import { pool } from '../src/index.js';
-import { assert } from '@esm-bundle/chai/esm/chai.js';
+import { assert } from '@chialab/ginsenghino';
+import { pool } from '@chialab/proteins';
 
 describe('Unit: Pool', () => {
     it('should return empty array when there are no tasks to run', () => {
