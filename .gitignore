@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 .eslintcache
 
+dist
 node_modules
 public
 coverage
