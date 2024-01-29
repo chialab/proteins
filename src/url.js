@@ -2,10 +2,10 @@
  * @module Url
  */
 
+import { entries as objectEntries } from './_helpers.js';
 import * as keypath from './keypath.js';
 import Symbolic from './symbolic.js';
 import { isArray, isIterable } from './types.js';
-import { entries as objectEntries } from './_helpers.js';
 
 const REF_SYM = Symbolic('ref');
 const URL_REGEX = /((?:^(?:[a-z]+:))|^)?(?:\/\/)?([^?/$]*)([^?]*)?(\?.*)?/i;
@@ -49,7 +49,8 @@ export function parse(url = '') {
         res.pathname = match[3];
         res.search = match[4];
     }
-    if (!match ||
+    if (
+        !match ||
         (res.port && !res.hostname) ||
         (res.protocol && res.protocol !== 'file:' && !res.hostname) ||
         (res.search && !res.hostname && !res.pathname) ||
@@ -232,9 +233,9 @@ export function isLocalUrl(url) {
 function updateSearchPath(url, path) {
     const href = url.href.split('?')[0];
     if (!path) {
-        return url.href = href;
+        return (url.href = href);
     }
-    return url.href = `${href}?${path}`;
+    return (url.href = `${href}?${path}`);
 }
 
 /**
@@ -277,8 +278,7 @@ export class SearchParams {
      * @return {Array} Entry keys list.
      */
     keys() {
-        return this.entries()
-            .map((entry) => entry[0]);
+        return this.entries().map((entry) => entry[0]);
     }
 
     /**
@@ -287,8 +287,7 @@ export class SearchParams {
      * @return {Array} Entry values list.
      */
     values() {
-        return this.entries()
-            .map((entry) => entry[1]);
+        return this.entries().map((entry) => entry[1]);
     }
 
     /**
@@ -302,8 +301,7 @@ export class SearchParams {
         }
         const search = this.url.search.substring(1);
         const unserialized = unserialize(search);
-        return Object.keys(unserialized)
-            .map((key) => [key, unserialized[key]]);
+        return Object.keys(unserialized).map((key) => [key, unserialized[key]]);
     }
 
     /**
@@ -341,10 +339,7 @@ export class SearchParams {
         this.delete(name);
         const entries = this.entries();
         entries.push([name, value]);
-        updateSearchPath(
-            this.url,
-            entriesToString(entries)
-        );
+        updateSearchPath(this.url, entriesToString(entries));
     }
 
     /**
@@ -353,12 +348,7 @@ export class SearchParams {
      * @param {string} name The entity name to remove.
      */
     delete(name) {
-        updateSearchPath(
-            this.url,
-            entriesToString(
-                this.entries().filter((entry) => entry[0] !== name)
-            )
-        );
+        updateSearchPath(this.url, entriesToString(this.entries().filter((entry) => entry[0] !== name)));
     }
 
     /**
@@ -441,7 +431,7 @@ export class Url {
         /**
          * The full url string.
          * @type {string}
-        */
+         */
         this.href = baseUrl ? resolve(baseUrl, path) : path;
         /**
          * The url query string interface.

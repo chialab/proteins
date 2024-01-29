@@ -5,15 +5,15 @@
  * @module Factory
  */
 
-import mix from './mixin.js';
-import Symbolic from './symbolic.js';
-import * as keypath from './keypath.js';
 import clone from './clone.js';
-import merge from './merge.js';
+import { off, on, trigger } from './events.js';
 import hasOwnProperty from './has.js';
-import { isObject, isString } from './types.js';
-import { on, off, trigger } from './events.js';
+import * as keypath from './keypath.js';
+import merge from './merge.js';
+import mix from './mixin.js';
 import { has } from './proto.js';
+import Symbolic from './symbolic.js';
+import { isObject, isString } from './types.js';
 
 /**
  * Symbol for Factory instances.
@@ -302,17 +302,17 @@ export const InjectableMixin = (SuperClass) =>
          */
         destroy() {
             this.inject.forEach((Injector) => {
-                const SYM = (Symbolic.isSymbolic(Injector)) ? Injector : Injector.SYM;
+                const SYM = Symbolic.isSymbolic(Injector) ? Injector : Injector.SYM;
                 delete this[SYM];
             });
             return super.destroy();
         }
     };
 
-export class BaseFactory extends mix().with(FactoryMixin) { }
+export class BaseFactory extends mix().with(FactoryMixin) {}
 
-export class Emitter extends mix().with(EmitterMixin) { }
+export class Emitter extends mix().with(EmitterMixin) {}
 
-export class Configurable extends mix().with(ConfigurableMixin) { }
+export class Configurable extends mix().with(ConfigurableMixin) {}
 
-export class Factory extends mix().with(EmitterMixin, ConfigurableMixin, InjectableMixin) { }
+export class Factory extends mix().with(EmitterMixin, ConfigurableMixin, InjectableMixin) {}

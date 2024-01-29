@@ -1,17 +1,9 @@
 import hasOwnProperty from './has.js';
-
 /**
  * @module keypath
  */
 
-import {
-    isNumber,
-    isString,
-    isBoolean,
-    isObject,
-    isArray,
-    isFalsy,
-} from './types.js';
+import { isArray, isBoolean, isFalsy, isNumber, isObject, isString } from './types.js';
 
 /**
  * Assert scope object is a valid object.
@@ -82,7 +74,7 @@ export function get(obj, path, defaultValue) {
     }
     let value = obj;
     path = pathToArray(path);
-    path.forEach(prop => {
+    path.forEach((prop) => {
         value = value[prop];
     });
     return value;

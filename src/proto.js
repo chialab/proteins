@@ -2,8 +2,8 @@
  * @module Proto
  */
 
-import { isFunction, isObject, isArray } from './types.js';
 import hasOwnProperty from './has.js';
+import { isArray, isFunction, isObject } from './types.js';
 
 const getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 const create = Object.create;
@@ -35,15 +35,14 @@ export function walk(Ctr, callback) {
 export function entries(Ctr, filter = () => true) {
     const res = {};
     walk(Ctr, (proto) => {
-        Object.getOwnPropertyNames(proto)
-            .forEach((key) => {
-                if (!hasOwnProperty(res, key)) {
-                    const descriptor = getOwnPropertyDescriptor(proto, key);
-                    if (filter(key, descriptor)) {
-                        res[key] = descriptor;
-                    }
+        Object.getOwnPropertyNames(proto).forEach((key) => {
+            if (!hasOwnProperty(res, key)) {
+                const descriptor = getOwnPropertyDescriptor(proto, key);
+                if (filter(key, descriptor)) {
+                    res[key] = descriptor;
                 }
-            });
+            }
+        });
     });
     return res;
 }
@@ -128,9 +127,7 @@ export function set(obj, proto) {
     if (!isFunction(obj) && isFunction(proto)) {
         proto = proto.prototype;
     }
-    Object.setPrototypeOf ?
-        Object.setPrototypeOf(obj, proto) :
-        obj.__proto__ = proto;
+    Object.setPrototypeOf ? Object.setPrototypeOf(obj, proto) : (obj.__proto__ = proto);
 }
 
 /**

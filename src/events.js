@@ -1,5 +1,5 @@
-import Symbolic from './symbolic.js';
 import has from './has.js';
+import Symbolic from './symbolic.js';
 import { isFunction } from './types.js';
 
 const SYM = Symbolic('listeners');
@@ -18,7 +18,7 @@ export function on(scope, name, callback) {
     }
     scope[SYM] = scope[SYM] || {};
     const callbacks = scope[SYM];
-    const evtCallbacks = callbacks[name] = callbacks[name] || [];
+    const evtCallbacks = (callbacks[name] = callbacks[name] || []);
     evtCallbacks.push(callback);
     return off.bind(null, scope, name, callback);
 }
@@ -34,7 +34,7 @@ export function off(scope, name, callback) {
     if (callback) {
         const callbacks = scope[SYM];
         if (callbacks) {
-            const evtCallbacks = callbacks[name] = callbacks[name] || [];
+            const evtCallbacks = (callbacks[name] = callbacks[name] || []);
             const io = evtCallbacks.indexOf(callback);
             if (io !== -1) {
                 evtCallbacks.splice(io, 1);
@@ -60,24 +60,22 @@ export function off(scope, name, callback) {
  */
 export function trigger(scope, name, ...args) {
     const callbacksList = (has(scope, SYM) && has(scope[SYM], name) && scope[SYM][name]) || [];
-    const finalResults = callbacksList
-        .slice(0)
-        .reduce((results, callback) => {
-            if (callbacksList.indexOf(callback) === -1) {
-                // the callback has been removed from the callback list.
-                return results;
-            }
-            const lastResult = results[results.length - 1];
-            let result;
-            if (lastResult instanceof Promise) {
-                // wait for the previous result.
-                result = lastResult.then(() => callback.call(scope, ...args));
-            } else {
-                result = callback.call(scope, ...args);
-            }
-            results.push(result);
+    const finalResults = callbacksList.slice(0).reduce((results, callback) => {
+        if (callbacksList.indexOf(callback) === -1) {
+            // the callback has been removed from the callback list.
             return results;
-        }, []);
+        }
+        const lastResult = results[results.length - 1];
+        let result;
+        if (lastResult instanceof Promise) {
+            // wait for the previous result.
+            result = lastResult.then(() => callback.call(scope, ...args));
+        } else {
+            result = callback.call(scope, ...args);
+        }
+        results.push(result);
+        return results;
+    }, []);
 
     return Promise.all(finalResults);
 }

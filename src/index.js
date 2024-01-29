@@ -8,15 +8,15 @@
  */
 
 import clone from './clone.js';
-import merge from './merge.js';
 import equivalent from './equivalent.js';
-import mix, { MixinScope } from './mixin.js';
-import Symbolic from './symbolic.js';
-import Observable from './observable.js';
+import * as Factory from './factory.js';
 import has from './has.js';
 import * as keypath from './keypath.js';
-import * as Factory from './factory.js';
+import merge from './merge.js';
+import mix, { MixinScope } from './mixin.js';
+import Observable from './observable.js';
 import * as Proto from './proto.js';
+import Symbolic from './symbolic.js';
 import * as Url from './url.js';
 
 export * from './types.js';

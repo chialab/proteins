@@ -9,11 +9,10 @@ import { isArray } from './types.js';
  * @return {Object} Descriptors' map.
  */
 export function getDescriptors(obj) {
-    return Object.getOwnPropertyNames(obj)
-        .reduce((acc, propName) => {
-            acc[propName] = Object.getOwnPropertyDescriptor(obj, propName);
-            return acc;
-        }, {});
+    return Object.getOwnPropertyNames(obj).reduce((acc, propName) => {
+        acc[propName] = Object.getOwnPropertyDescriptor(obj, propName);
+        return acc;
+    }, {});
 }
 
 /**
@@ -47,11 +46,13 @@ export const entries = Object.entries || ((obj) => Object.keys(obj).map((key) =>
 /**
  * Array.prototype.flat ponyfill.
  */
-export const flat = Array.prototype.flat || function() {
-    return this.reduce((acc, item) => {
-        if (isArray(item)) {
-            return acc.concat(flat.call(item));
-        }
-        return acc.concat([item]);
-    }, []);
-};
+export const flat =
+    Array.prototype.flat ||
+    function () {
+        return this.reduce((acc, item) => {
+            if (isArray(item)) {
+                return acc.concat(flat.call(item));
+            }
+            return acc.concat([item]);
+        }, []);
+    };

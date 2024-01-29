@@ -19,11 +19,12 @@ export function pool(workers, promiseFactories) {
         promises.push(worker(iterator));
     }
 
-    return Promise.all(promises)
-        .then((results) => flat.call(results)
+    return Promise.all(promises).then((results) =>
+        flat
+            .call(results)
             .sort((a, b) => a.index - b.index)
             .map(({ result }) => result)
-        );
+    );
 }
 
 /**
@@ -42,12 +43,11 @@ function worker(iterator, results = []) {
 
     const { index, value } = next.value;
 
-    return value()
-        .then((result) => {
-            results.push({ index, result });
+    return value().then((result) => {
+        results.push({ index, result });
 
-            return worker(iterator, results);
-        });
+        return worker(iterator, results);
+    });
 }
 
 /**

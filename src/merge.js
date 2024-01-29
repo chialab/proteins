@@ -1,6 +1,6 @@
+import { buildDescriptor, getDescriptors } from './_helpers.js';
 import clone from './clone.js';
-import { getDescriptors, buildDescriptor } from './_helpers.js';
-import { isObject, isArray } from './types.js';
+import { isArray, isObject } from './types.js';
 
 const defaults = {
     mergeObjects: true,
@@ -106,8 +106,12 @@ export default function merge(...objects) {
  * @param {Boolean} options.strictMerge Should merge only keys which already are in the first object.
  * @return {Function} The new merge function.
  */
-merge.config = function(options = {}) {
-    return (...args) => merge.call({
-        options: merge(defaults, options),
-    }, ...args);
+merge.config = function (options = {}) {
+    return (...args) =>
+        merge.call(
+            {
+                options: merge(defaults, options),
+            },
+            ...args
+        );
 };

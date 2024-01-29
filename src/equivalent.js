@@ -1,4 +1,4 @@
-import { isObject, isDate, isArray, isFunction } from './types.js';
+import { isArray, isDate, isFunction, isObject } from './types.js';
 
 /**
  * Internal objects equivalence check.

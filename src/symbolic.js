@@ -1,4 +1,4 @@
-const support = (typeof Symbol === 'function');
+const support = typeof Symbol === 'function';
 
 /**
  * Polyfill registry for symbols.
@@ -16,7 +16,7 @@ const registry = [];
  */
 class SymbolPolyfill {
     constructor(property) {
-        const sym = this.SYM = `__${property}_${registry.length}`;
+        const sym = (this.SYM = `__${property}_${registry.length}`);
         registry.push(sym);
         Object.defineProperty(Object.prototype, sym, {
             configurable: true,
@@ -58,7 +58,7 @@ export default function Symbolic(property) {
  * @param {Symbol|Symbolic} sym The symbol to check.
  * @return {Boolean}
  */
-Symbolic.isSymbolic = function(sym) {
+Symbolic.isSymbolic = function (sym) {
     if (!sym) {
         return false;
     }

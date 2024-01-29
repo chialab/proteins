@@ -1,5 +1,5 @@
-import Symbolic from './symbolic.js';
 import hasOwnProperty from './has.js';
+import Symbolic from './symbolic.js';
 
 const MIXINS_SYM = Symbolic('mixins');
 
@@ -23,7 +23,7 @@ export class MixinScope {
      * @param {Function} superClass The class to extend.
      */
     constructor(superClass) {
-        this.superClass = superClass || class { };
+        this.superClass = superClass || class {};
     }
     /**
      * Mix the super class with a list of mixins.

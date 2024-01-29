@@ -1,6 +1,6 @@
-import { isObject, isDate, isArray, isFunction } from './types.js';
+import { buildDescriptor, getDescriptors } from './_helpers.js';
 import { get, reconstruct } from './proto.js';
-import { getDescriptors, buildDescriptor } from './_helpers.js';
+import { isArray, isDate, isFunction, isObject } from './types.js';
 
 /**
  * Useless callback function.
@@ -10,7 +10,9 @@ import { getDescriptors, buildDescriptor } from './_helpers.js';
  * @param {string} key The current key.
  * @param {*} prop The current value.
  */
-function noop(scope, key, prop) { return prop; }
+function noop(scope, key, prop) {
+    return prop;
+}
 
 /**
  * Clone an object.

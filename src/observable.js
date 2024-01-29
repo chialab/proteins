@@ -1,7 +1,8 @@
 import { Emitter } from './factory.js';
-import { isArray, isObject } from './types.js';
-import { get, set, extend, reconstruct } from './proto.js';
+import { extend, get, reconstruct, set } from './proto.js';
 import Symbolic from './symbolic.js';
+import { isArray, isObject } from './types.js';
+
 /**
  * @typedef ChangeSet
  * @property {String} property The path to the changed property.
@@ -32,44 +33,47 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
  * Micro Proxy polyfill.
  * @private
  */
-const ProxyHelper = typeof Proxy !== 'undefined' ? Proxy : class {
-    constructor(data, handler) {
-        const res = reconstruct(get(data));
-        Object.keys(data)
-            .filter((key) => Object.getOwnPropertyDescriptor(data, key).configurable)
-            .forEach((key) => {
-                this.define(res, data, key, handler);
-            });
-        if (isArray(data)) {
-            let lastLength = data.length;
-            res.on('change', () => {
-                if (data.length !== lastLength) {
-                    Object.keys(data).forEach((key) => {
-                        if (key !== OBSERVABLE_SYM) {
-                            this.define(res, data, key, handler);
-                        }
-                    });
-                    lastLength = data.length;
-                }
-            });
-        }
-        res[OBSERVABLE_SYM] = data[OBSERVABLE_SYM];
-        return res;
-    }
-    define(res, data, property, handler) {
-        const desc = {
-            configurable: true,
-            enumerable: ('enumerable' in handler) ? handler.enumerable : !Symbolic.isSymbolic(property),
-        };
-        if (handler.get) {
-            desc.get = () => handler.get(data, property);
-        }
-        if (handler.set) {
-            desc.set = (val) => handler.set(data, property, val);
-        }
-        Object.defineProperty(res, property, desc);
-    }
-};
+const ProxyHelper =
+    typeof Proxy !== 'undefined'
+        ? Proxy
+        : class {
+              constructor(data, handler) {
+                  const res = reconstruct(get(data));
+                  Object.keys(data)
+                      .filter((key) => Object.getOwnPropertyDescriptor(data, key).configurable)
+                      .forEach((key) => {
+                          this.define(res, data, key, handler);
+                      });
+                  if (isArray(data)) {
+                      let lastLength = data.length;
+                      res.on('change', () => {
+                          if (data.length !== lastLength) {
+                              Object.keys(data).forEach((key) => {
+                                  if (key !== OBSERVABLE_SYM) {
+                                      this.define(res, data, key, handler);
+                                  }
+                              });
+                              lastLength = data.length;
+                          }
+                      });
+                  }
+                  res[OBSERVABLE_SYM] = data[OBSERVABLE_SYM];
+                  return res;
+              }
+              define(res, data, property, handler) {
+                  const desc = {
+                      configurable: true,
+                      enumerable: 'enumerable' in handler ? handler.enumerable : !Symbolic.isSymbolic(property),
+                  };
+                  if (handler.get) {
+                      desc.get = () => handler.get(data, property);
+                  }
+                  if (handler.set) {
+                      desc.set = (val) => handler.set(data, property, val);
+                  }
+                  Object.defineProperty(res, property, desc);
+              }
+          };
 /**
  * Trigger object changes.
  * @private
@@ -88,9 +92,7 @@ function triggerChanges(scope, changeset) {
 const ARRAY_PROTO_WRAP = {
     push(...items) {
         const length = this.length;
-        items = items.map((item, index) =>
-            subobserve(this, length + index, item)
-        );
+        items = items.map((item, index) => subobserve(this, length + index, item));
         const res = ARRAY_PROTO.push.call(this, ...items);
         triggerChanges(this, {
             property: length,
@@ -128,9 +130,7 @@ const ARRAY_PROTO_WRAP = {
         return res;
     },
     splice(index, count, ...items) {
-        items = items.map((item, index) =>
-            subobserve(this, this.length + index, item)
-        );
+        items = items.map((item, index) => subobserve(this, this.length + index, item));
         const res = ARRAY_PROTO.splice.call(this, index, count, ...items);
         triggerChanges(this, {
             property: index,
@@ -184,7 +184,7 @@ const handler = {
     get: (target, name) => target[name],
     set: (target, name, value) => {
         if (Symbolic.isSymbolic(name)) {
-            return target[name] = value;
+            return (target[name] = value);
         }
         const oldValue = target[name];
         if (target[name] !== value) {
@@ -269,7 +269,7 @@ export default class Observable {
         new Observable(data);
         Object.keys(data).forEach((key) => {
             const descriptor = Object.getOwnPropertyDescriptor(data, key);
-            if (key !== OBSERVABLE_SYM && descriptor && descriptor.configurable && ('value' in descriptor)) {
+            if (key !== OBSERVABLE_SYM && descriptor && descriptor.configurable && 'value' in descriptor) {
                 // Key has been added and is not yet observed. Big Brother is on its way.
                 data[key] = subobserve(data, key, data[key]);
                 triggerChanges(data, {
