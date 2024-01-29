@@ -1,5 +1,5 @@
-import { assert } from '@chialab/ginsenghino';
-import { on, off, trigger } from '@chialab/proteins';
+import { off, on, trigger } from '@chialab/proteins';
+import { beforeEach, describe, expect, test } from 'vitest';
 
 describe('Unit: Events', () => {
     const context = {};
@@ -7,9 +7,11 @@ describe('Unit: Events', () => {
 
     let callback1, callback2, callback3, callback4;
 
-    const prepareFn = (number) => (...args) => {
-        check[number] = args;
-    };
+    const prepareFn =
+        (number) =>
+        (...args) => {
+            check[number] = args;
+        };
 
     beforeEach(() => {
         for (const k in check) {
@@ -23,80 +25,80 @@ describe('Unit: Events', () => {
     });
 
     describe('on', () => {
-        it('should add simple callback', async () => {
+        test('should add simple callback', async () => {
             on(context, 'test1', callback1);
             await trigger(context, 'test1', 2);
-            assert.deepEqual(check['1'], [2]);
+            expect(check['1']).toEqual([2]);
         });
 
-        it('should add callback with one argument', async () => {
+        test('should add callback with one argument', async () => {
             on(context, 'test2', callback2);
             await trigger(context, 'test2', 'callback');
-            assert.deepEqual(check['2'], ['callback']);
+            expect(check['2']).toEqual(['callback']);
         });
 
-        it('should add multiple callbacks with more arguments', async () => {
+        test('should add multiple callbacks with more arguments', async () => {
             on(context, 'test3', callback3);
             on(context, 'test3', callback4);
             await trigger(context, 'test3', 1, 4, 2);
-            assert.deepEqual(check['3'], [1, 4, 2]);
-            assert.deepEqual(check['4'], [1, 4, 2]);
+            expect(check['3']).toEqual([1, 4, 2]);
+            expect(check['4']).toEqual([1, 4, 2]);
         });
 
-        it('should throws for not function callback', () => {
-            assert.throws(() => on(context, 'event', 4), TypeError);
+        test('should throws for not function callback', () => {
+            expect(() => on(context, 'event', 'not a function')).toThrow(TypeError);
         });
     });
 
     describe('off', () => {
-        it('should remove a callback', async () => {
+        test('should remove a callback', async () => {
             on(context, 'test3', callback3);
             on(context, 'test3', callback4);
             off(context, 'test3', callback3);
             await trigger(context, 'test3', 1, 4, 2);
-            assert.equal(check['3'], undefined);
-            assert.deepEqual(check['4'], [1, 4, 2]);
+            expect(check['3']).toBeUndefined();
+            expect(check['4']).toEqual([1, 4, 2]);
         });
 
-        it('should remove an event', async () => {
+        test('should remove an event', async () => {
             on(context, 'test2', callback2);
             off(context, 'test2');
             await trigger(context, 'test2', 'callback');
-            assert.equal(check['2'], undefined);
+            expect(check['2']).toBeUndefined();
         });
 
-        it('should remove all events', async () => {
+        test('should remove all events', async () => {
             on(context, 'test1', callback1);
             on(context, 'test2', callback2);
             on(context, 'test3', callback3);
             on(context, 'test4', callback3);
             off(context);
-            await trigger(context, 'test1', 2),
-            await trigger(context, 'test3', 1, 4, 2),
-            assert.equal(check['1'], undefined);
-            assert.equal(check['2'], undefined);
-            assert.equal(check['3'], undefined);
-            assert.equal(check['4'], undefined);
+            await trigger(context, 'test1', 2);
+            await trigger(context, 'test3', 1, 4, 2);
+            expect(check['1']).toBeUndefined();
+            expect(check['2']).toBeUndefined();
+            expect(check['3']).toBeUndefined();
+            expect(check['4']).toBeUndefined();
         });
     });
 
     describe('trigger', () => {
-        it('should return a promise', () => {
+        test('should return a promise', () => {
             const res = trigger(context, 'eventWithNoCallbacks');
-            assert(res instanceof Promise);
+            expect(res).toBeInstanceOf(Promise);
         });
 
-        it('should resolve all callbacks results', async () => {
+        test('should resolve all callbacks results', async () => {
             on(context, 'test', (num) => num ** 2);
             on(context, 'test', (num) => Promise.resolve(num ** 3));
             on(context, 'test', (num) => Promise.resolve(num ** 4));
             const result = await trigger(context, 'test', 2);
-            assert.deepEqual(result, [4, 8, 16]);
+            expect(result).toEqual([4, 8, 16]);
         });
 
-        it('remove a callback during a trigger should skip that callback', async () => {
+        test('remove a callback during a trigger should skip that callback', async () => {
             on(context, 'change', callback1);
-            on(context, 'change', function(...args) {
+            on(context, 'change', function (...args) {
                 off(context, 'change', callback3);
                 return callback2.call(this, ...args);
             });
@@ -104,13 +106,13 @@ describe('Unit: Events', () => {
             on(context, 'change', callback4);
 
             await trigger(context, 'change', 2);
-            assert.equal(check['1'], 2);
-            assert.equal(check['2'], 2);
-            assert.equal(check['3'], undefined);
-            assert.equal(check['4'], 2);
+            expect(check['1']).toEqual([2]);
+            expect(check['2']).toEqual([2]);
+            expect(check['3']).toBeUndefined();
+            expect(check['4']).toEqual([2]);
         });
 
-        it('should exec synchronous callbacks', async () => {
+        test('should exec synchronous callbacks', async () => {
             on(context, 'test1', (...args) => {
                 trigger(context, 'test2', 'callback');
                 return callback1(...args);
@@ -122,10 +124,10 @@ describe('Unit: Events', () => {
             on(context, 'test3', callback3);
             on(context, 'test3', callback4);
             trigger(context, 'test1', 2);
-            assert.deepEqual(check['1'], [2]);
-            assert.deepEqual(check['2'], ['callback']);
-            assert.deepEqual(check['3'], [1, 4, 2]);
-            assert.deepEqual(check['4'], [1, 4, 2]);
+            expect(check['1']).toEqual([2]);
+            expect(check['2']).toEqual(['callback']);
+            expect(check['3']).toEqual([1, 4, 2]);
+            expect(check['4']).toEqual([1, 4, 2]);
         });
     });
 });

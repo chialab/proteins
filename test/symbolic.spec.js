@@ -1,8 +1,8 @@
-import { assert } from '@chialab/ginsenghino';
 import { Symbolic } from '@chialab/proteins';
+import { describe, expect, test } from 'vitest';
 
 describe('Unit: Symbolic', () => {
-    it('should set a symbolic property', () => {
+    test('should set a symbolic property', () => {
         const AGE = Symbolic('age');
         const user = {
             firstName: 'Alan',
@@ -16,11 +16,11 @@ describe('Unit: Symbolic', () => {
             enumKeys.push(k);
         }
 
-        assert.equal(user.firstName, 'Alan');
-        assert.equal(user.lastName, 'Turing');
-        assert.equal(user[AGE], 29);
-        assert.equal(Object.keys(user).length, 2);
-        assert.equal(enumKeys.length, 2);
-        assert(!Object.prototype.hasOwnProperty.call(Object, 'age'));
+        expect(user.firstName).toBe('Alan');
+        expect(user.lastName).toBe('Turing');
+        expect(user[AGE]).toBe(29);
+        expect(Object.keys(user).length).toBe(2);
+        expect(enumKeys.length).toBe(2);
+        expect(Object.prototype.hasOwnProperty.call(Object, 'age')).toBeFalsy();
     });
 });

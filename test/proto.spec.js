@@ -1,22 +1,22 @@
-import { assert } from '@chialab/ginsenghino';
 import { Proto } from '@chialab/proteins';
+import { assert, beforeAll, describe, expect, test } from 'vitest';
 
 describe('Unit: Proto', () => {
     let A, B, C, D;
 
-    before(() => {
+    beforeAll(() => {
         A = class A {
             get prop() {
                 return null;
             }
 
-            test() { }
+            test() {}
         };
 
         B = class B extends A {
-            test() { }
+            test() {}
 
-            test2() { }
+            test2() {}
         };
 
         C = class C extends B {
@@ -35,9 +35,9 @@ describe('Unit: Proto', () => {
         };
 
         D = class D extends C {
-            test3() { }
+            test3() {}
 
-            test4() { }
+            test4() {}
 
             get prop() {
                 return null;
@@ -53,33 +53,33 @@ describe('Unit: Proto', () => {
         };
     });
 
-    it('should recognize prototype keys', () => {
+    test('should recognize prototype keys', () => {
         const res = Object.keys(Proto.entries(D)).sort();
-        assert.equal(res.length, 9);
-        assert.deepEqual(res, ['constructor', 'prop', 'prop2', 'prop3', 'prop4', 'test', 'test2', 'test3', 'test4']);
+        expect(res).toHaveLength(9);
+        expect(res).toEqual(['constructor', 'prop', 'prop2', 'prop3', 'prop4', 'test', 'test2', 'test3', 'test4']);
     });
 
-    it('should recognize prototype methods', () => {
+    test('should recognize prototype methods', () => {
         const res = Object.keys(Proto.methods(D)).sort();
-        assert.equal(res.length, 4);
-        assert.deepEqual(res, ['test', 'test2', 'test3', 'test4']);
+        expect(res).toHaveLength(4);
+        expect(res).toEqual(['test', 'test2', 'test3', 'test4']);
     });
 
-    it('should recognize prototype properties', () => {
+    test('should recognize prototype properties', () => {
         const res = Object.keys(Proto.properties(D)).sort();
-        assert.equal(res.length, 4);
-        assert.deepEqual(res, ['prop', 'prop2', 'prop3', 'prop4']);
+        expect(res).toHaveLength(4);
+        expect(res).toEqual(['prop', 'prop2', 'prop3', 'prop4']);
     });
 
-    it('should retrieve all descriptors for a property', () => {
-        assert.equal(Proto.reduce(Object, 'prop').length, 0);
-        assert.equal(Proto.reduce(A, 'prop').length, 1);
-        assert.equal(Proto.reduce(B, 'prop').length, 1);
-        assert.equal(Proto.reduce(C, 'prop').length, 2);
-        assert.equal(Proto.reduce(D, 'prop').length, 3);
+    test('should retrieve all descriptors for a property', () => {
+        expect(Proto.reduce(Object, 'prop')).toHaveLength(0);
+        expect(Proto.reduce(A, 'prop')).toHaveLength(1);
+        expect(Proto.reduce(B, 'prop')).toHaveLength(1);
+        expect(Proto.reduce(C, 'prop')).toHaveLength(2);
+        expect(Proto.reduce(D, 'prop')).toHaveLength(3);
     });
 
-    it('should detect property existence', () => {
+    test('should detect property existence', () => {
         assert(Proto.has(D, 'prop3'));
         assert(Proto.has(D, 'test3'));
         assert(Proto.has(D, 'constructor'));
@@ -88,10 +88,10 @@ describe('Unit: Proto', () => {
         assert(Proto.has(B, 'constructor'));
     });
 
-    it('should retrieve prototype', () => {
+    test('should retrieve prototype', () => {
         const a = new A();
-        assert(typeof Proto.get(a).test === 'function');
-        assert(Proto.get(a).prop === null);
-        assert(A.prototype === Proto.get(a));
+        expect(Proto.get(a).test).toBeTypeOf('function');
+        expect(Proto.get(a).prop).toBeNull();
+        expect(A.prototype).toBe(Proto.get(a));
     });
 });

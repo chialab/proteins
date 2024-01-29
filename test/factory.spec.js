@@ -1,5 +1,5 @@
-import { assert } from '@chialab/ginsenghino';
-import { trigger, Factory } from '@chialab/proteins';
+import { Factory, trigger } from '@chialab/proteins';
+import { beforeAll, describe, expect, test } from 'vitest';
 
 class InjectedFactory extends Factory.Factory {
     get prop() {
@@ -65,7 +65,7 @@ class ChildFactory extends MainFactory {
 describe('Unit: Factory', () => {
     let factory, child;
 
-    before(() => {
+    beforeAll(() => {
         factory = new MainFactory();
         child = factory.init(ChildFactory, {
             mode: 2,
@@ -73,54 +73,56 @@ describe('Unit: Factory', () => {
         });
     });
 
-    it('should instantiate a factory', () => {
-        assert(factory instanceof MainFactory);
-        assert.equal(factory[Factory.CONTEXT_SYM], factory);
+    test('should instantiate a factory', () => {
+        expect(factory).toBeInstanceOf(MainFactory);
+        expect(factory[Factory.CONTEXT_SYM]).toBe(factory);
     });
 
-    it('should instantiate a factory in the same context', () => {
-        assert(child instanceof ChildFactory);
-        assert.equal(child[InjectedFactory.SYM], factory[InjectedFactory.SYM]);
-        assert.equal(child.prop, 11);
-        assert.equal(child[Factory.CONTEXT_SYM], factory);
+    test('should instantiate a factory in the same context', () => {
+        expect(child).toBeInstanceOf(ChildFactory);
+        expect(child[InjectedFactory.SYM]).toBe(factory[InjectedFactory.SYM]);
+        expect(child[Factory.CONTEXT_SYM]).toBe(factory);
+        expect(child.prop).toBe(11);
     });
 
-    it('should instantiate sub factories', () => {
-        assert(child[Injected4Factory.SYM] instanceof Factory.Factory);
-        assert.equal(child[Injected4Factory.SYM].test(), 2);
-        assert.equal(child[Injected4Factory.SYM][Injected3Factory.SYM][Injected2Factory.SYM], child[Injected2Factory.SYM]);
+    test('should instantiate sub factories', () => {
+        expect(child[Injected4Factory.SYM]).toBeInstanceOf(Factory.Factory);
+        expect(child[Injected4Factory.SYM].test()).toBe(2);
+        expect(child[Injected4Factory.SYM][Injected3Factory.SYM][Injected2Factory.SYM]).toBe(
+            child[Injected2Factory.SYM]
+        );
     });
 
-    it('should instantiate a factory with configuration', () => {
-        assert.deepEqual(child.config(), {
+    test('should instantiate a factory with configuration', () => {
+        expect(child.config()).toEqual({
             mode: 2,
             dispatch: false,
             filters: ['lastName'],
         });
-        assert.equal(child.configChanged, undefined);
+        expect(child.configChanged).toBeUndefined();
         child.config('mode', 4);
-        assert.deepEqual(child.config(), {
+        expect(child.config()).toEqual({
             mode: 4,
             dispatch: false,
             filters: ['lastName'],
         });
     });
 
-    it('should handle injected', () => {
-        assert(child[InjectedFactory.SYM] instanceof InjectedFactory);
-        assert(child[Injected2Factory.SYM] instanceof Injected2Factory);
-        assert.equal(child[InjectedFactory.SYM].test(), '__TEST__');
-        assert.equal(child[Injected2Factory.SYM].test(), 11);
+    test('should handle injected', () => {
+        expect(child[InjectedFactory.SYM]).toBeInstanceOf(InjectedFactory);
+        expect(child[Injected2Factory.SYM]).toBeInstanceOf(Injected2Factory);
+        expect(child[InjectedFactory.SYM].test()).toBe('__TEST__');
+        expect(child[Injected2Factory.SYM].test()).toBe(11);
     });
 
-    it('should destroy a factory in the same context', () => {
+    test('should destroy a factory in the same context', () => {
         child.destroy();
-        assert(child instanceof ChildFactory);
-        assert(!child[Factory.CONTEXT_SYM]);
+        expect(child).toBeInstanceOf(ChildFactory);
+        expect(child[Factory.CONTEXT_SYM]).toBeUndefined();
     });
 
     describe('listener', () => {
-        it('should listen to object event manager', async () => {
+        test('should listen to object event manager', async () => {
             const scope = {
                 key: 1,
             };
@@ -145,8 +147,8 @@ describe('Unit: Factory', () => {
                 // trigger(scope, 'event'),
                 // trigger(scope, 'event2'),
             ]);
-            assert.equal(check1, 2);
-            assert.equal(check2, 1);
+            expect(check1).toBe(2);
+            expect(check2).toBe(1);
         });
     });
 });

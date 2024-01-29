@@ -1,12 +1,14 @@
-import { assert } from '@chialab/ginsenghino';
-import { Observable, Symbolic, isArray } from '@chialab/proteins';
+import { Observable, Symbolic } from '@chialab/proteins';
+import { assert, beforeEach, describe, expect, test } from 'vitest';
 
 describe('Unit: Observable', () => {
     describe('simple object', () => {
         let observable;
-        const changes = [];
+        let changes;
 
-        before(() => {
+        beforeEach(() => {
+            changes = [];
+
             observable = new Observable({
                 firstName: 'Alan',
                 lastName: 'Turing',
@@ -18,28 +20,25 @@ describe('Unit: Observable', () => {
             });
         });
 
-        it('should not trigger changes if object is not changed', () => {
+        test('should not trigger changes if object is not changed', () => {
             observable.firstName = 'Alan';
 
-            assert.equal(changes.length, 0);
+            expect(changes).toHaveLength(0);
         });
 
-        it('should trigger changes if object has been updated', () => {
+        test('should trigger changes if object has been updated', () => {
             observable.lastName = 'Skywalker';
 
             const change = changes[0];
-            assert.equal(change.value, 'Skywalker');
-            assert.equal(change.oldValue, 'Turing');
-        });
-
-        it('should trigger changes', () => {
-            assert.equal(changes.length, 1);
+            expect(change.value).toBe('Skywalker');
+            expect(change.oldValue).toBe('Turing');
+            expect(changes).toHaveLength(1);
         });
 
         // Regression test for a bug on IE:
         // without defining a value for `enumerable` while using `Object.defineProperty`
         // in `ProxyHelper`, IE can't recognize object properties and is not be able to JSON.stringify the object.
-        it('should correctly proxy an object', () => {
+        test('should correctly proxy an object', () => {
             const dreamTheater = {
                 members: {
                     guitar: 'John Petrucci',
@@ -50,10 +49,10 @@ describe('Unit: Observable', () => {
                 },
             };
             const observableDreamTheater = new Observable(dreamTheater);
-            assert.deepEqual(JSON.stringify(dreamTheater), JSON.stringify(observableDreamTheater));
+            expect(JSON.stringify(dreamTheater)).toBe(JSON.stringify(observableDreamTheater));
         });
 
-        it('should correctly proxy an object with an array property', () => {
+        test('should correctly proxy an object with an array property', () => {
             const bucciaratiCrew = {
                 members: [
                     'Bruno Bucciarati',
@@ -63,87 +62,79 @@ describe('Unit: Observable', () => {
                     'Leone Abbacchio',
                     'Pannacotta Fugo',
                 ],
-                stands: [
-                    'Sticky Fingers',
-                    'Gold Experience',
-                    'Sex Pistols',
-                    'Aerosmith',
-                    'Moody Blues',
-                    'Purple Haze',
-                ],
+                stands: ['Sticky Fingers', 'Gold Experience', 'Sex Pistols', 'Aerosmith', 'Moody Blues', 'Purple Haze'],
             };
 
             const observable = new Observable(bucciaratiCrew);
-            assert(isArray(observable.members));
-            assert(isArray(observable.stands));
+            expect(observable.members).toBeInstanceOf(Array);
+            expect(observable.stands).toBeInstanceOf(Array);
         });
     });
 
     describe('simple Array', () => {
-        const changes = [];
         let observable;
+        let changes;
 
-        before(() => {
-            observable = new Observable([
-                'Luke',
-                'Anakin',
-                'Padme',
-            ]);
+        beforeEach(() => {
+            changes = [];
+            observable = new Observable(['Luke', 'Anakin', 'Padme']);
 
             observable.on('change', (changset) => {
                 changes.push(changset);
             });
         });
 
-        it('should not trigger changes if object is not changed', () => {
+        test('should not trigger changes if object is not changed', () => {
             observable[0] = 'Luke';
 
-            assert.equal(changes.length, 0);
-            assert.equal(observable.length, 3);
+            expect(changes).toHaveLength(0);
+            expect(observable.length).toBe(3);
         });
 
-        it('should trigger changes if object has been updated', () => {
+        test('should trigger changes if object has been updated', () => {
+            observable[0] = 'Luke';
             observable[1] = 'Darth Vader';
 
-            const change = changes[0];
-            assert.equal(change.value, 'Darth Vader');
-            assert.equal(change.oldValue, 'Anakin');
+            expect(changes[0].value).toBe('Darth Vader');
+            expect(changes[0].oldValue).toBe('Anakin');
         });
 
-        it('should trigger changes for array functions', () => {
+        test('should trigger changes for array functions', () => {
+            observable[0] = 'Luke';
+            observable[1] = 'Darth Vader';
             observable[2] = 'Leia';
             observable.pop();
             observable.push('Leia', 'Han Solo');
 
-            assert.equal(changes[1].property, '2');
-            assert.equal(changes[1].oldValue, 'Padme');
-            assert.equal(changes[1].value, 'Leia');
-            assert.equal(changes[2].property, '2');
-            assert.equal(changes[2].added.length, 0);
-            assert.equal(changes[2].removed.length, 1);
-            assert.equal(changes[2].removed[0], 'Leia');
-            assert.equal(changes[3].property, '2');
-            assert.equal(changes[3].added.length, 2);
-            assert.equal(changes[3].removed.length, 0);
-            assert.deepEqual(changes[3].added, ['Leia', 'Han Solo']);
-            assert.equal(observable.length, 4);
+            expect(changes[1].property).toBe('2');
+            expect(changes[1].oldValue).toBe('Padme');
+            expect(changes[1].value).toBe('Leia');
+            expect(changes[2].property).toBe(2);
+            expect(changes[2].added.length).toBe(0);
+            expect(changes[2].removed.length).toBe(1);
+            expect(changes[2].removed[0]).toBe('Leia');
+            expect(changes[3].property).toBe(2);
+            expect(changes[3].added).toHaveLength(2);
+            expect(changes[3].removed).toHaveLength(0);
+            expect(changes[3].added).toEqual(['Leia', 'Han Solo']);
+            expect(observable).toHaveLength(4);
+            expect(changes).toHaveLength(4);
         });
 
-        it('should trigger changes', () => {
-            assert.equal(changes.length, 4);
-        });
-
-        it('should be of type Array', () => {
+        test('should be of type Array', () => {
             assert(Array.isArray(observable));
         });
     });
 
     describe('complex objects', () => {
-        const changes1 = [];
-        const changes2 = [];
         let observable, observable2;
+        let changes1;
+        let changes2;
 
-        before(() => {
+        beforeEach(() => {
+            changes1 = [];
+            changes2 = [];
+
             observable = new Observable({
                 prop1: 1,
                 prop2: ['a', 'b'],
@@ -151,10 +142,7 @@ describe('Unit: Observable', () => {
                     prop3_1: 1,
                     prop3_2: ['c', 'd'],
                 },
-                prop4: [
-                    { prop4_1: 1 },
-                    { prop4_2: [] },
-                ],
+                prop4: [{ prop4_1: 1 }, { prop4_2: [] }],
             });
             observable2 = new Observable(observable);
 
@@ -165,9 +153,7 @@ describe('Unit: Observable', () => {
             observable2.on('change', (changset) => {
                 changes2.push(changset);
             });
-        });
 
-        it('should trigger changes', () => {
             observable.prop1 = 2;
             observable.prop2.push('c');
             observable.prop3.prop3_1 = 2;
@@ -177,14 +163,16 @@ describe('Unit: Observable', () => {
                 prop6: 5,
             });
             observable.prop4[1].prop4_2[0].prop6 = 10;
-
-            assert.equal(changes1.length, 7);
-            assert.deepEqual(changes1, changes2);
         });
 
-        it('should compute property name', () => {
+        test('should trigger changes', () => {
+            expect(changes1).toHaveLength(7);
+            expect(changes1).toEqual(changes2);
+        });
+
+        test('should compute property name', () => {
             const paths = changes1.map((change) => change.property);
-            assert.deepEqual(paths, [
+            expect(paths).toEqual([
                 'prop1',
                 'prop2.2',
                 'prop3.prop3_1',
@@ -197,7 +185,7 @@ describe('Unit: Observable', () => {
     });
 
     describe('symbolic keys', () => {
-        it('should be ignored', () => {
+        test('should be ignored', () => {
             const changes = [];
             const sym = Symbolic('tags');
             const observable = new Observable({
@@ -211,50 +199,50 @@ describe('Unit: Observable', () => {
 
             observable[sym] = [];
             observable.name = 'Steve';
-            assert.equal(changes.length, 1);
+            expect(changes).toHaveLength(1);
         });
     });
 
     describe('not Observable objects', () => {
-        it('should throw an exception', () => {
-            assert.throws(() => new Observable(null));
-            assert.throws(() => new Observable(2));
-            assert.throws(() => new Observable('hello'));
-            assert.throws(() => new Observable(undefined));
-            assert.throws(() => new Observable(NaN));
+        test('should throw an exception', () => {
+            expect(() => new Observable(null)).toThrow();
+            expect(() => new Observable(2)).toThrow();
+            expect(() => new Observable('hello')).toThrow();
+            expect(() => new Observable(undefined)).toThrow();
+            expect(() => new Observable(NaN)).toThrow();
         });
     });
 
     describe('Observable of observable objects', () => {
-        it('should handle observable of observable', () => {
-            assert.doesNotThrow(() => new Observable(new Observable({})));
+        test('should handle observable of observable', () => {
+            expect(() => new Observable(new Observable({}))).not.toThrow();
         });
     });
 
     describe('Observable object with thousands of instances', () => {
-        it('should not crash in Firefox', () => {
-            assert.doesNotThrow(() => {
+        test('should not crash in Firefox', () => {
+            expect(() => {
                 const obj = [[], [], [], [], [], [], [], [], []];
                 let obs = new Observable(obj);
                 for (let i = 0; i < 3000; i++) {
                     obs = new Observable(obs);
                 }
-            });
+            }).not.toThrow();
         });
     });
 
     describe('Reobserve object when adding properties', () => {
-        it('should trigger changes', () => {
+        test('should trigger changes', () => {
             const observable = new Observable({ foo: 'foo' });
             const changes = [];
-            observable.on('change', changeset => {
+            observable.on('change', (changeset) => {
                 changes.push(changeset);
             });
             observable.bar = 'bar';
             observable.baz = 'baz';
             Observable.reobserve(observable);
 
-            assert.deepEqual(changes, [
+            expect(changes).toEqual([
                 {
                     property: 'bar',
                     oldValue: undefined,

@@ -1,32 +1,32 @@
-import { assert } from '@chialab/ginsenghino';
-import { clone, isDate, isNumber, isString, isObject, isArray, isUndefined, Observable } from '@chialab/proteins';
+import { clone, Observable } from '@chialab/proteins';
+import { describe, expect, test } from 'vitest';
 
 describe('Unit: Clone', () => {
-    it('should clone a date', () => {
+    test('should clone a date', () => {
         const original = new Date();
         original.test = true;
         const cloned = clone(original);
-        assert(isDate(cloned));
-        assert(cloned.getTime() === original.getTime());
-        assert(original.test);
-        assert(isUndefined(cloned.test));
+        expect(cloned).toBeInstanceOf(Date);
+        expect(cloned.getTime()).toBe(original.getTime());
+        expect(original.test).toBe(true);
+        expect(cloned.test).toBeUndefined();
     });
 
-    it('should clone a number', () => {
+    test('should clone a number', () => {
         const original = 2;
         const cloned = clone(original);
-        assert(isNumber(cloned));
-        assert.equal(cloned, original);
+        expect(cloned).toBeTypeOf('number');
+        expect(cloned).toBe(original);
     });
 
-    it('should clone a string', () => {
+    test('should clone a string', () => {
         const original = 'hello';
         const cloned = clone(original);
-        assert(isString(cloned));
-        assert.equal(cloned, original);
+        expect(cloned).toBeTypeOf('string');
+        expect(cloned).toBe(original);
     });
 
-    it('should clone an object', () => {
+    test('should clone an object', () => {
         const original = {
             firstName: 'Alan',
             lastName: 'Turing',
@@ -40,23 +40,23 @@ describe('Unit: Clone', () => {
             ],
         };
         const cloned = clone(original);
-        assert(isObject(cloned));
-        assert.equal(cloned.firstName, 'Alan');
-        assert.equal(cloned.lastName, 'Turing');
-        assert(isDate(cloned.birthday));
-        assert.equal(cloned.birthday.getTime(), new Date('1912/06/23').getTime());
-        assert(isArray(cloned.enemies));
-        assert.equal(cloned.enemies.length, 1);
-        assert.equal(cloned.enemies[0].name, 'enigma');
-        assert.equal(cloned.enemies[0].attack, 8);
-        assert.equal(cloned.enemies[0].defense, 9);
-        assert.equal(JSON.stringify(original), JSON.stringify(cloned));
+        expect(cloned).toBeTypeOf('object');
+        expect(cloned.firstName).toBe('Alan');
+        expect(cloned.lastName).toBe('Turing');
+        expect(cloned.birthday).toBeInstanceOf(Date);
+        expect(cloned.birthday.getTime()).toBe(new Date('1912/06/23').getTime());
+        expect(cloned.enemies).toBeInstanceOf(Array);
+        expect(cloned.enemies.length).toBe(1);
+        expect(cloned.enemies[0].name).toBe('enigma');
+        expect(cloned.enemies[0].attack).toBe(8);
+        expect(cloned.enemies[0].defense).toBe(9);
+        expect(JSON.stringify(original)).toBe(JSON.stringify(cloned));
         cloned.enemies.pop();
-        assert.equal(original.enemies.length, 1);
-        assert.equal(cloned.enemies.length, 0);
+        expect(original.enemies.length).toBe(1);
+        expect(cloned.enemies.length).toBe(0);
     });
 
-    it('should clone an object with custom callback', () => {
+    test('should clone an object with custom callback', () => {
         const original = [1, 2, 3];
         const cloned = clone(original, (arr, index, val) => {
             if (index == 1) {
@@ -64,14 +64,14 @@ describe('Unit: Clone', () => {
             }
             return val;
         });
-        assert(isArray(cloned));
-        assert.equal(cloned.length, 3);
-        assert.equal(cloned[0], 1);
-        assert.equal(cloned[1], 4);
-        assert.equal(cloned[2], 3);
+        expect(cloned).toBeInstanceOf(Array);
+        expect(cloned.length).toBe(3);
+        expect(cloned[0]).toBe(1);
+        expect(cloned[1]).toBe(4);
+        expect(cloned[2]).toBe(3);
     });
 
-    it('should clone a class', () => {
+    test('should clone a class', () => {
         class A {
             constructor() {
                 this.test3 = 3;
@@ -86,17 +86,17 @@ describe('Unit: Clone', () => {
         }
         const b = new B();
         const cloned = clone(b);
-        assert(cloned instanceof B);
-        assert(cloned instanceof A);
-        assert(cloned !== b);
-        assert(cloned.test === 11);
-        assert(cloned.test3 === 3);
-        assert(cloned.test2 instanceof A);
-        assert(cloned.test2 !== b.test2);
-        assert(cloned.test2.test3 === 3);
+        expect(cloned).toBeInstanceOf(B);
+        expect(cloned).toBeInstanceOf(A);
+        expect(cloned).not.toBe(b);
+        expect(cloned.test).toBe(11);
+        expect(cloned.test3).toBe(3);
+        expect(cloned.test2).toBeInstanceOf(A);
+        expect(cloned.test2).not.toBe(b.test2);
+        expect(cloned.test2.test3).toBe(3);
     });
 
-    it('should clone circular dependencies', () => {
+    test('should clone circular dependencies', () => {
         const a = {
             test: 2,
         };
@@ -106,20 +106,20 @@ describe('Unit: Clone', () => {
         };
         a.value = b;
         const cloned = clone(b);
-        assert.equal(cloned.test, 11);
-        assert(cloned.value !== a);
-        assert.equal(cloned.value.test, 2);
-        assert(cloned.value.value !== b);
-        assert.equal(cloned.value.value, cloned);
+        expect(cloned.test).toBe(11);
+        expect(cloned.value).not.toBe(a);
+        expect(cloned.value.test).toBe(2);
+        expect(cloned.value.value).not.toBe(b);
+        expect(cloned.value.value).toBe(cloned);
     });
 
-    it('should not clone functions', () => {
-        const TEST_FUN = () => { };
-        assert.equal(clone(TEST_FUN), TEST_FUN);
-        assert(clone(TEST_FUN) !== TEST_FUN.bind(null));
+    test('should not clone functions', () => {
+        const TEST_FUN = () => {};
+        expect(clone(TEST_FUN)).toBe(TEST_FUN);
+        expect(clone(TEST_FUN)).not.toBe(TEST_FUN.bind(null));
     });
 
-    it('should clone properties with getter/setter', () => {
+    test('should clone properties with getter/setter', () => {
         const a = {
             test: 2,
         };
@@ -132,77 +132,77 @@ describe('Unit: Clone', () => {
             },
         });
         const cloned = clone(a);
-        assert.equal(cloned.test, 2);
-        assert.equal(cloned.test2, 2);
+        expect(cloned.test).toBe(2);
+        expect(cloned.test2).toBe(2);
 
         cloned.test2 = 3;
-        assert.equal(cloned.test, 6);
+        expect(cloned.test).toBe(6);
     });
 
-    it('should clone arrays with custom properties', () => {
+    test('should clone arrays with custom properties', () => {
         const a = [1, 2];
         Object.defineProperty(a, 'test', { value: 3 });
         const cloned = clone(a);
-        assert.equal(cloned.test, 3);
+        expect(cloned.test).toBe(3);
     });
 
-    it('should unfreeze clones of frozen objects', () => {
+    test('should unfreeze clones of frozen objects', () => {
         const a = { test: 1 };
         Object.freeze(a);
         const cloned = clone(a);
         cloned.test = 2;
-        assert.isNotFrozen(cloned);
-        assert.equal(cloned.test, 2);
-        // it does not works
+        expect(Object.isFrozen(cloned)).toBe(false);
+        expect(cloned.test).toBe(2);
+        // test does not works
         // assert.throws(() => {
         //     'use strict';
         //     cloned.test = 2;
         // }, TypeError);
     });
 
-    it('should freeze clones of frozen objects with strict mode', () => {
+    test('should freeze clones of frozen objects with strict mode', () => {
         const a = { test: 1 };
         Object.freeze(a);
         const cloned = clone(a, true);
-        assert.isFrozen(cloned);
-        assert.equal(cloned.test, 1);
-        // it does not works
+        expect(Object.isFrozen(cloned)).toBe(true);
+        expect(cloned.test).toBe(1);
+        // test does not works
         // assert.throws(() => {
         //     'use strict';
         //     cloned.test = 2;
         // }, TypeError);
     });
 
-    it('should unseal clones of sealed objects', () => {
+    test('should unseal clones of sealed objects', () => {
         const a = { test: 1 };
         Object.seal(a);
         const cloned = clone(a);
         cloned.missing = true;
-        assert.isNotSealed(cloned);
-        assert.equal(cloned.missing, true);
-        // it does not works
+        expect(Object.isSealed(cloned)).toBe(false);
+        expect(cloned.missing).toBe(true);
+        // test does not works
         // assert.throws(() => {
         //     'use strict';
         //     cloned.missing = 2;
         // }, TypeError);
     });
 
-    it('should seal clones of sealed objects with strict mode', () => {
+    test('should seal clones of sealed objects with strict mode', () => {
         const a = { test: 1 };
         Object.seal(a);
         const cloned = clone(a, true);
-        assert.isSealed(cloned);
-        // it does not works
+        expect(Object.isSealed(cloned)).toBe(true);
+        // test does not works
         // assert.throws(() => {
         //     'use strict';
         //     cloned.missing = 2;
         // }, TypeError);
     });
 
-    it('should clone Observable arrays', () => {
+    test('should clone Observable arrays', () => {
         const a = new Observable([1, 2]);
         const cloned = clone(a);
-        assert(isArray(cloned));
-        assert.notStrictEqual(cloned, [1, 2]);
+        expect(cloned).toBeInstanceOf(Array);
+        expect(cloned).toEqual([1, 2]);
     });
 });

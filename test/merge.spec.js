@@ -1,12 +1,11 @@
-import { assert } from '@chialab/ginsenghino';
-import { merge, isUndefined, isDate } from '@chialab/proteins';
+import { merge } from '@chialab/proteins';
+import { beforeAll, describe, expect, test } from 'vitest';
 
 function getDescriptors(obj) {
-    return Object.getOwnPropertyNames(obj)
-        .reduce((acc, propName) => {
-            acc[propName] = Object.getOwnPropertyDescriptor(obj, propName);
-            return acc;
-        }, {});
+    return Object.getOwnPropertyNames(obj).reduce((acc, propName) => {
+        acc[propName] = Object.getOwnPropertyDescriptor(obj, propName);
+        return acc;
+    }, {});
 }
 
 describe('Unit: Merge', () => {
@@ -45,20 +44,33 @@ describe('Unit: Merge', () => {
         },
     };
 
-    it('should merge two objects', () => {
-        const hybrid = merge(obj1, obj2);
-        assert.equal(hybrid.firstName, 'Alan');
-        assert.equal(hybrid.lastName, 'Rickman');
-        assert.equal(hybrid.birthday.getTime(), new Date('1946/02/21').getTime());
-        assert.equal(hybrid.enemies.length, 1);
-        assert.equal(hybrid.enemies[0].name, 'oscar');
-        assert.equal(hybrid.wife.firstName, 'Rima');
-        assert(isDate(hybrid.awards.golden_globe));
-        assert(isDate(hybrid.awards.smith));
-        assert.equal(hybrid.awards.special.getTime(), new Date('2017/01/02').getTime());
+    const array1 = ['value_1_1', 'value_1_2'];
+    const array2 = ['value_2_1', 'value_2_2'];
+
+    beforeAll(() => {
+        array2.customProp = 'customProp_value';
+        Object.defineProperty(array2, 'customProp2', {
+            get() {
+                return 'customProp2_value';
+            },
+        });
+        array2.customProp3 = { test: 1 };
     });
 
-    it('should merge two objects with getter/setter', () => {
+    test('should merge two objects', () => {
+        const hybrid = merge(obj1, obj2);
+        expect(hybrid.firstName).toBe('Alan');
+        expect(hybrid.lastName).toBe('Rickman');
+        expect(hybrid.birthday.getTime()).toBe(new Date('1946/02/21').getTime());
+        expect(hybrid.enemies.length).toBe(1);
+        expect(hybrid.enemies[0].name).toBe('oscar');
+        expect(hybrid.wife.firstName).toBe('Rima');
+        expect(hybrid.awards.golden_globe).instanceOf(Date);
+        expect(hybrid.awards.smith).instanceOf(Date);
+        expect(hybrid.awards.special.getTime()).toBe(new Date('2017/01/02').getTime());
+    });
+
+    test('should merge two objects with getter/setter', () => {
         const test = {
             prop1: 1,
             prop2: {
@@ -78,63 +90,44 @@ describe('Unit: Merge', () => {
             },
         });
         const merged = merge(test, test2);
-        assert.equal(merged['prop1'], 1);
-        assert.deepEqual(merged['prop2'], {
+        expect(merged.prop1).toBe(1);
+        expect(merged['prop2']).toEqual({
             array_prop: [4, 5],
             array_prop2: [6, 7],
         });
-        assert.equal(merged['prop3'], 3);
-        assert.ownInclude(Object.getOwnPropertyNames(merged), 'customProp');
-        assert.equal(merged['customProp'], 'customProp_value');
+        expect(merged['prop3']).toBe(3);
+        expect(Object.getOwnPropertyNames(merged)).toContain('customProp');
+        expect(merged['customProp']).toBe('customProp_value');
     });
 
-    it('should merge two objects in strict mode', () => {
+    test('should merge two objects in strict mode', () => {
         const hybrid = merge.config({ strictMerge: true })(obj1, obj2);
-        assert.equal(hybrid.firstName, 'Alan');
-        assert.equal(hybrid.lastName, 'Rickman');
-        assert.equal(hybrid.birthday.getTime(), new Date('1946/02/21').getTime());
-        assert.equal(hybrid.enemies.length, 1);
-        assert.equal(hybrid.enemies[0].name, 'oscar');
-        assert(isUndefined(hybrid.wife));
-        assert(isDate(hybrid.awards.smith));
-        assert(isUndefined(hybrid.awards.golden_globe));
-        assert.equal(hybrid.awards.special.getTime(), new Date('2017/01/02').getTime());
+        expect(hybrid.firstName).toBe('Alan');
+        expect(hybrid.lastName).toBe('Rickman');
+        expect(hybrid.birthday.getTime()).toBe(new Date('1946/02/21').getTime());
+        expect(hybrid.enemies.length).toBe(1);
+        expect(hybrid.enemies[0].name).toBe('oscar');
+        expect(hybrid.wife).toBeUndefined();
+        expect(hybrid.awards.smith).toBeInstanceOf(Date);
+        expect(hybrid.awards.golden_globe).toBeUndefined();
+        expect(hybrid.awards.special.getTime()).toBe(new Date('2017/01/02').getTime());
     });
 
-    it('should merge two objects (joinArrays)', () => {
+    test('should merge two objects (joinArrays)', () => {
         const hybrid = merge.config({ joinArrays: true })(obj1, obj2);
-        assert.equal(hybrid.firstName, 'Alan');
-        assert.equal(hybrid.lastName, 'Rickman');
-        assert.equal(hybrid.birthday.getTime(), new Date('1946/02/21').getTime());
-        assert.equal(hybrid.enemies.length, 2);
-        assert.equal(hybrid.enemies[0].name, 'enigma');
-        assert.equal(hybrid.enemies[1].name, 'oscar');
-        assert.equal(hybrid.wife.firstName, 'Rima');
-        assert(isDate(hybrid.awards.golden_globe));
-        assert(isDate(hybrid.awards.smith));
-        assert.equal(hybrid.awards.special.getTime(), new Date('2017/01/02').getTime());
+        expect(hybrid.firstName).toBe('Alan');
+        expect(hybrid.lastName).toBe('Rickman');
+        expect(hybrid.birthday.getTime()).toBe(new Date('1946/02/21').getTime());
+        expect(hybrid.enemies.length).toBe(2);
+        expect(hybrid.enemies[0].name).toBe('enigma');
+        expect(hybrid.enemies[1].name).toBe('oscar');
+        expect(hybrid.wife.firstName).toBe('Rima');
+        expect(hybrid.awards.golden_globe).toBeInstanceOf(Date);
+        expect(hybrid.awards.smith).toBeInstanceOf(Date);
+        expect(hybrid.awards.special.getTime()).toBe(new Date('2017/01/02').getTime());
     });
 
-    const array1 = [
-        'value_1_1',
-        'value_1_2',
-    ];
-    const array2 = [
-        'value_2_1',
-        'value_2_2',
-    ];
-
-    before(() => {
-        array2.customProp = 'customProp_value';
-        Object.defineProperty(array2, 'customProp2', {
-            get() {
-                return 'customProp2_value';
-            },
-        });
-        array2.customProp3 = { test: 1 };
-    });
-
-    it('should merge two arrays with custom properties', () => {
+    test('should merge two arrays with custom properties', () => {
         // Values of array1 will be overwritten by those of array2 because their keys match.
         const expected = [...array2];
         expected.customProp = 'customProp_value';
@@ -146,31 +139,28 @@ describe('Unit: Merge', () => {
         expected.customProp3 = { test: 1 };
         const actual = merge(array1, array2);
         const actualProperties = Object.getOwnPropertyNames(actual);
-        assert.deepEqual(actual, expected);
-        assert.ownInclude(actualProperties, 'customProp');
-        assert.ownInclude(actualProperties, 'customProp2');
-        assert.ownInclude(actualProperties, 'customProp3');
-        assert.notEqual(array2.customProp3, actual.customProp3);
-        assert.equal(actual.customProp3.test, 1);
+        expect(actual).toEqual(expected);
+        expect(actualProperties).toContain('customProp');
+        expect(actualProperties).toContain('customProp2');
+        expect(actualProperties).toContain('customProp3');
+        expect(array2.customProp3).not.toBe(actual.customProp3);
+        expect(actual.customProp3.test).toBe(1);
     });
 
-    it('should merge two arrays with custom properties (joinArrays)', () => {
+    test('should merge two arrays with custom properties (joinArrays)', () => {
         const actual = merge.config({ joinArrays: true })(array1, array2);
-        const expected = [...array1, ...array2];
-        expected['customProp'] = 'customProp_value';
-        Object.defineProperty(expected, 'customProp2', {
-            get() {
-                return 'customProp2_value';
-            },
-        });
-
-        assert.deepEqual(actual, expected);
-        assert.ownInclude(Object.getOwnPropertyNames(actual), 'customProp');
-        assert.ownInclude(Object.getOwnPropertyNames(actual), 'customProp2');
-        assert.equal(actual['customProp2'], expected['customProp2']);
+        expect(actual[0]).toEqual('value_1_1');
+        expect(actual[1]).toEqual('value_1_2');
+        expect(actual[2]).toEqual('value_2_1');
+        expect(actual[3]).toEqual('value_2_2');
+        expect(actual.customProp).toBe('customProp_value');
+        expect(actual.customProp2).toBe('customProp2_value');
+        expect(actual.customProp3).toEqual({ test: 1 });
+        expect(Object.getOwnPropertyNames(actual)).toContain('customProp');
+        expect(Object.getOwnPropertyNames(actual)).toContain('customProp2');
     });
 
-    it('should skip different property names (strictMerge)', () => {
+    test('should skip different property names (strictMerge)', () => {
         const obj = {
             prop1: 1,
             prop2: 2,
@@ -181,13 +171,13 @@ describe('Unit: Merge', () => {
         };
 
         const merged = merge.config({ strictMerge: true })(obj, obj2);
-        assert.deepEqual(merged, {
+        expect(merged).toEqual({
             prop1: 1,
             prop2: 7,
         });
     });
 
-    it('should skip properties when different descriptor structure (strictMerge)', () => {
+    test('should skip properties when different descriptor structure (strictMerge)', () => {
         const obj = {
             prop1: 1,
         };
@@ -209,13 +199,13 @@ describe('Unit: Merge', () => {
         const merged = merge.config({ strictMerge: true })(obj, obj2);
         const descriptors = getDescriptors(merged);
 
-        assert.equal(merged.prop1, 7);
-        assert.include(Object.keys(descriptors['prop2']), 'get');
-        assert.include(Object.keys(descriptors['prop2']), 'set');
-        assert.equal(merged.prop2, 2);
+        expect(merged.prop1).toBe(7);
+        expect(Object.keys(descriptors['prop2'])).toContain('get');
+        expect(Object.keys(descriptors['prop2'])).toContain('set');
+        expect(merged.prop2).toBe(2);
     });
 
-    it('should throw with incompatible types', () => {
-        assert.throws(() => merge({}, 2), 'incompatible types');
+    test('should throw with incompatible types', () => {
+        expect(() => merge({}, 2)).toThrow('incompatible types');
     });
 });

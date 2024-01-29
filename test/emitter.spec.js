@@ -1,15 +1,17 @@
-import { assert } from '@chialab/ginsenghino';
 import { Factory } from '@chialab/proteins';
+import { beforeAll, describe, expect, test } from 'vitest';
 
 describe('Unit: Emitter', () => {
     let check = {};
     let obj, callback1, callback2, callback3, callback4;
 
-    const prepareFn = (number) => (...args) => {
-        check[number] = args;
-    };
+    const prepareFn =
+        (number) =>
+        (...args) => {
+            check[number] = args;
+        };
 
-    before(() => {
+    beforeAll(() => {
         callback1 = prepareFn(1);
         callback2 = prepareFn(2);
         callback3 = prepareFn(3);
@@ -32,7 +34,7 @@ describe('Unit: Emitter', () => {
     }
 
     describe('on', () => {
-        before(async () => {
+        beforeAll(async () => {
             reset();
             await Promise.all([
                 obj.trigger('test1', 2),
@@ -41,57 +43,48 @@ describe('Unit: Emitter', () => {
             ]);
         });
 
-        it('should add simple callback', () => {
-            assert.deepEqual(check['1'], [2]);
+        test('should add simple callback', () => {
+            expect(check['1']).toEqual([2]);
         });
 
-        it('should add callback with one argument', () => {
-            assert.deepEqual(check['2'], ['callback']);
+        test('should add callback with one argument', () => {
+            expect(check['2']).toEqual(['callback']);
         });
 
-        it('should add multiple callbacks with more arguments', () => {
-            assert.deepEqual(check['3'], [1, 4, 2]);
-            assert.deepEqual(check['4'], [1, 4, 2]);
+        test('should add multiple callbacks with more arguments', () => {
+            expect(check['3']).toEqual([1, 4, 2]);
+            expect(check['4']).toEqual([1, 4, 2]);
         });
     });
 
     describe('off', () => {
-        it('should remove a callback', async () => {
+        test('should remove a callback', async () => {
             reset();
             obj.off('test3', callback3);
-            Promise.all([
-                obj.trigger('test3', 1, 4, 2),
-            ]);
-            assert.equal(check['3'], false);
-            assert.deepEqual(check['4'], [1, 4, 2]);
+            Promise.all([obj.trigger('test3', 1, 4, 2)]);
+            expect(check['3']).toEqual(false);
+            expect(check['4']).toEqual([1, 4, 2]);
         });
 
-        it('should remove an event', async () => {
+        test('should remove an event', async () => {
             reset();
             obj.off('test2');
-            await Promise.all([
-                obj.trigger('test2', 'callback'),
-            ]);
-            assert.equal(check['2'], false);
+            await Promise.all([obj.trigger('test2', 'callback')]);
+            expect(check['2']).toEqual(false);
         });
 
-        it('should remove all events', async () => {
+        test('should remove all events', async () => {
             reset();
             obj.destroy();
-            await Promise.all([
-                obj.trigger('test1', 2),
-                obj.trigger('test3', 1, 4, 2),
-            ]);
-            assert.equal(check['1'], false);
+            await Promise.all([obj.trigger('test1', 2), obj.trigger('test3', 1, 4, 2)]);
+            expect(check['1']).toEqual(false);
             // assert.equal(check['4'], false);
         });
     });
 
-
-
     describe('not function callback', () => {
-        it('should throws', () => {
-            assert.throws(() => obj.on('event', 4), TypeError);
+        test('should throws', () => {
+            expect(() => obj.on('event', 4)).toThrow(TypeError);
         });
     });
 });
