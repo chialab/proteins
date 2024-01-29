@@ -27,6 +27,9 @@
     "test:browser": "vitest run --config vitest.browser.ts",
     "test:node": "vitest run --config vitest.node.ts",
     "lint": "prettier --check . && eslint src test",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
     "prepack": "yarn build && publint"
   },
   "repository": {
@@ -59,6 +62,7 @@
     "publint": "^0.2.7",
     "rimraf": "^5.0.0",
     "typescript": "^5.0.0",
+    "vitepress": "^1.0.0-rc.40",
     "vitest": "^1.2.2"
   }
 }

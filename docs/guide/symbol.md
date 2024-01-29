@@ -1,3 +1,5 @@
+# Symbol
+
 ## Set a symbolic property
 
 ```js

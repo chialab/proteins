@@ -1,3 +1,5 @@
+# Type utilities
+
 Sometimes, JavaScript is very odd, especially when you need to recognise the input parameter type of a function. In order to keep the code clear and more safe, Proteins exports a set of type checking function:
 
 ## Functions
@@ -5,9 +7,9 @@ Sometimes, JavaScript is very odd, especially when you need to recognise the inp
 ```js
 import { isFunction } from '@chialab/proteins';
 
-isFunction(() => {})        // -> true
-isFunction(Object.toString) // -> true
-isFunction(class {})        // -> true
+isFunction(() => {}); // -> true
+isFunction(Object.toString); // -> true
+isFunction(class {}); // -> true
 ```
 
 ## Arrays
@@ -15,8 +17,8 @@ isFunction(class {})        // -> true
 ```js
 import { isArray } from '@chialab/proteins';
 
-isArray([1, 2, 3])              // -> true
-isArray(document.body.children) // -> false
+isArray([1, 2, 3]); // -> true
+isArray(document.body.children); // -> false
 ```
 
 ## Strings
@@ -24,8 +26,8 @@ isArray(document.body.children) // -> false
 ```js
 import { isString } from '@chialab/proteins';
 
-isString('hello') // -> true
-isString('2')     // -> true
+isString('hello'); // -> true
+isString('2'); // -> true
 ```
 
 ## Numbers
@@ -34,12 +36,12 @@ isString('2')     // -> true
 import { isNumber } from '@chialab/proteins';
 
 // some js oddities
-isNaN('2') // -> false
-typeof NaN === 'number' // -> true
+isNaN('2'); // -> false
+typeof NaN === 'number'; // -> true
 
-isNumber(2)   // -> true
-isNumber('2') // -> false
-isNumber(NaN) // -> false
+isNumber(2); // -> true
+isNumber('2'); // -> false
+isNumber(NaN); // -> false
 ```
 
 ## Booleans
@@ -47,8 +49,8 @@ isNumber(NaN) // -> false
 ```js
 import { isBoolean } from '@chialab/proteins';
 
-isBoolean(false) // -> true
-isBoolean(true)  // -> true
+isBoolean(false); // -> true
+isBoolean(true); // -> true
 ```
 
 ## Dates
@@ -56,8 +58,8 @@ isBoolean(true)  // -> true
 ```js
 import { isDate } from '@chialab/proteins';
 
-isDate(new Date())   // -> true
-isDate('2017/05/12') // -> false
+isDate(new Date()); // -> true
+isDate('2017/05/12'); // -> false
 ```
 
 ## Objects
@@ -66,10 +68,10 @@ isDate('2017/05/12') // -> false
 import { isObject } from '@chialab/proteins';
 
 // some js oddities
-typeof null === 'object' // -> true
+typeof null === 'object'; // -> true
 
-isObject({})         // -> true
-isObject(new Date()) // -> false
+isObject({}); // -> true
+isObject(new Date()); // -> false
 ```
 
 ## Undefined values
@@ -77,8 +79,8 @@ isObject(new Date()) // -> false
 ```js
 import { isUndefined } from '@chialab/proteins';
 
-isUndefined(undefined) // -> true
-isUndefined(null)      // -> false
+isUndefined(undefined); // -> true
+isUndefined(null); // -> false
 ```
 
 ## Falsy values
@@ -86,9 +88,9 @@ isUndefined(null)      // -> false
 ```js
 import { isFalsy } from '@chialab/proteins';
 
-isFalsy(null)      // -> true
-isFalsy(undefined) // -> true
-isFalsy(false)     // -> true
-isFalsy(0)         // -> false
-isFalsy('')        // -> false
+isFalsy(null); // -> true
+isFalsy(undefined); // -> true
+isFalsy(false); // -> true
+isFalsy(0); // -> false
+isFalsy(''); // -> false
 ```
