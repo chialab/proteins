@@ -1,5 +1,11 @@
 # [3.7.0](https://github.com/chialab/proteins/compare/v3.6.0...v3.7.0) (2022-05-24)
 
+## 3.7.2
+
+### Patch Changes
+
+- 8753bd0: Add types to export map.
+
 ## 3.7.1
 
 ### Patch Changes
