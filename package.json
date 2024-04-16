@@ -8,6 +8,7 @@
   "typings": "types/index.d.ts",
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "require": "./dist/proteins.cjs",
       "default": "./dist/proteins.js"
     }
